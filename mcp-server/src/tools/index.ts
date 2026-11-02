@@ -512,6 +512,7 @@ export async function getSymbolDetailsTool(params: GetSymbolDetailsInput, servic
  * @public
  */
 export async function traceDataTool(params: TraceDataInput, service: TsDocService) {
+  const outputFormat = params.format ?? params.response_format ?? 'markdown';
   try {
     const { report, markdown } = await service.traceData({
       target: params.target,
@@ -521,7 +522,6 @@ export async function traceDataTool(params: TraceDataInput, service: TsDocServic
       includeTests: params.includeTests,
       includeExternal: params.includeExternal,
     });
-    const outputFormat = params.format ?? params.response_format ?? 'markdown';
     if (outputFormat === 'json') {
       return formatResponse(JSON.stringify(report, null, 2), 'json');
     }
@@ -531,7 +531,14 @@ export async function traceDataTool(params: TraceDataInput, service: TsDocServic
       content: [
         {
           type: 'text' as const,
-          text: `Error: ${error instanceof Error ? error.message : 'Unknown error'}`,
+          text:
+            outputFormat === 'json'
+              ? JSON.stringify(
+                  { error: error instanceof Error ? error.message : 'Unknown error' },
+                  null,
+                  2
+                )
+              : `Error: ${error instanceof Error ? error.message : 'Unknown error'}`,
         },
       ],
       isError: true,

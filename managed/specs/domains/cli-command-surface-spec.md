@@ -426,7 +426,7 @@ tsdoc-edge relationship impact ProjectIndexer
 - colors → src/commands/BaseCommand.ts:55
 - BaseCommand → src/commands/BaseCommand.ts:91
 - CanonicalGraphCommand → src/commands/CanonicalGraphCommand.ts:30
-- DataTraceCommand → src/commands/DataTraceCommand.ts:37
+- DataTraceCommand → src/commands/DataTraceCommand.ts:38
 - DocsCommand → src/commands/DocsCommand.ts:59
 - MoveCommand → src/commands/MoveCommand.ts:25
 - OntologyCommand → src/commands/OntologyCommand.ts:31

@@ -256,20 +256,21 @@ export class DataTraceService {
   } {
     const query = parsed.symbolQuery;
     const exact = this.index.getNode(query);
-    if (exact) {
-      return { status: 'found', nodes: [exact] };
-    }
 
     const filterCandidates = (nodes: readonly CanonicalGraphNode[]): CanonicalGraphNode[] => {
-      const filtered = nodes.filter((node) => {
+      return nodes.filter((node) => {
         if (!includeExternal && isExternalNode(node)) return false;
         if (!includeTests && isTestNode(node)) return false;
         return true;
       });
-      return filtered.length > 0
-        ? filtered
-        : nodes.filter((node) => includeExternal || !isExternalNode(node));
     };
+
+    if (exact) {
+      const filteredExact = filterCandidates([exact]);
+      return filteredExact.length > 0
+        ? { status: 'found', nodes: filteredExact }
+        : { status: 'missing', nodes: [] };
+    }
 
     const byQualified = filterCandidates(this.index.getNodesByQualifiedName(query));
     if (byQualified.length > 0) {
@@ -304,11 +305,17 @@ export class DataTraceService {
         ...this.index.getNodesByName(ownerQuery),
       ]);
       if (ownerCandidates.length > 0) {
-        return {
-          status: ownerCandidates.length === 1 ? 'found' : 'ambiguous',
-          nodes: uniqueNodes(ownerCandidates),
-          ...(memberName ? {} : {}),
-        };
+        const matchingChildren = uniqueNodes(
+          ownerCandidates.flatMap((owner) =>
+            this.getChildMemberNodes(owner).filter((child) => child.name === memberName)
+          )
+        );
+        if (matchingChildren.length > 0) return classifyCandidateSet(matchingChildren);
+
+        const matchingOwners = ownerCandidates.filter((owner) =>
+          extractRawNodeMetadata(owner).objectMembers.some((member) => member.name === memberName)
+        );
+        if (matchingOwners.length > 0) return classifyCandidateSet(matchingOwners);
       }
     }
 
@@ -388,9 +395,14 @@ export class DataTraceService {
     for (const target of targetNodes) {
       const meta = extractRawNodeMetadata(target);
       const isFieldTarget =
-        Boolean(meta.parent) ||
-        Boolean(parsedQuery.explicitMemberName) ||
-        (target.qualifiedName?.includes('.') === true && target.kind === 'variable');
+        target.kind !== 'function' &&
+        target.kind !== 'class' &&
+        target.kind !== 'interface' &&
+        target.kind !== 'type' &&
+        target.kind !== 'enum' &&
+        (Boolean(meta.parent) ||
+          Boolean(parsedQuery.explicitMemberName) ||
+          (target.qualifiedName?.includes('.') === true && target.kind === 'variable'));
 
       // 1. Collect targetFields
       if (isFieldTarget) {
@@ -514,12 +526,15 @@ export class DataTraceService {
 
         // Polymorphic dispatch edges
         if (edge.kind === 'implements' || edge.kind === 'overrides' || edge.kind === 'dispatches') {
-          const targetNode = this.index.getNode(edge.to) ?? target;
+          const interfaceNode =
+            edge.kind === 'dispatches' ? caller : (this.index.getNode(edge.to) ?? target);
+          const concreteNode = edge.kind === 'dispatches' ? target : caller;
           polymorphicDispatches.push({
-            interfaceMemberId: targetNode.id,
-            interfaceMemberName: targetNode.qualifiedName ?? targetNode.name ?? targetNode.id,
-            concreteMemberId: caller.id,
-            concreteMemberName: caller.qualifiedName ?? caller.name ?? caller.id,
+            interfaceMemberId: interfaceNode.id,
+            interfaceMemberName:
+              interfaceNode.qualifiedName ?? interfaceNode.name ?? interfaceNode.id,
+            concreteMemberId: concreteNode.id,
+            concreteMemberName: concreteNode.qualifiedName ?? concreteNode.name ?? concreteNode.id,
             relation: edge.kind,
             file: edge.evidence?.file ?? caller.file,
             line: edge.evidence?.startLine ?? caller.evidence?.startLine,
@@ -549,13 +564,15 @@ export class DataTraceService {
       // Outgoing polymorphic edges (when target is concrete class/method implementing an interface)
       for (const edge of this.index.getOutgoingEdges(target.id)) {
         if (edge.kind === 'implements' || edge.kind === 'overrides' || edge.kind === 'dispatches') {
-          const ifaceNode = this.index.getNode(edge.to);
-          if (!ifaceNode) continue;
+          const interfaceNode = edge.kind === 'dispatches' ? target : this.index.getNode(edge.to);
+          const concreteNode = edge.kind === 'dispatches' ? this.index.getNode(edge.to) : target;
+          if (!interfaceNode || !concreteNode) continue;
           polymorphicDispatches.push({
-            interfaceMemberId: ifaceNode.id,
-            interfaceMemberName: ifaceNode.qualifiedName ?? ifaceNode.name ?? ifaceNode.id,
-            concreteMemberId: target.id,
-            concreteMemberName: target.qualifiedName ?? target.name ?? target.id,
+            interfaceMemberId: interfaceNode.id,
+            interfaceMemberName:
+              interfaceNode.qualifiedName ?? interfaceNode.name ?? interfaceNode.id,
+            concreteMemberId: concreteNode.id,
+            concreteMemberName: concreteNode.qualifiedName ?? concreteNode.name ?? concreteNode.id,
             relation: edge.kind,
             file: edge.evidence?.file ?? target.file,
             line: edge.evidence?.startLine ?? target.evidence?.startLine,
@@ -862,7 +879,6 @@ export class DataTraceService {
           edge.kind !== 'calls' &&
           edge.kind !== 'accesses' &&
           edge.kind !== 'instantiates' &&
-          edge.kind !== 'type_ref' &&
           edge.kind !== 'dispatches'
         ) {
           continue;
@@ -1100,7 +1116,31 @@ export class DataTraceService {
     const file = node.file ?? node.evidence?.file;
     if (file) {
       for (const fileNode of this.index.getNodesByFile(file)) {
-        candidateNodes.set(fileNode.id, fileNode);
+        const fileName = fileNode.name ?? '';
+        const suffix = TYPESPEC_EVIDENCE_SUFFIXES.find((item) => fileName.endsWith(item.suffix));
+        if (!suffix) continue;
+        const prefix = fileName.slice(0, -suffix.suffix.length);
+        const stripDomainSuffix = (val: string): string =>
+          val.replace(
+            /(?:Dto|Entity|Model|Record|Row|Schema|Input|Output|Request|Response|PublicId|Id)$/,
+            ''
+          );
+        const props = this.extractObjectLiteralProperties(fileNode);
+        const propertyMatches = [
+          props.targetName,
+          props.entityName,
+          props.canonicalEntityName,
+          props.aspectModelName,
+          props.canonicalTargetName,
+          props.idName,
+          props.representationName,
+        ].some(
+          (value) =>
+            value !== undefined && (baseNames.has(value) || baseNames.has(stripDomainSuffix(value)))
+        );
+        if (baseNames.has(prefix) || baseNames.has(stripDomainSuffix(prefix)) || propertyMatches) {
+          candidateNodes.set(fileNode.id, fileNode);
+        }
       }
     }
     for (const base of baseNames) {
@@ -1431,9 +1471,14 @@ export class DataTraceService {
       } else {
         const meta = extractRawNodeMetadata(target);
         const isField =
-          Boolean(meta.parent) ||
-          Boolean(parsedQuery.explicitMemberName) ||
-          (target.qualifiedName?.includes('.') === true && target.kind === 'variable');
+          target.kind !== 'function' &&
+          target.kind !== 'class' &&
+          target.kind !== 'interface' &&
+          target.kind !== 'type' &&
+          target.kind !== 'enum' &&
+          (Boolean(meta.parent) ||
+            Boolean(parsedQuery.explicitMemberName) ||
+            (target.qualifiedName?.includes('.') === true && target.kind === 'variable'));
         const seedField = isField
           ? (parsedQuery.explicitMemberName ?? extractFieldShortName(target))
           : undefined;
@@ -1525,8 +1570,9 @@ export class DataTraceService {
 
     const astFunc = findAstFunctionDeclaration(
       sf,
-      funcNode.name ?? '',
-      funcNode.evidence?.startLine
+      funcNode.qualifiedName ?? funcNode.name ?? '',
+      funcNode.evidence?.startLine,
+      this.index.getNode(typeof funcNode.parent === 'string' ? funcNode.parent : '')?.name
     );
     if (!astFunc) return undefined;
 
@@ -1578,14 +1624,19 @@ export class DataTraceService {
     }
 
     // If no parameter matched a type-seeded function (e.g. function constructs or reads `this.repo`), still track `this` and local variables touching `seedField` / `seedType`
-    const bodyText = astFunc.body ? astFunc.body.getText(sf) : '';
-    const hasValidatorInBody = VALIDATOR_CALL_REGEX.test(bodyText);
-
     const referencesTracked = (expr: ts.Node): boolean => {
       let found = false;
-      const check = (n: ts.Node): void => {
+      const check = (n: ts.Node, shadowed: ReadonlySet<string> = new Set()): void => {
         if (found) return;
-        if (ts.isIdentifier(n) && trackedVars.has(n.text)) {
+        if (n !== expr && ts.isArrowFunction(n)) {
+          const shadowedNames = new Set<string>();
+          for (const parameter of n.parameters) {
+            if (ts.isIdentifier(parameter.name)) shadowedNames.add(parameter.name.text);
+          }
+          check(n.body, new Set([...shadowed, ...shadowedNames]));
+          return;
+        }
+        if (ts.isIdentifier(n) && trackedVars.has(n.text) && !shadowed.has(n.text)) {
           found = true;
           return;
         }
@@ -1597,7 +1648,7 @@ export class DataTraceService {
           found = true;
           return;
         }
-        ts.forEachChild(n, check);
+        ts.forEachChild(n, (child) => check(child, shadowed));
       };
       check(expr);
       return found;
@@ -1606,6 +1657,15 @@ export class DataTraceService {
     const recordedReadLines = new Set<string>();
 
     const walkBody = (node: ts.Node): void => {
+      if (
+        node !== astFunc.body &&
+        (ts.isFunctionDeclaration(node) ||
+          ts.isFunctionExpression(node) ||
+          ts.isMethodDeclaration(node) ||
+          ts.isArrowFunction(node))
+      ) {
+        return;
+      }
       const line = getLineNumber(sf, node.getStart(sf));
 
       // Check Trust-Loss Boundaries inside function body
@@ -1619,9 +1679,11 @@ export class DataTraceService {
             failClosedStatus: 'type-erased',
           });
         } else if (
-          ts.isAsExpression(node.expression) &&
-          (node.expression.type.kind === ts.SyntaxKind.UnknownKeyword ||
-            node.expression.type.kind === ts.SyntaxKind.AnyKeyword)
+          ts.isAsExpression(unwrapParentheses(node.expression)) &&
+          ((unwrapParentheses(node.expression) as ts.AsExpression).type.kind ===
+            ts.SyntaxKind.UnknownKeyword ||
+            (unwrapParentheses(node.expression) as ts.AsExpression).type.kind ===
+              ts.SyntaxKind.AnyKeyword)
         ) {
           trustBoundaries.push({
             kind: 'boundary:double-assertion',
@@ -1648,7 +1710,10 @@ export class DataTraceService {
 
       if (ts.isCallExpression(node)) {
         const calleeText = node.expression.getText(sf);
-        if ((calleeText === 'JSON.parse' || calleeText.endsWith('.json')) && !hasValidatorInBody) {
+        if (
+          (calleeText === 'JSON.parse' || calleeText.endsWith('.json')) &&
+          !isDeserializeCallValidated(node, astFunc.body)
+        ) {
           trustBoundaries.push({
             kind: 'boundary:unvalidated-deserialize',
             line,
@@ -1862,12 +1927,27 @@ export class DataTraceService {
     if (!sf) return undefined;
 
     const scopeNode =
-      findAstFunctionDeclaration(sf, caller.name ?? '', caller.evidence?.startLine) ?? sf;
+      caller.kind === 'function'
+        ? findAstFunctionDeclaration(
+            sf,
+            caller.qualifiedName ?? caller.name ?? '',
+            caller.evidence?.startLine,
+            this.index.getNode(typeof caller.parent === 'string' ? caller.parent : '')?.name
+          )
+        : sf;
+    if (!scopeNode) return undefined;
+    const rangeStart = caller.evidence?.startLine;
+    const rangeEnd = caller.evidence?.endLine ?? rangeStart;
 
     let foundWrite: { line: number; snippet: string } | undefined;
     let foundRead: { line: number; snippet: string } | undefined;
 
     const visit = (node: ts.Node): void => {
+      if (caller.kind !== 'function' && rangeStart !== undefined && ts.isStatement(node)) {
+        const nodeStart = getLineNumber(sf, node.getStart(sf));
+        const nodeEnd = getLineNumber(sf, node.getEnd() - 1);
+        if (nodeEnd < rangeStart || (rangeEnd !== undefined && nodeStart > rangeEnd)) return;
+      }
       if (ts.isPropertyAccessExpression(node) && node.name.text === fieldName) {
         const line = getLineNumber(sf, node.getStart(sf));
         const parent = node.parent;
@@ -2010,6 +2090,61 @@ function parseTargetQuery(rawTarget: string): ParsedTargetQuery {
     symbolQuery: trimmed,
     explicitMemberName: dotIndex > 0 ? trimmed.slice(dotIndex + 1) : undefined,
   };
+}
+
+function unwrapParentheses(expression: ts.Expression): ts.Expression {
+  let current = expression;
+  while (ts.isParenthesizedExpression(current)) current = current.expression;
+  return current;
+}
+
+function isDeserializeCallValidated(
+  node: ts.CallExpression,
+  body: ts.Block | ts.Expression | undefined
+): boolean {
+  const parent = node.parent;
+  if (ts.isCallExpression(parent) && parent.arguments.some((argument) => argument === node)) {
+    if (VALIDATOR_CALL_REGEX.test(parent.expression.getText())) return true;
+  }
+
+  let initializer: ts.VariableDeclaration | undefined;
+  let current: ts.Node = node;
+  while (
+    !ts.isSourceFile(current) &&
+    (ts.isAwaitExpression(current.parent) || ts.isParenthesizedExpression(current.parent))
+  ) {
+    current = current.parent;
+  }
+  if (
+    !ts.isSourceFile(current) &&
+    ts.isVariableDeclaration(current.parent) &&
+    ts.isIdentifier(current.parent.name)
+  ) {
+    initializer = current.parent;
+  }
+  if (!initializer || !body) return false;
+  const initializerName = initializer.name.getText();
+
+  let validated = false;
+  const visit = (candidate: ts.Node): void => {
+    if (validated) return;
+    if (
+      ts.isCallExpression(candidate) &&
+      VALIDATOR_CALL_REGEX.test(candidate.expression.getText())
+    ) {
+      if (
+        candidate.arguments.some(
+          (argument) => ts.isIdentifier(argument) && argument.text === initializerName
+        )
+      ) {
+        validated = true;
+        return;
+      }
+    }
+    ts.forEachChild(candidate, visit);
+  };
+  visit(body);
+  return validated;
 }
 
 function classifyCandidateSet(nodes: readonly CanonicalGraphNode[]): {
@@ -2155,8 +2290,11 @@ function parseFunctionSignatureTypes(signature: string): {
   let closeParen = -1;
   for (let i = openParen; i < signature.length; i++) {
     const ch = signature[i];
-    if (ch === '(' || ch === '<' || ch === '[' || ch === '{') depth++;
+    if (ch === '(' || ch === '[' || ch === '{' || (ch === '<' && isGenericAngleOpen(signature, i)))
+      depth++;
     else if (ch === ')' || ch === '>' || ch === ']' || ch === '}') {
+      if (ch === '>' && signature[i - 1] === '=') continue;
+      if (ch === '>' && !hasOpenAngle(signature, i)) continue;
       depth--;
       if (depth === 0 && ch === ')') {
         closeParen = i;
@@ -2177,7 +2315,7 @@ function parseFunctionSignatureTypes(signature: string): {
   const paramNames: string[] = [];
   const paramTypes: string[] = [];
   for (const seg of paramSegments) {
-    const colonIdx = seg.indexOf(':');
+    const colonIdx = findTopLevelColon(seg);
     if (colonIdx >= 0) {
       paramNames.push(seg.slice(0, colonIdx).replace(/[?.]/g, '').trim());
       paramTypes.push(seg.slice(colonIdx + 1).trim());
@@ -2190,14 +2328,58 @@ function parseFunctionSignatureTypes(signature: string): {
   return { paramNames, paramTypes, returnType };
 }
 
+function isGenericAngleOpen(input: string, index: number): boolean {
+  const previous = input[index - 1] ?? '';
+  const next = input[index + 1] ?? '';
+  return (
+    previous !== '<' && next !== '=' && previous !== '=' && !/[\s,.(?:+\-*/%&|!]/.test(previous)
+  );
+}
+
+function hasOpenAngle(input: string, index: number): boolean {
+  let depth = 0;
+  for (let i = 0; i < index; i++) {
+    if (input[i] === '<' && isGenericAngleOpen(input, i)) depth++;
+    else if (input[i] === '>' && input[i - 1] !== '=' && depth > 0) depth--;
+  }
+  return depth > 0;
+}
+
+function findTopLevelColon(segment: string): number {
+  let depth = 0;
+  for (let i = 0; i < segment.length; i++) {
+    const ch = segment[i];
+    if (ch === '(' || ch === '[' || ch === '{' || (ch === '<' && isGenericAngleOpen(segment, i))) {
+      depth++;
+    } else if (
+      ch === ')' ||
+      ch === ']' ||
+      ch === '}' ||
+      (ch === '>' && segment[i - 1] !== '=' && depth > 0)
+    ) {
+      depth--;
+    } else if (ch === ':' && depth === 0) {
+      return i;
+    }
+  }
+  return -1;
+}
+
 function splitTopLevelComma(input: string): string[] {
   const parts: string[] = [];
   let depth = 0;
   let start = 0;
   for (let i = 0; i < input.length; i++) {
     const ch = input[i];
-    if (ch === '(' || ch === '<' || ch === '[' || ch === '{') depth++;
-    else if (ch === ')' || ch === '>' || ch === ']' || ch === '}') depth--;
+    if (ch === '(' || ch === '[' || ch === '{' || (ch === '<' && isGenericAngleOpen(input, i)))
+      depth++;
+    else if (
+      ch === ')' ||
+      ch === ']' ||
+      ch === '}' ||
+      (ch === '>' && input[i - 1] !== '=' && depth > 0)
+    )
+      depth--;
     else if (ch === ',' && depth === 0) {
       parts.push(input.slice(start, i).trim());
       start = i + 1;
@@ -2227,11 +2409,9 @@ function isPrimitiveOrVoidReturn(returnType: string): boolean {
 }
 
 function isSharedStateOrStoreCandidate(node: CanonicalGraphNode): boolean {
-  if (node.kind === 'variable' || node.kind === 'interface' || node.kind === 'type') {
-    return true;
-  }
-  if (node.kind === 'class') {
-    return /(?:Repository|Store|Database|Manager|Cache|Registry|Context|Index|Coordinator|Service)$/i.test(
+  if (node.kind === 'variable') return true;
+  if (node.kind === 'class' || node.kind === 'interface') {
+    return /(?:Repository|Store|Database|Manager|Cache|Registry|Context|Index|Coordinator|Service|State|Queue|Buffer|Pool)$/i.test(
       node.name ?? ''
     );
   }
@@ -2311,9 +2491,22 @@ function matchesSpecBinding(
           s.qualifiedName === parentNode?.qualifiedName ||
           s.qualifiedName === parentNode?.name)
       ) {
-        return true;
+        const selectorFile =
+          typeof s.file === 'string' ? s.file : typeof s.path === 'string' ? s.path : undefined;
+        return (
+          selectorFile === undefined ||
+          selectorFile === (node.file ?? node.evidence?.file) ||
+          selectorFile === (parentNode?.file ?? parentNode?.evidence?.file)
+        );
       }
-      if (typeof s.path === 'string' && s.path === node.file && !s.qualifiedName && !s.symbolId) {
+      const selectorPath =
+        typeof s.file === 'string' ? s.file : typeof s.path === 'string' ? s.path : undefined;
+      if (
+        selectorPath !== undefined &&
+        selectorPath === (node.file ?? node.evidence?.file) &&
+        !s.qualifiedName &&
+        !s.symbolId
+      ) {
         return true;
       }
     }
@@ -2460,10 +2653,24 @@ function extractTelemetrySymbols(
 function findAstFunctionDeclaration(
   sf: ts.SourceFile,
   name: string,
-  approxStartLine?: number
+  approxStartLine?: number,
+  ownerName?: string
 ): ts.FunctionLikeDeclarationBase | undefined {
   const candidates: Array<{ node: ts.FunctionLikeDeclarationBase; lineDiff: number }> = [];
   const shortName = name.split('.').pop() ?? name;
+  const requestedOwner =
+    ownerName ?? (name.includes('.') ? name.slice(0, name.lastIndexOf('.')) : undefined);
+
+  const enclosingOwner = (node: ts.Node): string | undefined => {
+    let current = node.parent;
+    while (!ts.isSourceFile(current)) {
+      if (ts.isClassDeclaration(current) || ts.isInterfaceDeclaration(current)) {
+        return current.name?.getText(sf);
+      }
+      current = current.parent;
+    }
+    return undefined;
+  };
 
   const visit = (node: ts.Node): void => {
     let matchedName: string | undefined;
@@ -2491,7 +2698,13 @@ function findAstFunctionDeclaration(
       funcNode = node.initializer;
     }
 
-    if (funcNode && (matchedName === shortName || matchedName === name)) {
+    if (
+      funcNode &&
+      (matchedName === shortName || matchedName === name) &&
+      (requestedOwner === undefined ||
+        enclosingOwner(funcNode) === requestedOwner ||
+        requestedOwner.endsWith(`.${enclosingOwner(funcNode) ?? ''}`))
+    ) {
       const line = getLineNumber(sf, node.getStart(sf));
       const lineDiff = approxStartLine ? Math.abs(line - approxStartLine) : 0;
       candidates.push({ node: funcNode, lineDiff });
@@ -2623,6 +2836,9 @@ export function formatDataTraceLlmMarkdown(report: DataTraceReport): string {
   lines.push(
     `Status: ${report.status} | Tier: ${report.query.tier} | MaxDepth: ${report.query.maxDepth}`
   );
+  if (report.candidateIds && report.candidateIds.length > 0) {
+    lines.push(`CandidateIds: ${report.candidateIds.join(', ')}`);
+  }
   lines.push('');
 
   lines.push('## Resolved Targets');

@@ -89,10 +89,10 @@ MCP 서버(`[[MCP Integration]]`)에서는 `tsdoc_trace_data` 도구로 동일�
 ### Implemented By
 
 - Data Lineage and Slicing → src/graph-analysis/DataTraceService.ts:1
-- DataTraceCommand → src/commands/DataTraceCommand.ts:37
+- DataTraceCommand → src/commands/DataTraceCommand.ts:38
 - DataTraceServiceOptions → src/graph-analysis/DataTraceService.ts:61
 - DataTraceService → src/graph-analysis/DataTraceService.ts:123
-- formatDataTraceLlmMarkdown → src/graph-analysis/DataTraceService.ts:2619
+- formatDataTraceLlmMarkdown → src/graph-analysis/DataTraceService.ts:2832
 - DataTraceTier → src/graph-analysis/data-trace-contracts.ts:19
 - DataTraceOrigin → src/graph-analysis/data-trace-contracts.ts:27
 - DataTraceAuthorityRole → src/graph-analysis/data-trace-contracts.ts:35
@@ -100,23 +100,25 @@ MCP 서버(`[[MCP Integration]]`)에서는 `tsdoc_trace_data` 도구로 동일�
 - DataTraceRole → src/graph-analysis/data-trace-contracts.ts:57
 - DirectionalLineageRelation → src/graph-analysis/data-trace-contracts.ts:72
 - TrustLossBoundaryKind → src/graph-analysis/data-trace-contracts.ts:93
-- DataTraceRequest → src/graph-analysis/data-trace-contracts.ts:105
-- DataTraceTargetNodeSummary → src/graph-analysis/data-trace-contracts.ts:128
-- DataTraceFieldMember → src/graph-analysis/data-trace-contracts.ts:157
-- DataTraceOutgoingTypeRef → src/graph-analysis/data-trace-contracts.ts:177
-- DataTraceRoleUsage → src/graph-analysis/data-trace-contracts.ts:192
-- DataTracePolymorphicBinding → src/graph-analysis/data-trace-contracts.ts:212
-- DataTraceSharedJunction → src/graph-analysis/data-trace-contracts.ts:228
-- TypeFieldFlowReport → src/graph-analysis/data-trace-contracts.ts:245
-- DataTraceCheckpointBinding → src/graph-analysis/data-trace-contracts.ts:259
-- DataTraceProvenanceLink → src/graph-analysis/data-trace-contracts.ts:275
-- DataTraceEvidenceArtifact → src/graph-analysis/data-trace-contracts.ts:299
-- DataTracePersistenceBridge → src/graph-analysis/data-trace-contracts.ts:322
-- DataTraceTelemetrySymbol → src/graph-analysis/data-trace-contracts.ts:348
-- CrossBoundaryLineageReport → src/graph-analysis/data-trace-contracts.ts:365
-- DataflowSliceStep → src/graph-analysis/data-trace-contracts.ts:380
-- DataflowTrustBoundary → src/graph-analysis/data-trace-contracts.ts:406
-- FunctionDataflowSlice → src/graph-analysis/data-trace-contracts.ts:420
-- CodeDataflowSliceReport → src/graph-analysis/data-trace-contracts.ts:437
-- DataTraceReport → src/graph-analysis/data-trace-contracts.ts:449
+- DataflowTrustBoundaryKind → src/graph-analysis/data-trace-contracts.ts:105
+- DataTraceRequest → src/graph-analysis/data-trace-contracts.ts:113
+- DataTraceTargetNodeSummary → src/graph-analysis/data-trace-contracts.ts:136
+- DataTraceFieldMember → src/graph-analysis/data-trace-contracts.ts:165
+- DataTraceOutgoingTypeRef → src/graph-analysis/data-trace-contracts.ts:185
+- DataTraceRoleUsage → src/graph-analysis/data-trace-contracts.ts:200
+- DataTracePolymorphicBinding → src/graph-analysis/data-trace-contracts.ts:220
+- DataTraceSharedJunction → src/graph-analysis/data-trace-contracts.ts:236
+- TypeFieldFlowReport → src/graph-analysis/data-trace-contracts.ts:253
+- DataTraceCheckpointBinding → src/graph-analysis/data-trace-contracts.ts:267
+- DataTraceProvenanceLink → src/graph-analysis/data-trace-contracts.ts:283
+- DataTraceEvidenceArtifact → src/graph-analysis/data-trace-contracts.ts:307
+- DataTracePersistenceBridge → src/graph-analysis/data-trace-contracts.ts:330
+- DataTraceTelemetrySymbol → src/graph-analysis/data-trace-contracts.ts:356
+- CrossBoundaryLineageReport → src/graph-analysis/data-trace-contracts.ts:373
+- DataflowSliceStep → src/graph-analysis/data-trace-contracts.ts:388
+- DataflowSliceOperation → src/graph-analysis/data-trace-contracts.ts:405
+- DataflowTrustBoundary → src/graph-analysis/data-trace-contracts.ts:422
+- FunctionDataflowSlice → src/graph-analysis/data-trace-contracts.ts:436
+- CodeDataflowSliceReport → src/graph-analysis/data-trace-contracts.ts:453
+- DataTraceReport → src/graph-analysis/data-trace-contracts.ts:465
 

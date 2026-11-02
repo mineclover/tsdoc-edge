@@ -70,6 +70,9 @@ interface CanonicalSnapshot {
 
 interface SpecSnapshot {
   revisionId: string;
+  contentFingerprint: string;
+  workspaceId: string;
+  provenance: Record<string, unknown>;
   nodes: Array<Record<string, unknown>>;
   edges: Array<Record<string, unknown>>;
   bindings: Array<Record<string, unknown>>;
@@ -147,7 +150,7 @@ export class TsDocService {
     this.workspaceRoot = path.resolve(workspaceRoot || process.cwd());
     this.dbPath = this.resolveDatabasePath(this.workspaceRoot);
     this.canonicalDbPath = this.resolveCanonicalGraphPath(this.workspaceRoot);
-    this.specDbPath = path.join(this.workspaceRoot, '.tsdoc', 'spec-graph.db');
+    this.specDbPath = this.resolveSpecGraphPath(this.workspaceRoot);
   }
 
   /** Resolve the canonical graph database path from project configuration. @internal */
@@ -166,6 +169,26 @@ export class TsDocService {
       }
     }
     return path.join(rootDir, '.tsdoc', 'canonical-graph.db');
+  }
+
+  /** Resolve the specification graph database path from environment/config/defaults. @internal */
+  private resolveSpecGraphPath(rootDir: string): string {
+    const configured = process.env.TSDOC_EDGE_SPEC_GRAPH_DB;
+    if (configured) return path.resolve(rootDir, configured);
+    const configPath = path.join(rootDir, '.tsdoc.config.json');
+    if (fs.existsSync(configPath)) {
+      try {
+        const parsed = JSON.parse(fs.readFileSync(configPath, 'utf-8')) as {
+          specGraph?: { databasePath?: string };
+        };
+        if (parsed.specGraph?.databasePath) {
+          return path.resolve(rootDir, parsed.specGraph.databasePath);
+        }
+      } catch {
+        // Use the specification graph default below.
+      }
+    }
+    return path.join(rootDir, '.tsdoc', 'spec-graph.db');
   }
 
   /** Open the canonical graph database only when it exists. @internal */
@@ -193,63 +216,85 @@ export class TsDocService {
   private getCanonicalSnapshot(): CanonicalSnapshot | null {
     const db = this.getCanonicalDb();
     if (!db) return null;
-    const state = db
-      .prepare('SELECT active_revision_id FROM canonical_graph_state WHERE singleton = 1')
-      .get() as { active_revision_id: string } | undefined;
-    if (!state) return null;
-    const nodes = db
-      .prepare(
-        'SELECT payload_json FROM canonical_graph_nodes WHERE revision_id = ? ORDER BY ordinal'
-      )
-      .all(state.active_revision_id)
-      .map(
-        (row) => JSON.parse(String((row as { payload_json: string }).payload_json)) as CanonicalNode
-      );
-    const edges = db
-      .prepare(
-        'SELECT payload_json FROM canonical_graph_edges WHERE revision_id = ? ORDER BY ordinal'
-      )
-      .all(state.active_revision_id)
-      .map(
-        (row) => JSON.parse(String((row as { payload_json: string }).payload_json)) as CanonicalEdge
-      );
-    const aliases = db
-      .prepare('SELECT canonical_id, legacy_id FROM canonical_symbol_aliases WHERE revision_id = ?')
-      .all(state.active_revision_id) as Array<{ canonical_id: string; legacy_id: string }>;
-    return {
-      revisionId: state.active_revision_id,
-      nodes,
-      edges,
-      aliases: aliases.map((alias) => ({
-        canonicalId: alias.canonical_id,
-        legacyId: alias.legacy_id,
-      })),
-    };
+    try {
+      const state = db
+        .prepare('SELECT active_revision_id FROM canonical_graph_state WHERE singleton = 1')
+        .get() as { active_revision_id: string } | undefined;
+      if (!state) return null;
+      const nodes = db
+        .prepare(
+          'SELECT payload_json FROM canonical_graph_nodes WHERE revision_id = ? ORDER BY ordinal'
+        )
+        .all(state.active_revision_id)
+        .map(
+          (row) =>
+            JSON.parse(String((row as { payload_json: string }).payload_json)) as CanonicalNode
+        );
+      const edges = db
+        .prepare(
+          'SELECT payload_json FROM canonical_graph_edges WHERE revision_id = ? ORDER BY ordinal'
+        )
+        .all(state.active_revision_id)
+        .map(
+          (row) =>
+            JSON.parse(String((row as { payload_json: string }).payload_json)) as CanonicalEdge
+        );
+      const aliases = db
+        .prepare(
+          'SELECT canonical_id, legacy_id FROM canonical_symbol_aliases WHERE revision_id = ?'
+        )
+        .all(state.active_revision_id) as Array<{ canonical_id: string; legacy_id: string }>;
+      return {
+        revisionId: state.active_revision_id,
+        nodes,
+        edges,
+        aliases: aliases.map((alias) => ({
+          canonicalId: alias.canonical_id,
+          legacyId: alias.legacy_id,
+        })),
+      };
+    } catch {
+      return null;
+    }
   }
 
   /** Read the active specification graph revision. @internal */
   private getSpecSnapshot(): SpecSnapshot | null {
     const db = this.getSpecDb();
     if (!db) return null;
-    const state = db
-      .prepare('SELECT active_revision_id FROM spec_graph_state WHERE singleton = 1')
-      .get() as { active_revision_id: string } | undefined;
-    if (!state) return null;
-    const row = db
-      .prepare('SELECT payload_json FROM spec_graph_revisions WHERE revision_id = ?')
-      .get(state.active_revision_id) as { payload_json: string } | undefined;
-    if (!row) return null;
-    const payload = JSON.parse(row.payload_json) as {
-      nodes?: Array<Record<string, unknown>>;
-      edges?: Array<Record<string, unknown>>;
-      bindings?: Array<Record<string, unknown>>;
-    };
-    return {
-      revisionId: state.active_revision_id,
-      nodes: payload.nodes ?? [],
-      edges: payload.edges ?? [],
-      bindings: payload.bindings ?? [],
-    };
+    try {
+      const state = db
+        .prepare('SELECT active_revision_id FROM spec_graph_state WHERE singleton = 1')
+        .get() as { active_revision_id: string } | undefined;
+      if (!state) return null;
+      const row = db
+        .prepare(
+          'SELECT content_fingerprint, workspace_id, payload_json FROM spec_graph_revisions WHERE revision_id = ?'
+        )
+        .get(state.active_revision_id) as
+        | { content_fingerprint: string; workspace_id: string; payload_json: string }
+        | undefined;
+      if (!row) return null;
+      const payload = JSON.parse(row.payload_json) as {
+        contentFingerprint?: string;
+        workspaceId?: string;
+        provenance?: Record<string, unknown>;
+        nodes?: Array<Record<string, unknown>>;
+        edges?: Array<Record<string, unknown>>;
+        bindings?: Array<Record<string, unknown>>;
+      };
+      return {
+        revisionId: state.active_revision_id,
+        contentFingerprint: payload.contentFingerprint ?? row.content_fingerprint,
+        workspaceId: payload.workspaceId ?? row.workspace_id,
+        provenance: payload.provenance ?? {},
+        nodes: payload.nodes ?? [],
+        edges: payload.edges ?? [],
+        bindings: payload.bindings ?? [],
+      };
+    } catch {
+      return null;
+    }
   }
 
   /** Identify canonical external and standard-library nodes. @internal */
@@ -1791,9 +1836,9 @@ export class TsDocService {
       ? {
           contractVersion: '1.0',
           revisionId: spec.revisionId,
-          workspaceId: path.basename(this.workspaceRoot),
-          createdAt: new Date().toISOString(),
-          sourceManifestDigest: spec.revisionId,
+          contentFingerprint: spec.contentFingerprint,
+          workspaceId: spec.workspaceId,
+          provenance: spec.provenance,
           nodes: spec.nodes,
           edges: spec.edges,
           bindings: spec.bindings,

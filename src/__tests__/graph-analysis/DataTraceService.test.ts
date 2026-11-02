@@ -1,4 +1,8 @@
-import { DataTraceService } from '../../graph-analysis';
+import {
+  type DataflowSliceOperation,
+  type DataflowTrustBoundaryKind,
+  DataTraceService,
+} from '../../graph-analysis';
 import type { CanonicalGraphEdge, CanonicalGraphNode, CanonicalProjectGraph } from '../../indexer';
 import type { SpecGraphRevision } from '../../spec-graph';
 
@@ -614,7 +618,7 @@ export function readOrderConsumer(repo: OrderRepository, orderId: string): strin
     expect(slices.some((s) => s.functionName === 'OrderRepository.saveOrder')).toBe(true);
 
     // All 4 fail-closed trust-loss boundaries detected
-    const boundaryKinds = primary.trustBoundaries.map((b) => b.kind);
+    const boundaryKinds: DataflowTrustBoundaryKind[] = primary.trustBoundaries.map((b) => b.kind);
     expect(boundaryKinds).toEqual(
       expect.arrayContaining([
         'boundary:any',
@@ -623,5 +627,84 @@ export function readOrderConsumer(repo: OrderRepository, orderId: string): strin
         'boundary:dynamic-index',
       ])
     );
+  });
+
+  it('enforces member-resolution, unrelated evidence filtering, and dispatches orientation', () => {
+    const baseGraph = buildFixtureGraph();
+    const file = 'src/domain/order.ts';
+    const extraNodes: CanonicalGraphNode[] = [
+      {
+        id: `${file}#InvoiceEntityRoot:variable`,
+        sourceId: `${file}#InvoiceEntityRoot:variable`,
+        kind: 'variable',
+        name: 'InvoiceEntityRoot',
+        qualifiedName: 'InvoiceEntityRoot',
+        file,
+        objectMembers: [{ name: 'entityName', signature: "'InvoiceEntity'" }],
+        evidence: { file, startLine: 110, endLine: 112 },
+      },
+      {
+        id: `${file}#IOrderWriter.saveOrder:function`,
+        sourceId: `${file}#IOrderWriter.saveOrder:function`,
+        kind: 'function',
+        name: 'saveOrder',
+        qualifiedName: 'IOrderWriter.saveOrder',
+        file,
+        evidence: { file, startLine: 68, endLine: 68 },
+      },
+    ];
+    const extraEdges: CanonicalGraphEdge[] = [
+      {
+        kind: 'dispatches',
+        from: `${file}#IOrderWriter.saveOrder:function`,
+        to: `${file}#OrderRepository.saveOrder:function`,
+        evidence: { file, startLine: 70 },
+      },
+    ];
+
+    const service = new DataTraceService(
+      {
+        ...baseGraph,
+        nodes: [...baseGraph.nodes, ...extraNodes],
+        edges: [...baseGraph.edges, ...extraEdges],
+      },
+      {
+        specGraph: buildFixtureSpecGraph(),
+        workspaceRoot: '/virtual',
+        readFile,
+      }
+    );
+
+    // Nonexistent member on valid owner must return missing, not the owner node
+    const missingMember = service.trace({ target: 'OrderDto.nonExistentField' });
+    expect(missingMember.status).toBe('missing');
+    expect(missingMember.resolvedTargets).toEqual([]);
+
+    // Unrelated same-file evidence constant (`InvoiceEntityRoot`) must not attach to `OrderDto`
+    const orderLineage = service.trace({
+      target: 'OrderDto',
+      tier: 'boundary-lineage',
+    }).boundaryLineage;
+    expect(orderLineage?.evidenceArtifacts.map((a) => a.symbolName)).not.toContain(
+      'InvoiceEntityRoot'
+    );
+
+    // `dispatches` edge maps `from` as interfaceMember and `to` as concreteMember
+    const dispatchFlow = service.trace({
+      target: 'OrderRepository.saveOrder',
+      tier: 'type-flow',
+    }).typeFlow;
+    expect(dispatchFlow?.polymorphicDispatches).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          interfaceMemberName: 'IOrderWriter.saveOrder',
+          concreteMemberName: 'OrderRepository.saveOrder',
+          relation: 'dispatches',
+        }),
+      ])
+    );
+
+    const opSample: DataflowSliceOperation = 'PARAM_IN';
+    expect(opSample).toBe('PARAM_IN');
   });
 });

@@ -26,8 +26,8 @@ Provide AI coding assistants (Claude Code, Codex, Antigravity, Cursor) with dete
 
 - **Input**: Zod-validated JSON-RPC tool arguments over MCP `stdio` transport (`mcp-server/src/schemas/`), plus `TSDOC_WORKSPACE` workspace root path.
 - **Output**: Structured JSON payloads wrapped in MCP `CallToolResult` content blocks with `readOnlyHint: true`, `destructiveHint: false`, `idempotentHint: true`.
-- **Context**: Reads `.tsdoc/canonical-graph.db` (`GraphRepository` active revision), `.tsdoc/spec-graph.db` (`SpecGraphRepository` active revision), `.tsdoc.db` (`DatabaseManager` enrichment/doc database), and `managed/` checkpoints.
-- **Logic**: `TsDocService` (`mcp-server/src/services/tsdocService.ts`) opens read-only SQLite handles, resolves canonical `@ttsc/graph` nodes/edges and `SpecGraph` bindings first with enrichment fallback, and caches invariant relationship projections in memory for sub-millisecond repeated queries.
+- **Context**: `TsDocService` reads `.tsdoc/canonical-graph.db` (via `getCanonicalDb`), `.tsdoc/spec-graph.db` (via `getSpecDb`), `.tsdoc.db` (via `DatabaseManager`), and `managed/` checkpoints.
+- **Logic**: `TsDocService` (`mcp-server/src/services/tsdocService.ts`) opens read-only `better-sqlite3` connections to those three databases, resolves canonical `@ttsc/graph` nodes/edges and `SpecGraph` bindings first with enrichment fallback, and caches invariant relationship projections in memory for sub-millisecond repeated queries.
 - **Effect**: Strictly read-only (`readonly: true` SQLite connections; never mutates workspace files or databases).
 - **Scope**: 10 registered MCP tools across symbol discovery, pre-edit context, impact traversal, 3-Tier Data Trace, and normative specification governance.
 

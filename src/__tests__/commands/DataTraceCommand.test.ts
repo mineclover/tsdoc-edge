@@ -35,6 +35,26 @@ describe('DataTraceCommand & Unified CLI Routing (symbol trace / relationship tr
     expect(badDepth.exitCode).not.toBe(0);
   });
 
+  it('rejects a value flag with no value', async () => {
+    const cmd = new DataTraceCommand();
+    const result = await cmd.execute(['OrderDto', '--tier']);
+    expect(result.exitCode).not.toBe(0);
+    expect(consoleLogSpy.mock.calls.flat().join(' ')).toContain('Missing value for --tier');
+  });
+
+  it('rejects non-integer depth values', async () => {
+    const cmd = new DataTraceCommand();
+    const result = await cmd.execute(['OrderDto', '--depth', '2.5']);
+    expect(result.exitCode).not.toBe(0);
+  });
+
+  it('renders LLM Markdown when the target is missing', async () => {
+    const cmd = new DataTraceCommand();
+    const result = await cmd.execute(['DefinitelyMissingDataTraceTarget', '--llm']);
+    expect(result.exitCode).not.toBe(0);
+    expect(consoleLogSpy.mock.calls.map((c) => c.join(' ')).join('\n')).toContain('# Data Trace:');
+  });
+
   it('routes through `symbol trace` and `relationship trace` and returns structured JSON', async () => {
     const symCmd = new SymbolUnifiedCommand();
     const symRes = await symCmd.execute([

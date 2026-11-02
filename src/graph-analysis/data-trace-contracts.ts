@@ -97,6 +97,14 @@ export type TrustLossBoundaryKind =
   | 'boundary:dynamic-index';
 
 /**
+ * Alias for trust-boundary kinds used by Tier 3 dataflow contracts.
+ *
+ * @doc [[Data Lineage and Slicing]]
+ * @public
+ */
+export type DataflowTrustBoundaryKind = TrustLossBoundaryKind;
+
+/**
  * Input options for executing a 3-Tier Data Trace query.
  *
  * @doc [[Data Lineage and Slicing]]
@@ -379,16 +387,7 @@ export interface CrossBoundaryLineageReport {
  */
 export interface DataflowSliceStep {
   readonly stepIndex: number;
-  readonly operation:
-    | 'PARAM_IN'
-    | 'LOCAL_ALIAS'
-    | 'DESTRUCTURE'
-    | 'READ'
-    | 'WRITE'
-    | 'READ_WRITE'
-    | 'PASS_AS_ARG'
-    | 'AWAIT_CALL'
-    | 'RETURN';
+  readonly operation: DataflowSliceOperation;
   readonly variableOrField: string;
   readonly expression: string;
   readonly line: number;
@@ -396,6 +395,23 @@ export interface DataflowSliceStep {
   readonly argIndex?: number;
   readonly boundParamName?: string;
 }
+
+/**
+ * Operation kinds emitted by an AST dataflow slice.
+ *
+ * @doc [[Data Lineage and Slicing]]
+ * @public
+ */
+export type DataflowSliceOperation =
+  | 'PARAM_IN'
+  | 'LOCAL_ALIAS'
+  | 'DESTRUCTURE'
+  | 'READ'
+  | 'WRITE'
+  | 'READ_WRITE'
+  | 'PASS_AS_ARG'
+  | 'AWAIT_CALL'
+  | 'RETURN';
 
 /**
  * Trust-loss or fail-closed boundary encountered during AST dataflow slicing.

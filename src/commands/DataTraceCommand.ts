@@ -12,6 +12,7 @@
  */
 
 import * as fs from 'node:fs';
+import * as path from 'node:path';
 import {
   type DataTraceReport,
   DataTraceService,
@@ -110,6 +111,30 @@ Examples:
       );
       if (flagError) return flagError;
 
+      for (const flag of ['--to', '--tier', '--depth']) {
+        const equalPrefix = `${flag}=`;
+        const equalArg = args.find((arg) => arg.startsWith(equalPrefix));
+        const standaloneIndex = args.indexOf(flag);
+        const rawValue = equalArg ? equalArg.slice(equalPrefix.length) : undefined;
+        const standaloneMissing =
+          standaloneIndex !== -1 &&
+          (standaloneIndex + 1 >= args.length || args[standaloneIndex + 1].startsWith('-'));
+        if (
+          (equalArg !== undefined &&
+            rawValue !== undefined &&
+            (rawValue.trim() === '' || rawValue.trim().startsWith('-'))) ||
+          standaloneMissing
+        ) {
+          const msg = `Missing value for ${flag}. Expected a non-empty value that does not start with '-'.`;
+          if (this.hasFlag(args, '--json')) {
+            console.log(JSON.stringify({ success: false, error: msg }, null, 2));
+          } else {
+            this.printError(msg);
+          }
+          return this.failure(msg);
+        }
+      }
+
       const valueFlags = ['--to', '--tier', '--depth'];
       const positional = this.getPositionalArgs(args, valueFlags);
       if (positional.length === 0) {
@@ -129,7 +154,12 @@ Examples:
       }
 
       const rawDepth = this.getOption(args, '--depth');
-      const maxDepth = rawDepth ? Number.parseInt(rawDepth, 10) : 3;
+      const maxDepth =
+        rawDepth && /^[1-6]$/.test(rawDepth.trim())
+          ? Number.parseInt(rawDepth, 10)
+          : rawDepth
+            ? Number.NaN
+            : 3;
       if (!Number.isFinite(maxDepth) || maxDepth < 1 || maxDepth > 6) {
         this.printError(`Invalid --depth '${rawDepth}'. Expected an integer between 1 and 6.`);
         return this.failure(`Invalid --depth: ${rawDepth}`);
@@ -181,7 +211,7 @@ Examples:
 
         const service = new DataTraceService(activeGraph.graph, {
           specGraph: activeSpec,
-          workspaceRoot: activeGraph.graph.rootDir || cwd,
+          workspaceRoot: path.resolve(cwd, activeGraph.graph.rootDir || cwd),
         });
 
         const report = service.trace({
@@ -191,7 +221,7 @@ Examples:
           maxDepth,
           includeTests,
           includeExternal,
-          workspaceRoot: activeGraph.graph.rootDir || cwd,
+          workspaceRoot: path.resolve(cwd, activeGraph.graph.rootDir || cwd),
         });
 
         if (json) {
@@ -202,8 +232,12 @@ Examples:
         }
 
         if (report.status === 'missing') {
-          this.printError(`No canonical symbol or field matched '${target}'.`);
-          console.log('Tip: Use `tsdoc-edge symbol query <name>` to search available symbols.');
+          if (llm) {
+            console.log(formatDataTraceLlmMarkdown(report));
+          } else {
+            this.printError(`No canonical symbol or field matched '${target}'.`);
+            console.log('Tip: Use `tsdoc-edge symbol query <name>` to search available symbols.');
+          }
           return this.failure(`Target not found: ${target}`);
         }
 
@@ -224,6 +258,10 @@ Examples:
   private renderHumanReport(report: DataTraceReport): void {
     const titleSuffix = report.query.toTarget ? ` → ${report.query.toTarget}` : '';
     this.printHeader(`3-Tier Data Trace: ${report.query.target}${titleSuffix}`);
+
+    if (report.status === 'ambiguous') {
+      console.log(`⚠️ Ambiguous Target — Candidate IDs: ${(report.candidateIds ?? []).join(', ')}`);
+    }
 
     console.log('🎯 Resolved Target(s):');
     for (const t of report.resolvedTargets) {
