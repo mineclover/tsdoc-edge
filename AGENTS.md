@@ -74,13 +74,13 @@ TSDoc Edge는 세 계층 SSOT를 함께 동기화합니다. `@microsoft/tsdoc`�
 검증합니다. `symbol`, `spec`, `convention`은 각각 심볼 조회·검색, SpecGraph 생명주기,
 정확한 그래프 revision에 대한 규약 검사를 제공합니다.
 
-## 차세대 Go 네이티브 통합 엔진 (`ttsc-doc` / TypeScript 7 `ttsc@0.34.3`)
+## 차세대 Go 네이티브 통합 엔진 (`ttsc-doc` / TypeScript 7 `ttsc@0.35.0`)
 
 `/Users/junwoobang/workflow/ttsc-doc`은 `tsdoc-edge`의 297개 TypeScript 파일과
 `ttsc-graph-router`의 65개 파일, 그리고 `.tsdoc.db`, `canonical-graph.db`,
 `spec-graph.db`, `.ttsc-graph-router-cache`로 나뉜 4개 SQLite/JSON 저장소를 하나의
 19개 파일 Go 네이티브 무의존성 바이너리로 통합하는 동반/후속 엔진입니다. TypeScript 7
-`ttsc@0.34.3`과 함께 실행하며, 상주 `ttscgraph serve` NDJSON 파이프를 통해 증분 및 캐시
+`ttsc@0.35.0`과 함께 실행하며, 상주 `ttscgraph serve` NDJSON 파이프를 통해 증분 및 캐시
 질의를 `<1ms`에 처리합니다. 기존 `tsdoc-edge` 명령과 문서·SpecGraph SSOT는 그대로
 유지되므로 두 엔진은 동일한 프로젝트에서 병행 검증할 수 있습니다.
 

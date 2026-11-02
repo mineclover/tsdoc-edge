@@ -20,7 +20,7 @@ checks.
 ## Next-Gen `ttsc-doc` Engine
 
 [`ttsc-doc`](/Users/junwoobang/workflow/ttsc-doc) is the Go-native TypeScript 7 companion and
-successor engine (`ttsc@0.34.3`) that unifies `tsdoc-edge` and `ttsc-graph-router`. It keeps the
+successor engine (`ttsc@0.35.0`) that unifies `tsdoc-edge` and `ttsc-graph-router`. It keeps the
 same checkpoint, backlink, and SpecGraph SSOT while replacing the split stores with a resident
 `ttscgraph serve` NDJSON session for sub-millisecond incremental and cached queries.
 
