@@ -74,7 +74,7 @@ normalizer가 v1 assembler에 전달할 때만 `compatibilityTsconfigPath` bridg
 
 첫 호환 목표는 ttsc-ex의 `typescript@7.0.x`, `ttsc`, `@ttsc/graph`, graph-router
 조합이다([[TtscPlatformSpecification]], [[CrossSpecIntegrationContract]]).
-저장소의 기본 build, typecheck, watch, check-stage lint lane은 `ttsc@0.34.3`(`@ttsc/lint@0.34.3` 포함)과
+저장소의 기본 build, typecheck, watch, check-stage lint lane은 `ttsc@0.35.0`(`@ttsc/lint@0.35.0` 포함)과
 native TypeScript `7.0.2`(`devDependencies.typescript-native`) 정식판을 사용한다. 런타임에
 TypeScript JS Compiler API(`ts.createSourceFile` 등)를 직접 호출하는 파서·분석기 코드는
 `dependencies.typescript`(`6.0.3`) 런타임으로 분리 유지한다. npm `typescript@7.0.2` 패키지는 네이티브

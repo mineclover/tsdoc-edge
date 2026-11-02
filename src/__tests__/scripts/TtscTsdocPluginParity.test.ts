@@ -1,6 +1,6 @@
 /**
  * End-to-end parity and behavioral tests for the native Go TSDoc contributor
- * (`tools/ttsc-tsdoc`) running inside `@ttsc/lint` 0.34.3 against `@microsoft/tsdoc`.
+ * (`tools/ttsc-tsdoc`) running inside `@ttsc/lint` 0.35.0 against `@microsoft/tsdoc`.
  *
  * @packageDocumentation
  */

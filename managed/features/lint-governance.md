@@ -9,7 +9,7 @@ source: src/commands/LintCommand.ts
 
 # [[Lint Governance]]
 
-Biome owns formatting and local syntax/style hygiene; `ttsc@0.34.3` + `@ttsc/lint@0.34.3` (backed
+Biome owns formatting and local syntax/style hygiene; `ttsc@0.35.0` + `@ttsc/lint@0.35.0` (backed
 by `typescript-native@7.0.2`) owns semantic type correctness, checker-backed lint gates, and native
 TSDoc/checkpoint check-stage enforcement via `tools/ttsc-tsdoc`. Detailed platform boundaries live
 in [[TtscPlatformSpecification]], [[TSDocStandardSpecification]], and

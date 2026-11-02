@@ -1,5 +1,5 @@
 /**
- * `@ttsc/lint` enforced build & LSP configuration (`0.34.3`).
+ * `@ttsc/lint` enforced build & LSP configuration (`0.35.0`).
  *
  * Auto-discovered by `ttsc` during `npm run build`, `npm run typecheck`,
  * `npm test`, and `ttscserver` editor sessions. All 25 rules (including all 7

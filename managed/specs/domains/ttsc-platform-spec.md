@@ -13,7 +13,7 @@ tags:
 
 # [[TtscPlatformSpecification]]
 
-`ttsc`(`0.34.3`), 네이티브 Go TypeScript 컴파일러(`typescript-native` / `tsgo 7.0.2`), `@ttsc/lint`(`0.34.3`), `@ttsc/graph`(`ttsc-graph-router` raw artifact `1.1.0`)가 **독립적으로 소유하는 컴파일·체크·자동수정·플러그인 호스트·원시 컴파일러 그래프 아티팩트 규격**을 정의합니다. 본 명세는 `@microsoft/tsdoc` 표준 어휘([[TSDocStandardSpecification]])나 `tsdoc-edge`의 제품 거버넌스 도메인([[TsdocEdgePlatformSpecification]])과 독립된 컴파일러·정적분석 플랫폼 계층입니다.
+`ttsc`(`0.35.0`), 네이티브 Go TypeScript 컴파일러(`typescript-native` / `tsgo 7.0.2`), `@ttsc/lint`(`0.35.0`), `@ttsc/graph`(`ttsc-graph-router` raw artifact `1.1.0`)가 **독립적으로 소유하는 컴파일·체크·자동수정·플러그인 호스트·원시 컴파일러 그래프 아티팩트 규격**을 정의합니다. 본 명세는 `@microsoft/tsdoc` 표준 어휘([[TSDocStandardSpecification]])나 `tsdoc-edge`의 제품 거버넌스 도메인([[TsdocEdgePlatformSpecification]])과 독립된 컴파일러·정적분석 플랫폼 계층입니다.
 
 ```tsdoc-spec
 {
@@ -108,7 +108,7 @@ tags:
   - `ttsc check` / `ttsc fix`: emit 없이 모든 등록 규칙을 검사하거나 `FixReporter`의 `TextEdit`를 원자적으로 적용.
   - `ttsc prepare` / `ttsc cache paths --json`: `@ttsc/lint` 및 contributor Go 소스를 사전 컴파일하고 CI 캐시 경로(`node_modules/.cache/ttsc`, `go-build`)를 노출.
   - `ttscserver`: 에디터/IDE 세션용 LSP 서버(저장 상태 진단, Quick Fix, `HintRule` 자동완성, `ProjectInputRule` 파일 감시 무효화).
-- **자동 플러그인 탐색 (`0.34.3`)**: 설치된 패키지의 `package.json#ttsc.plugin`(`{ "transform": "@ttsc/lint" }`)을 자동 감지하여 별도 `tsconfig.plugins` 선언이 없어도 루트 `lint.config.mjs`를 로드합니다.
+- **자동 플러그인 탐색 (`0.35.0`)**: 설치된 패키지의 `package.json#ttsc.plugin`(`{ "transform": "@ttsc/lint" }`)을 자동 감지하여 별도 `tsconfig.plugins` 선언이 없어도 루트 `lint.config.mjs`를 로드합니다.
 
 ### 2. `@ttsc/lint` Go `rule` SPI 및 내장 규칙 네임스페이스 (Context)
 
@@ -170,7 +170,7 @@ npm run lint:ttsc
 
 ## 설계 결정 및 경계 가이드 (Design Decisions)
 
-1. **2계층 설정 분리 (`lint.config.mjs` 20 `error` + `lint.ratchet.config.mjs` 5 추가 프로덕션 `error`)**: `0.34.3` 자동 탐색으로 인해 모든 `ttsc` 호출이 `lint.config.mjs`(20개 전역 `error`)를 읽으며, `lint.ratchet.config.mjs`는 `extends: './lint.config.mjs'` 위에 `src/` 전용 엄격 타입 안전 `error` 규칙 5종을 추가하여 총 25개 `error` 게이트(경고 백로그 0건)를 유지합니다.
+1. **2계층 설정 분리 (`lint.config.mjs` 20 `error` + `lint.ratchet.config.mjs` 5 추가 프로덕션 `error`)**: `0.35.0` 자동 탐색으로 인해 모든 `ttsc` 호출이 `lint.config.mjs`(20개 전역 `error`)를 읽으며, `lint.ratchet.config.mjs`는 `extends: './lint.config.mjs'` 위에 `src/` 전용 엄격 타입 안전 `error` 규칙 5종을 추가하여 총 25개 `error` 게이트(경고 백로그 0건)를 유지합니다.
 2. **원시 그래프와 정규 그래프의 분리**: `@ttsc/graph`의 로컬 노드 ID를 영속 DB 기본키로 직접 노출하지 않고, 항상 [^ProviderSnapshotNormalizer]에서 `workspaceId`와 `graphNamespace`(`ttsc:<repoId>`)를 결합한 정규 ID로 변환합니다.
 3. **AST·그래프 사실과 중복되는 주석 태그 제거**: `@ttsc/graph`가 결정론적으로 산출하는 6종 정규 엣지(`implements`, `extends`, `calls`, `accesses`, `instantiates`, `type_ref`), `CanonicalNodeId`, TypeScript `import`/가시성 수식어가 코드 공간 의존성·식별자의 유일한 정본이므로, 수동 주석 태그 9종(`@implements`, `@extends`, `@uses`, `@usedBy`, `@dependsOn`, `@depends`, `@depType`, `@depReason`, `@id`)은 퇴출하고 관계 브리지로만 연결합니다.
 
