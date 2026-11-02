@@ -74,6 +74,50 @@ TSDoc Edge는 세 계층 SSOT를 함께 동기화합니다. `@microsoft/tsdoc`�
 검증합니다. `symbol`, `spec`, `convention`은 각각 심볼 조회·검색, SpecGraph 생명주기,
 정확한 그래프 revision에 대한 규약 검사를 제공합니다.
 
+## 차세대 Go 네이티브 통합 엔진 (`ttsc-doc` / TypeScript 7 `ttsc@0.34.3`)
+
+`/Users/junwoobang/workflow/ttsc-doc`은 `tsdoc-edge`의 297개 TypeScript 파일과
+`ttsc-graph-router`의 65개 파일, 그리고 `.tsdoc.db`, `canonical-graph.db`,
+`spec-graph.db`, `.ttsc-graph-router-cache`로 나뉜 4개 SQLite/JSON 저장소를 하나의
+19개 파일 Go 네이티브 무의존성 바이너리로 통합하는 동반/후속 엔진입니다. TypeScript 7
+`ttsc@0.34.3`과 함께 실행하며, 상주 `ttscgraph serve` NDJSON 파이프를 통해 증분 및 캐시
+질의를 `<1ms`에 처리합니다. 기존 `tsdoc-edge` 명령과 문서·SpecGraph SSOT는 그대로
+유지되므로 두 엔진은 동일한 프로젝트에서 병행 검증할 수 있습니다.
+
+### 명령어 대응표
+
+| `tsdoc-edge` / `ttsc-graph-router` | `ttsc-doc` 통합 명령 |
+|---|---|
+| `tsdoc-edge sync [--check\|--dry-run\|--json]` | `ttsc-doc sync [--check\|--dry-run\|--json]` |
+| `tsdoc-edge wc <file>` / 심볼·체크포인트 조회 | `ttsc-doc wc <file\|symbol\|[[Checkpoint]]>` |
+| `tsdoc-edge dc <file>` / 심볼·체크포인트 설계 조회 | `ttsc-doc dc <file\|symbol\|[[Checkpoint]]>` |
+| `symbol trace` / `relationship trace <from> [to]` | `ttsc-doc trace <from> [to]` |
+| `relationship` 및 `ttsc-graph-router` graph routes | `ttsc-doc route repo-map\|related\|dependencies\|scope\|impact\|graph-lint` |
+| `mcp-server`의 tsdoc/graph 도구 | `ttsc-doc mcp` |
+
+`ttsc-doc mcp`는 다음 10개 통합 STDIO MCP 도구를 제공합니다.
+
+`inspect_typescript_graph`, `graph_repo_map`, `graph_related_nodes`,
+`graph_file_dependencies`, `graph_scope_tree`, `graph_changed_impact`,
+`tsdoc_work_context`, `tsdoc_design_context`, `tsdoc_trace_data`,
+`tsdoc_sync_check`.
+
+### 양 엔진 호환 문서·SpecGraph 작성 규칙
+
+새 문서와 주석은 다음 형태를 지켜야 `tsdoc-edge`와 `ttsc-doc`에서 100% 같은 체크포인트,
+백링크, 명세 바인딩을 생성합니다.
+
+- 관리 문서의 H1은 반드시 `# [[Checkpoint]]` 형식으로 작성합니다.
+- 모듈 파일의 패키지 문서에는 `@packageDocumentation`을 사용합니다.
+- 공개 심볼의 JSDoc은 선언 바로 앞에서 줄을 시작하는 `/**` 주석으로 쓰고,
+  `@doc [[Checkpoint]]`를 포함합니다.
+- SpecGraph 문서는 front matter 또는 메타데이터에 `type: project-spec`를 선언합니다.
+  `spec:<Checkpoint> -> REQ-*` 요구사항 엣지와 `BIND-*` 바인딩의
+  `canonicalNodeId` 대상을 정확히 기록합니다.
+
+이 규칙을 바꾸거나 예외를 추가할 때는 두 엔진에서 `sync --check --json`을 실행해
+백링크, 끊어진 링크, `SpecGraph` 바인딩 결과를 함께 확인합니다.
+
 ### work-context & design-context 활용 가이드
 
 **파일 수정 전 필수 실행**:

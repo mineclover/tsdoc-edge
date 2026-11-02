@@ -17,6 +17,37 @@ refresh or verify the complete pipeline. Use `symbol query` (or `symbol find-met
 lookup, `spec` for SpecGraph lifecycle operations, and `convention` for revision-pinned governance
 checks.
 
+## Next-Gen `ttsc-doc` Engine
+
+[`ttsc-doc`](/Users/junwoobang/workflow/ttsc-doc) is the Go-native TypeScript 7 companion and
+successor engine (`ttsc@0.34.3`) that unifies `tsdoc-edge` and `ttsc-graph-router`. It keeps the
+same checkpoint, backlink, and SpecGraph SSOT while replacing the split stores with a resident
+`ttscgraph serve` NDJSON session for sub-millisecond incremental and cached queries.
+
+| Current stack | `ttsc-doc` |
+|---|---|
+| 362 TypeScript files (297 + 65) | 19 Go files, zero runtime dependencies |
+| 4 SQLite/JSON DB/cache stores | 0 disk DBs + 1 resident `ttscgraph serve` session |
+| Separate backlink and SpecGraph paths | 100% Backlinks & SpecGraph parity across all 299 `managed/` docs and 55 SpecGraph bindings |
+
+Quick start:
+
+```bash
+ttsc-doc sync --check                 # add --dry-run or --json as needed
+ttsc-doc wc src/commands/BuildCommand.ts
+ttsc-doc dc src/commands/BuildCommand.ts
+ttsc-doc trace Type.field Target.field
+ttsc-doc route impact src/commands/BuildCommand.ts
+ttsc-doc mcp                            # unified STDIO MCP server
+```
+
+The MCP server exposes ten unified tools: `inspect_typescript_graph`, `graph_repo_map`,
+`graph_related_nodes`, `graph_file_dependencies`, `graph_scope_tree`, `graph_changed_impact`,
+`tsdoc_work_context`, `tsdoc_design_context`, `tsdoc_trace_data`, and `tsdoc_sync_check`.
+Authoring remains portable: use `# [[Checkpoint]]` H1 headings, `@packageDocumentation`,
+line-leading `/**` comments with `@doc [[Checkpoint]]`, and `type: project-spec` documents whose
+`spec:<Checkpoint> -> REQ-*` edges and `BIND-*` entries name exact `canonicalNodeId` targets.
+
 ---
 
 ## Why TSDoc Edge?
