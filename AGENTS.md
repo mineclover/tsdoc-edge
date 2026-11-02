@@ -194,32 +194,66 @@ node dist/lsp/server.js
 3. 독립 이해 가능: 다른 문서 없이도 이해 가능
 4. 라우팅 허브: 자연스러운 연결점
 
-## 프로젝트 구조
+## 패키지 및 프로젝트 구조
+
+### 1. 워크스페이스 패키지 구성
+
+| 패키지 / 경로 | 주제 및 핵심 책임 | 주요 엔트리포인트 |
+|---|---|---|
+| **`tsdoc-edge` (Root)** | 3계층 SSOT 동기화, 정본 `@ttsc/graph`·`SpecGraph` 거버넌스 커널, 3계층 데이터 추적(`DataTraceService`), CLI(`20`개 최상위 명령), LSP 서버 | `src/cli.ts`, `src/index.ts`, `src/lsp/server.ts` |
+| **`tsdoc-edge-mcp-server` (`mcp-server/`)** | `.tsdoc.db`, `.tsdoc/canonical-graph.db`, `.tsdoc/spec-graph.db`를 읽기 전용으로 노출하는 10-도구 Model Context Protocol 서버 | `mcp-server/src/index.ts`, `mcp-server/src/tools/index.ts` |
+| **`tools/ttsc-tsdoc` (`tools/ttsc-tsdoc/`)** | `ttsc` 컴파일 타임에 TSDoc 문법 및 도메인 태그 규칙을 검사하는 네이티브 Go `@ttsc/lint` 플러그인 | `tools/ttsc-tsdoc/plugin.go` |
+
+### 2. `src/` 서브시스템 주제별 구조 (`26`개 디렉토리 · `297`개 파일)
 
 ```
 src/
-├── analyzer/       # 분석 (품질, 커버리지, 도메인 관계)
-├── cli.ts          # CLI 엔트리포인트
-├── commands/       # 20개 정본 CLI 최상위 명령 및 통합 그룹
-├── convention/     # 규약 팩 컴파일 및 정합성 평가 엔진
-├── doc-symbol/     # [[Symbol]] 체크포인트 및 Backlinks 시스템
-├── graph/          # 심볼 그래프
-├── graph-analysis/ # 정본 @ttsc/graph 질의 및 프로젝션
-├── indexer/        # graph-router 어댑터 및 정본 그래프 조립
-├── lsp/            # LSP 서버 및 실시간 오버레이 그래프
-├── parser/         # 통합 Microsoft TSDoc AST 파싱
-├── provider/       # 시맨틱 그래프 프로바이더
-├── semantic-graph/ # 코드 그래프 + SpecGraph 통합 뷰
-├── spec/           # 명세 완성도·메트릭 및 미사용 문서 탐지
-├── spec-graph/     # 실행 가능한 SpecGraph(`tsdoc-spec`) 추출기
-├── storage/        # SQLite (.tsdoc.db, canonical-graph.db, spec-graph.db) + JSONL
-├── types/          # 타입 정의
-└── validator/      # 문서·연결성·명세 검증
+├── cli.ts              # 부수효과 없는 CLI 부트스트랩 및 최상위 명령 디스패처
+├── index.ts            # 프로그래밍 방식 SDK 파사드 (TSDocEdge, 파서, 그래프, 컨텍스트 생성기)
+│
+├── [1. TSDoc AST 파싱 및 타입 계약 계층]
+│   ├── parser/         # 통합 Microsoft TSDoc AST 리더 (TsdocCommentReader, TSDocParser, ModuleSpecTagParser, EnhancedDocExtractor)
+│   └── types/          # 도메인 타입 계약 (tags/ 22개 커스텀 태그 및 canonical-tag-bridge, graph/, domain/, spec/, analysis/)
+│
+├── [2. 정본 코드 그래프(@ttsc/graph) 및 인덱싱 계층]
+│   ├── provider/       # SemanticGraphProvider SPI, TtscSemanticGraphProvider, Snapshot/Delta 정규화기
+│   ├── indexer/        # ProjectIndexer, TtscGraphRouterArtifactAdapter, CanonicalGraphCoordinator, 충돌 안전 별칭 매핑
+│   ├── graph/          # Enrichment 심볼 그래프 빌더 (SymbolGraphBuilder, SymbolSearchEngine, DepthTraverser)
+│   ├── graph-analysis/ # 정본 @ttsc/graph 질의(CanonicalGraphIndex, GraphAnalysisService) 및 3계층 데이터 추적(DataTraceService)
+│   └── query/          # 다중 홉 관계 탐색 쿼리 엔진 (RelationshipQueryEngine)
+│
+├── [3. 규범 명세(SpecGraph) 및 컨벤션 거버넌스 계층]
+│   ├── spec-graph/     # 실행 가능한 SpecGraph(`tsdoc-spec`) 추출기(ManagedSpecExtractor), ExactBindingResolver, ConformanceEngine
+│   ├── semantic-graph/ # 교차 평면 EffectiveAnalysisService 및 불변 AnalysisInputRevision 고정
+│   ├── convention/     # 규약 팩 컴파일러(ConventionPackCompiler), ConventionCheckService, Naming/TSDoc/graph-lint 평가기
+│   └── spec/           # 명세 완성도(SpecCompletenessValidator), 메트릭(SpecMetricsAggregator), 미사용 문서 탐지(UnusedDocumentDetector)
+│
+├── [4. 문서 체크포인트([[Symbol]]) 및 연결성 검증 계층]
+│   ├── doc-symbol/     # [[Symbol]] 체크포인트 레지스트리(DocumentSymbolRegistry), BacklinkGenerator, SymbolReferenceResolver
+│   ├── linking/        # 코드 ↔ 문서 양방향 링커(DocCodeLinker) 및 LinkValidator
+│   ├── validator/      # ConnectivityValidator, ConventionValidator, StrictModeValidator, GeneratedDocsValidator
+│   └── fixer/          # TSDoc 태그 및 체크포인트 자동 보정기 (DocumentationFixer)
+│
+├── [5. 동적 컨텍스트 생성·분석·출력 계층]
+│   ├── generator/      # 동적 LLM/XML 작업 컨텍스트 생성기 (LLMsTextGenerator, XMLContextGenerator)
+│   ├── analyzer/       # 52개 도메인·AST·테스트·타입·인터페이스·건강도 분석기 (EnhancedWorkContextAnalyzer, TypeChainTracer 등)
+│   ├── metrics/        # 정본 노드 커버리지 프로젝션(CanonicalCoverageProjection), 베이스라인 및 게이트 평가
+│   ├── analytics/      # CLI 명령 및 심볼 활용 통계 추적기 (UsageTracker)
+│   └── output/         # JSON / XML / Human 구조화 출력 빌더 및 스키마 검증기
+│
+└── [6. 영속 저장소·LSP·CLI 명령 계층]
+    ├── storage/        # 5대 불변 리비전 SQLite 저장소(GraphRepository, SpecGraphRepository 등) + DatabaseManager(.tsdoc.db)
+    ├── lsp/            # 실시간 LSP 서버(TsdocEdgeService, IncrementalBuilder) 및 6번째 평면 미저장 오버레이(OverlayGraphView)
+    ├── commands/       # 20개 정본 CLI 최상위 명령 및 7개 통합 그룹 라우터 (wc, dc, sync, symbol, relationship, docs, spec 등)
+    ├── config/         # .tsdoc.config.json 생명주기 관리 (ConfigManager)
+    ├── utilities/      # 심볼·파일 참조 리팩토링 갱신기 (SymbolReferenceUpdater, FileReferenceUpdater)
+    └── utils/          # 결정론적 kebab-case IdGenerator 및 ConfigLoader
 ```
 
 ## 추가 참고
 
 - `README.md`: 프로젝트 개요 및 전체 기능
-- `managed/specs/index.md`: 전 서브시스템 규범 명세(`SpecGraph`, 54개 코드 바인딩)
+- `managed/specs/index.md`: 전 서브시스템 규범 명세(`SpecGraph`, 55개 코드 바인딩)
+- `managed/features/data-lineage-and-trace.md`: 3계층 데이터 흐름·계보·슬라이싱 추적 명세
 - `managed/workflows/work-context-workflow.md`: work-context 명령어 상세
 - `managed/features/`: 기능별 명세서 (`lsp-integration.md`, `mcp-integration.md` 등)

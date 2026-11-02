@@ -296,7 +296,7 @@ active scope에는 C2 owner 판정만 남긴다.
 - [[Relationship Types]] → managed/relationships/index.md:34
 - [[ConventionCheck]] → managed/specs/conventions/convention-check.md:260
 - [[CrossSpecIntegrationContract]] → managed/specs/domains/cross-spec-integration-contract.md:231
-- [[AuthoredProjectSpecifications]] → managed/specs/index.md:126
+- [[AuthoredProjectSpecifications]] → managed/specs/index.md:140
 - [[Workflows Index]] → managed/workflows/index.md:153
 - [[Semantic Graph Spec Governance Changelog]] → managed/workflows/semantic-graph-spec-governance-changelog.md:11
 - [[Semantic Graph Spec Governance Completed Work]] → managed/workflows/semantic-graph-spec-governance-completed.md:11

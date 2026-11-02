@@ -257,34 +257,69 @@ Create `.tsdoc.config.json`:
 | [Quick Start](managed/quick-start.md) | 5-minute setup guide |
 | [Usage Scenarios](managed/guides/usage-scenarios.md) | Real-world workflows |
 | [Commands Index](managed/COMMANDS.md) | 20 canonical top-level CLI commands & unified groups |
-| [Authored Project Specifications](managed/specs/index.md) | Normative `SpecGraph` specifications (8 domain/convention specs, 54 bindings) |
+| [Authored Project Specifications](managed/specs/index.md) | Normative `SpecGraph` specifications (8 domain/convention specs, 55 bindings) |
+| [3-Tier Data Trace](managed/features/data-lineage-and-trace.md) | Type/Field roles, cross-boundary lineage (`SpecGraph`/`@samchon/typespec-evidence`/`oa-sdk`), and AST slicing |
 | [Relationship Guide](managed/guides/relationship-analysis-guide.md) | Dependency analysis |
 | [LSP Integration](managed/features/lsp-integration.md) | Real-time IDE integration & overlay graph |
-| [MCP Integration](managed/features/mcp-integration.md) | 9-tool Model Context Protocol server specification |
+| [MCP Integration](managed/features/mcp-integration.md) | 10-tool Model Context Protocol server specification |
 | [Convention Pack Check](managed/features/convention-pack-check.md) | Revision-pinned spec-binding governance loop |
 
 ---
 
-## Project Structure
+## Package & Module Topic Map
+
+### 1. Workspace Packages
+
+| Package / Path | Topic & Responsibility | Primary Surface |
+|----------------|------------------------|-----------------|
+| **`tsdoc-edge` (Root)** | Core SSOT documentation connectivity, canonical `@ttsc/graph` & `SpecGraph` governance kernel, 3-tier data tracing, CLI, and LSP server | `tsdoc-edge` CLI (`20` top-level commands), `tsdoc-edge-lsp`, programmatic SDK (`src/index.ts`) |
+| **`tsdoc-edge-mcp-server` (`mcp-server/`)** | Read-only Model Context Protocol (MCP) server exposing `.tsdoc.db`, `.tsdoc/canonical-graph.db`, and `.tsdoc/spec-graph.db` to AI agents | `10` MCP tools (`tsdoc_search_symbols`, `tsdoc_get_work_context`, `tsdoc_get_design_context`, `tsdoc_get_impact`, `tsdoc_get_spec_bindings`, `tsdoc_trace_data`, etc.) |
+| **`tools/ttsc-tsdoc` (`tools/ttsc-tsdoc/`)** | Native Go `ttsc` lint rule contributor plugin enforcing TSDoc syntax and domain tag rules at compile time | `@ttsc/lint` (`tsdoc/*` rules integrated into the `25`-rule zero-finding gate) |
+
+### 2. Core `src/` Subsystems by Topic (`26` Directories · `297` Files)
 
 ```
 src/
-├── analyzer/       # Code analysis (health, coverage, domain relationships)
-├── commands/       # 20 canonical top-level CLI commands & unified groups
-├── convention/     # Convention pack compilation and conformance evaluators
-├── doc-symbol/     # [[Symbol]] checkpoint registry & backlinks
-├── graph/          # Symbol graph
-├── graph-analysis/ # Canonical @ttsc/graph queries and projections
-├── indexer/        # graph-router adapter + canonical graph assembly
-├── lsp/            # LSP server & effective overlay graph
-├── parser/         # Unified Microsoft TSDoc AST reader & tag parsers
-├── provider/       # Semantic graph provider adapters
-├── semantic-graph/ # Effective code + SpecGraph composition
-├── spec/           # Specification metrics, completeness & unused-doc detection
-├── spec-graph/     # Executable SpecGraph extraction (`tsdoc-spec`)
-├── storage/        # SQLite (.tsdoc.db, canonical-graph.db, spec-graph.db) + JSONL
-├── types/          # Type definitions
-└── validator/      # Document, connectivity & specification validators
+├── cli.ts              # Zero-side-effect CLI bootstrap & top-level command dispatcher
+├── index.ts            # Public programmatic SDK facade (TSDocEdge, parsers, graph, context generators)
+│
+├── [1. Parsing & TSDoc AST Plane]
+│   ├── parser/         # Unified @microsoft/tsdoc AST reader (TsdocCommentReader, TSDocParser, ModuleSpecTagParser, EnhancedDocExtractor)
+│   └── types/          # Core domain contracts (tags/ 22 custom tags & canonical-tag-bridge, graph/, domain/, spec/, analysis/)
+│
+├── [2. Canonical Code Graph & Indexing Plane]
+│   ├── provider/       # SemanticGraphProvider SPI, TtscSemanticGraphProvider, Snapshot & Delta normalizers
+│   ├── indexer/        # ProjectIndexer, TtscGraphRouterArtifactAdapter, CanonicalGraphCoordinator, collision-safe alias mapping
+│   ├── graph/          # Enrichment symbol graph builder (SymbolGraphBuilder, SymbolSearchEngine, DepthTraverser)
+│   ├── graph-analysis/ # Canonical @ttsc/graph queries (CanonicalGraphIndex, GraphAnalysisService) & 3-tier DataTraceService
+│   └── query/          # Multi-hop relationship traversal query engine (RelationshipQueryEngine)
+│
+├── [3. Normative SpecGraph & Convention Governance Plane]
+│   ├── spec-graph/     # Executable `tsdoc-spec` extractor (ManagedSpecExtractor), ExactBindingResolver, ConformanceEngine
+│   ├── semantic-graph/ # Cross-plane EffectiveAnalysisService & immutable AnalysisInputRevision pinning
+│   ├── convention/     # ConventionPackCompiler, ConventionCheckService, Naming/TSDoc/ttsc-graph-lint evaluators & gate
+│   └── spec/           # SpecCompletenessValidator, SpecMetricsAggregator, SpecStatusManager, UnusedDocumentDetector
+│
+├── [4. Checkpoint [[Symbol]] & Documentation Connectivity Plane]
+│   ├── doc-symbol/     # [[Symbol]] checkpoint registry (DocumentSymbolRegistry), BacklinkGenerator, SymbolReferenceResolver
+│   ├── linking/        # Bidirectional code ↔ doc linker (DocCodeLinker) & LinkValidator
+│   ├── validator/      # ConnectivityValidator, ConventionValidator, StrictModeValidator, GeneratedDocsValidator
+│   └── fixer/          # Automated TSDoc tag & checkpoint fixer (DocumentationFixer)
+│
+├── [5. Dynamic Context Generation, Analyzer & Output Plane]
+│   ├── generator/      # Dynamic LLM/XML work-context generators (LLMsTextGenerator, XMLContextGenerator)
+│   ├── analyzer/       # 52 domain/AST/test/type/interface/health analyzers (EnhancedWorkContextAnalyzer, TypeChainTracer, etc.)
+│   ├── metrics/        # CanonicalCoverageProjection, CoverageMetricContract, Baseline & Gate evaluation
+│   ├── analytics/      # CLI command & symbol usage telemetry tracker (UsageTracker)
+│   └── output/         # Structured JSON/XML/Human output builders and schema validators
+│
+├── [6. Persistence, IDE Surface & CLI Commands]
+│   ├── storage/        # 5 content-addressed SQLite revision stores (GraphRepository, SpecGraphRepository, etc.) + DatabaseManager
+│   ├── lsp/            # Real-time LSP server, TsdocEdgeService, IncrementalBuilder & 6th-plane Unsaved OverlayGraphView
+│   ├── commands/       # 20 canonical top-level CLI commands & 7 unified command routers (wc, dc, sync, symbol, relationship, etc.)
+│   ├── config/         # .tsdoc.config.json lifecycle manager (ConfigManager)
+│   ├── utilities/      # Symbol & file reference refactoring updaters (SymbolReferenceUpdater, FileReferenceUpdater)
+│   └── utils/          # Deterministic kebab-case IdGenerator & ConfigLoader
 ```
 
 ---
@@ -381,13 +416,13 @@ saved-file whole-project refreshes.
 | Metric | Value |
 |--------|-------|
 | CLI Commands | 20 canonical top-level (`tsdoc-edge help --tree`) |
-| Canonical `@ttsc/graph` | 8,381 internal (8,634 total) nodes / 17,118 internal (21,335 total) edges |
-| Normative `SpecGraph` | 8 `project-spec` docs · 62 nodes · 54 bindings (`54/54` satisfied) |
-| Enrichment Symbol DB | 9,088 symbols / 22,765 domain+test relationships |
-| Managed Checkpoints & Links | 308/308 `With [[Symbol]]` (`100%`) · 1,996 checked links (`0` broken) · `0` unused docs |
+| Canonical `@ttsc/graph` | 8,349 internal (8,613 total) nodes / 16,870 internal (20,995 total) edges |
+| Normative `SpecGraph` | 8 `project-spec` docs · 63 nodes · 55 bindings (`55/55` satisfied) |
+| Enrichment Symbol DB | 8,601 symbols (`100%` file `@doc` coverage across 297 `src/` + 6 `mcp-server/src/` files · `80.0%` effective symbol coverage) |
+| Managed Checkpoints & Links | 299/299 `With [[Symbol]]` (`100%`) · 1,995 checked links (`0` broken) · `0` unused docs |
 | `@ttsc/lint` | 25 error rules (`0` findings) |
-| Health Scores | `90/100 (A)` system-status · `89/100 (A)` spec metrics |
-| Test Suites | 237 suites (3,269 tests) |
+| Health Scores | `90/100 (A)` system-status · `89/100 (A)` spec metrics · `93/100 (A+)` core modules |
+| Test Suites | 225 suites (2,939 tests) + 10/10 MCP integration checks |
 
 ---
 

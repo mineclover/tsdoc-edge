@@ -1492,7 +1492,7 @@ interface ConformanceReport {
 - [[Convention Pack Check]] → managed/features/convention-pack-check.md:437
 - [[Data Lineage and Slicing]] → managed/features/data-lineage-and-trace.md:76
 - [[GraphAndPersistencePlaneSpecification]] → managed/specs/domains/graph-and-persistence-plane-spec.md:278
-- [[AuthoredProjectSpecifications]] → managed/specs/index.md:127
+- [[AuthoredProjectSpecifications]] → managed/specs/index.md:141
 - [[Semantic Graph Spec Governance Completed Work]] → managed/workflows/semantic-graph-spec-governance-completed.md:135
 - [[Semantic Graph Spec Governance Roadmap]] → managed/workflows/semantic-graph-spec-governance-roadmap.md:273
 - [[TS7 Test Compilation Lane]] → managed/workflows/ts7-test-compilation-lane.md:337

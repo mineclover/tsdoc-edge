@@ -42,7 +42,7 @@ npm run build
 }
 ```
 
-Claude Desktop을 재시작하면 9개의 tsdoc 도구를 사용할 수 있습니다! 🎉
+Claude Desktop을 재시작하면 10개의 tsdoc 도구를 사용할 수 있습니다! 🎉
 
 ## 🛠️ Available Tools
 
@@ -260,6 +260,19 @@ Top Node Types:
 ### 9. **tsdoc_get_spec_bindings** - SpecGraph 규범 바인딩
 활성 `.tsdoc/spec-graph.db`의 normative specification 노드와 코드 conformance 바인딩을 조회합니다. `filePath`, `specId`, `query` 중 하나 이상으로 필터링하고 `format` (`markdown|json`, 하위 호환 별칭: `response_format`)을 선택할 수 있습니다.
 
+---
+
+### 10. **tsdoc_trace_data** - 3계층 데이터 추적 (Type/Field + 경계 계보 + AST 슬라이싱)
+특정 타입·필드(`OrderDto.totalAmount`), 함수·메서드(`calculateDiscount`), 또는 파일 내 심볼(`src/billing/invoice.ts#createInvoice#amount`)의 데이터 흐름과 변환 계보를 3계층으로 통합 추적합니다.
+
+**Parameters:**
+- `target` (string, required): 추적할 시작 심볼, `Type.field`, 또는 `file#symbol#variable`
+- `to` (string, optional): 도착 대상 심볼/필드 (지정 시 시작→도착 최단 변환 경로 탐색)
+- `tier` (`all|type-flow|lineage|ast-slice`, default: `all`): 조회할 추적 계층
+- `direction` (`upstream|downstream|both`, default: `both`): 탐색 방향
+- `maxDepth` (number, 1-10, default: 4): 최대 탐색 홉 수
+- `format` (`markdown|json`, default: `markdown`, 하위 호환 별칭: `response_format`): 출력 형식
+
 Canonical graph와 SpecGraph는 read-only SQLite 연결로 열리고, external/stdlib 노드는 기본적으로 숨겨집니다. 기존 legacy 응답 필드와 alias는 유지됩니다.
 
 ## 💡 사용 시나리오
@@ -387,7 +400,7 @@ TypeScript Codebase
 ```
 
 **Key Components:**
-- `index.ts`: MCP server entry point, registers 7 tools
+- `index.ts`: MCP server entry point, registers 10 tools
 - `services/tsdocService.ts`: Direct database queries
 - `tools/`: Tool implementations and formatting
 - `schemas/`: Zod-based input validation
@@ -458,12 +471,11 @@ mcp-server/
 
 ## 🚀 Version History
 
-### v1.0.0 (2025-11-23) - Production Ready
-- ✅ Direct database access (replaced exec-based CLI calls)
-- ✅ 9 production-ready tools
-- ✅ Comprehensive error handling
-- ✅ Full test coverage
-- ✅ Performance optimized (<10ms avg query time)
+### v1.1.0 (2026-11-02) - Canonical Graph, SpecGraph & 3-Tier Data Trace
+- ✅ 10 production-ready tools (`tsdoc_get_impact`, `tsdoc_get_spec_bindings`, `tsdoc_trace_data` 포함)
+- ✅ Read-only canonical `.tsdoc/canonical-graph.db` & `.tsdoc/spec-graph.db` integration
+- ✅ Direct database access (`8,601` enrichment symbols, `8,349` canonical internal nodes, `55` SpecGraph bindings)
+- ✅ Comprehensive error handling & `<10ms` avg query time
 
 ---
 

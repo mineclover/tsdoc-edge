@@ -33,7 +33,7 @@ source: src/spec-graph/ManagedSpecExtractor.ts
 
 ### 3. Domain Specification Catalog (8 Canonical Specs Covering Full Platform Surface)
 
-The authored specification root separates upstream standards (`@microsoft/tsdoc` and `ttsc`) from `tsdoc-edge`'s product governance plane and binds every major platform subsystem (`54` explicit `CanonicalNodeId` implementation bindings across `8` `project-spec` documents):
+The authored specification root separates upstream standards (`@microsoft/tsdoc` and `ttsc`) from `tsdoc-edge`'s product governance plane and binds every major platform subsystem (`55` explicit `CanonicalNodeId` implementation bindings across `8` `project-spec` documents):
 
 | Domain | Canonical Spec | Independent Ownership Scope |
 | --- | --- | --- |
@@ -42,9 +42,23 @@ The authored specification root separates upstream standards (`@microsoft/tsdoc`
 | **3. `tsdoc-edge` 독립 스펙** | [[TsdocEdgePlatformSpecification]] | SSOT `[[Checkpoint]]` flattening & backlinks ([^DocumentSymbolRegistry], [^UnusedDocumentDetector]), 22 irreducible domain extension tags ([^ModuleSpecTagParser]), 6-plane revision-pinned governance kernel, `work-context` / `design-context` / [[MCP Integration]] |
 | **4. 교차 연동 계약** | [[CrossSpecIntegrationContract]] | Single-owner matrix across 8 architectural dimensions, Bridge 1 (`tools/ttsc-tsdoc` Go contributor + `@microsoft/tsdoc` parity oracle), Bridge 2 (`@ttsc/graph` → [^ProviderSnapshotNormalizer] → [^ProjectIndexer]), and Bridge 3 ([^projectCanonicalTtscRelationships] + [^graphEdgeSemantic]) |
 | **5. CLI 명령어 표면 스펙** | [[CliCommandSurfaceSpecification]] | Canonical 20 top-level CLI commands ([^registerCliCommands]), zero-side-effect boot invariant, 1-step 3-layer SSOT synchronization ([^SyncCommand]), fail-closed unified symbol lookup ([^SymbolQueryCommand]), and 7 unified command groups |
-| **6. 그래프·영속 리비전 스펙** | [[GraphAndPersistencePlaneSpecification]] | 5 content-addressed immutable SQLite revision stores ([^GraphRepository], [^SpecGraphRepository], [^AnalysisInputRevisionRepository], [^ConventionCheckHistoryRepository], [^CoverageMetricReportRepository]) and canonical graph analysis engine ([^GraphAnalysisService], [^CanonicalGraphIndex]) |
+| **6. 그래프·영속 리비전 스펙** | [[GraphAndPersistencePlaneSpecification]] | 5 content-addressed immutable SQLite revision stores ([^GraphRepository], [^SpecGraphRepository], [^AnalysisInputRevisionRepository], [^ConventionCheckHistoryRepository], [^CoverageMetricReportRepository]), canonical graph analysis engine ([^GraphAnalysisService], [^CanonicalGraphIndex]), and 3-tier data lineage/slice engine ([^DataTraceService]) |
 | **7. LSP·커버리지 표면 스펙** | [[LspAndCoverageSurfaceSpecification]] | Real-time `tsdoc-edge-lsp` service ([^TsdocEdgeService], [^IncrementalBuilder]), 6th Unsaved Overlay plane ([^OverlayGraphView], [^EffectiveCodeGraphView]), canonical coverage node projection ([^projectCoverageReportToCanonicalNodes]), and honest spec metrics ([^SpecMetricsAggregator]) |
 | **8. 컨벤션 적합성 엔진 스펙** | [[ConventionCheck]] | Revision-pinned conformance kernel ([^extractManagedSpecGraph], [^EffectiveAnalysisService], [^ExactBindingResolver], [^ConformanceEngine], [^ConventionCheckService], [^NamingConventionEvaluator], [^TsdocConventionEvaluator]) |
+
+### 4. Package & Subsystem Topic Matrix (패키지 및 서브시스템별 주제 매핑)
+
+| Package / Subsystem | Topic & Core Responsibility | Owning Normative Spec |
+| --- | --- | --- |
+| **`tsdoc-edge` (`src/parser/`, `src/types/tags/`)** | `@microsoft/tsdoc` v0 AST parsing, unified comment reader (`TsdocCommentReader`), `tsdoc.json` schema generation, and 22 custom domain tags | [[TSDocStandardSpecification]], [[TsdocEdgePlatformSpecification]] |
+| **`tools/ttsc-tsdoc` & `src/indexer/` & `src/provider/`** | Native Go `@ttsc/lint` contributor, `@ttsc/graph` (`graph-router`) snapshot/delta normalization, and `ProjectIndexer` canonical assembly | [[TtscPlatformSpecification]], [[CrossSpecIntegrationContract]] |
+| **`src/graph/`, `src/graph-analysis/`, `src/query/`, `src/storage/`** | 5 immutable SQLite revision repositories, `CanonicalGraphIndex`, multi-hop `GraphAnalysisService`, and 3-tier `DataTraceService` (Type/Field + cross-boundary lineage + AST slicing) | [[GraphAndPersistencePlaneSpecification]] |
+| **`src/spec-graph/`, `src/semantic-graph/`, `src/convention/`, `src/spec/`** | Executable `tsdoc-spec` extraction, `ExactBindingResolver`, `ConformanceEngine`, `ConventionCheckService`, naming/TSDoc evaluators, and `SpecMetricsAggregator` | [[ConventionCheck]], [[TsdocEdgePlatformSpecification]] |
+| **`src/doc-symbol/`, `src/linking/`, `src/validator/`, `src/fixer/`** | `[[Checkpoint]]` flattening registry, bidirectional backlinks, connectivity/convention/strict validators, and `DocumentationFixer` | [[TsdocEdgePlatformSpecification]] |
+| **`src/generator/`, `src/analyzer/`, `src/output/`, `src/analytics/`** | Dynamic LLM/XML context generators (`LLMsTextGenerator`, `XMLContextGenerator`), 52 AST/domain/test/type analyzers, and structured JSON/XML output builders | [[TsdocEdgePlatformSpecification]], [[CliCommandSurfaceSpecification]] |
+| **`src/commands/`, `src/config/`, `src/utilities/`, `src/utils/`** | 20 top-level CLI commands (`sync`, `wc`, `dc`, `symbol`, `relationship`, `docs`, `spec`, `convention`, etc.) and reference refactoring utilities | [[CliCommandSurfaceSpecification]] |
+| **`src/lsp/`, `src/metrics/`** | Real-time `tsdoc-edge-lsp` server, 6th-plane `OverlayGraphView`, and canonical node coverage projection/baselines | [[LspAndCoverageSurfaceSpecification]] |
+| **`tsdoc-edge-mcp-server` (`mcp-server/`)** | 10-tool read-only Model Context Protocol server (`tsdoc_get_work_context`, `tsdoc_get_design_context`, `tsdoc_get_impact`, `tsdoc_get_spec_bindings`, `tsdoc_trace_data`, etc.) | [[TsdocEdgePlatformSpecification]], [[GraphAndPersistencePlaneSpecification]] |
 
 ## 핵심 산출물 (Output)
 
