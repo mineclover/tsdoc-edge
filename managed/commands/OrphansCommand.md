@@ -217,8 +217,4 @@ Source: `src/commands/Phase5Commands.ts`
 ### Implemented By
 
 - OrphansCommand → src/commands/OrphansCommand.ts:47
-- DeadCodeTagOptions → src/fixer/DeadCodeTagger.ts:23
-- TagResult → src/fixer/DeadCodeTagger.ts:43
-- TaggedDeadCodeSymbol → src/fixer/DeadCodeTagger.ts:60
-- DeadCodeTagger → src/fixer/DeadCodeTagger.ts:94
 

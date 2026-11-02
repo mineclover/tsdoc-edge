@@ -15,9 +15,9 @@ codeImplementation: not-applicable
 
 TSDoc Edge 시스템의 유틸리티 모듈을 기능별로 정리한 인덱스입니다. 각 유틸리티는 특정 기능(그래프 구축, 검증, 생성 등)을 캡슐화합니다.
 
-**총 18개 유틸리티**
+**총 16개 유틸리티**
 
-Canonical utility links: [[SymbolSearchEngine]], [[ConnectivityValidator]], [[MermaidGenerator]],
+Canonical utility links: [[SymbolSearchEngine]], [[ConnectivityValidator]],
 [[IdGenerator]], [[UsageTracker]], [[FileScanner]], [[ConfigLoader]]
 
 ---
@@ -117,24 +117,6 @@ Canonical utility links: [[SymbolSearchEngine]], [[ConnectivityValidator]], [[Me
 
 ---
 
-### ModuleSpecValidator
-**Path**: `ModuleSpecValidator.md`
-**Priority**: ⭐⭐ High
-
-모듈 명세서 검증 유틸리티 (7 Perspectives).
-
-**Validates**:
-- Purpose 명확성
-- Input/Output 정의 완전성
-- Context 의존성 일치
-- Logic 설명 충분성
-- Effect 부수효과 명시
-- Scope 인터페이스 정의
-
-**Used By**: ValidateSpecCommand, SpecAnalyzer
-
----
-
 ### [[SpecCompletenessValidator]]
 **Path**: `SpecCompletenessValidator.md`
 **Priority**: ⭐⭐ High
@@ -206,24 +188,6 @@ Canonical utility links: [[SymbolSearchEngine]], [[ConnectivityValidator]], [[Me
 ---
 
 ## Generator Utilities (생성 관련)
-
-### [[MermaidGenerator]]
-**Path**: `MermaidGenerator.md`
-**Priority**: ⭐⭐ High
-
-Mermaid 다이어그램 생성 유틸리티.
-
-**Generates**:
-- Dependency graphs
-- Call graphs
-- Type hierarchies
-- Relationship diagrams
-
-**Output Format**: `.mmd` files
-
-**Used By**: VisualizeDepsCommand, GenerateGraphCommand
-
----
 
 ### [[IdGenerator]]
 **Path**: `IdGenerator.md`
@@ -409,16 +373,16 @@ interface Manager<T> {
 Uses: FileScanner, SymbolGraphBuilder, DocCodeLinker, ConfigLoader, IdGenerator
 
 ### Validation System
-Uses: ConventionValidator, ConnectivityValidator, LinkValidator, ModuleSpecValidator, SpecCompletenessValidator
+Uses: ConventionValidator, ConnectivityValidator, LinkValidator, SpecCompletenessValidator
 
 ### Query System
 Uses: SymbolSearchEngine, SymbolGraphBuilder, UsageTracker
 
 ### Specification System
-Uses: SpecStatusManager, SpecVersionManager, SpecContentSimilarityChecker, ModuleSpecValidator
+Uses: SpecStatusManager, SpecVersionManager, SpecContentSimilarityChecker, SpecCompletenessValidator
 
 ### Documentation System
-Uses: DocCodeLinker, UnusedDocumentDetector, MermaidGenerator, [[Utilities Index]]
+Uses: DocCodeLinker, UnusedDocumentDetector, [[Utilities Index]]
 
 ---
 
@@ -471,7 +435,7 @@ DatabaseManager
 
 - [[TSDoc Edge Documentation]] → managed/README.md:182
 - [[Primary Types Index]] → managed/primary-types/index.md:449
-- [[Types Index]] → managed/types/index.md:378
+- [[Types Index]] → managed/types/index.md:366
 
 ### Implemented By
 

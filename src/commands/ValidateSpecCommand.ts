@@ -184,11 +184,3 @@ export class ValidateSpecCommand extends BaseCommand {
     return files;
   }
 }
-
-/**
- * GenerateDocsCommand - Generate markdown docs from enhanced docs
- * @public
- * @doc [[GenerateDocsCommand]]
- * @doc [[CLI Commands]]
- * @doc [[CLI Commands#generate-docs]]
- */

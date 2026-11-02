@@ -6,7 +6,7 @@
  * @packageDocumentation
  * @doc [[Types Index]]
  * @context Root barrel module aggregating all TSDoc Edge domain type definitions
- * @functionality Re-exports analysis, analytics, config, core, domain, feature, graph, guard, registry, spec, state, tag, and test-symbol contracts
+ * @functionality Re-exports analysis, analytics, config, core, domain, feature, graph, guard, registry, spec, tag, and test-symbol contracts
  */
 
 // Analysis types - quality, coverage, health
@@ -45,8 +45,6 @@ export * from './guards/test-symbol-guards';
 export * from './registry';
 // Specification types - spec management
 export * from './spec';
-// State management types - comment folding
-export * from './state';
 // TSDoc tag types - base and enhanced
 export * from './tags';
 // Test symbol types - test suites, cases, scenarios

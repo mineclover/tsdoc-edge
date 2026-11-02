@@ -168,7 +168,7 @@ In strict mode, symbols must have:
 
 ### Generate Enhanced Docs
 ```bash
-tsdoc-edge generate-docs src/services/UserService.ts --enhanced
+tsdoc-edge wc src/services/UserService.ts --llm
 ```
 
 ### Validate Enhanced Docs

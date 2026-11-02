@@ -110,7 +110,6 @@ describe('Streamlined 20-Command CLI Surface', () => {
       'backlinks',
       'check-links',
       'update-refs',
-      'generate',
       'validate',
       'find-unused',
       'move',

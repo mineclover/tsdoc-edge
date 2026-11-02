@@ -184,7 +184,7 @@ const impacted = builder.getDependents('user-repository');
 - [[Symbol]] → managed/types/Symbol.md:90
 - [[ConnectivityValidator]] → managed/utilities/ConnectivityValidator.md:172
 - [[SymbolSearchEngine]] → managed/utilities/SymbolSearchEngine.md:168
-- [[Utilities Index]] → managed/utilities/index.md:429
+- [[Utilities Index]] → managed/utilities/index.md:393
 
 ### Implemented By
 

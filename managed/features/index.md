@@ -377,8 +377,8 @@ tsdoc-edge test-impact database-manager
 - [[Core Components]] → managed/core-components/index.md:36
 - [[Examples]] → managed/examples/index.md:33
 - [[Primary Types Index]] → managed/primary-types/index.md:450
-- [[Types Index]] → managed/types/index.md:379
+- [[Types Index]] → managed/types/index.md:367
 - [[TSDoc Edge User Guide]] → managed/user-guide.md:284
-- [[Utilities Index]] → managed/utilities/index.md:464
+- [[Utilities Index]] → managed/utilities/index.md:428
 - [[Workflows Index]] → managed/workflows/index.md:282
 

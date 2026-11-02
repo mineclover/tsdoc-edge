@@ -318,5 +318,5 @@ tsdoc-edge build src
 
 ### Referenced By
 
-- [[Codebase Health Report]] → managed/features/codebase-health-report.md:158
+- [[Codebase Health Report]] → managed/features/codebase-health-report.md:157
 

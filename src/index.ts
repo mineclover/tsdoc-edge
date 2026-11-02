@@ -9,8 +9,8 @@
  * @doc [[TSDocEdge]]
  */
 
-import { MarkdownGenerator } from './generator/MarkdownGenerator';
 import { TSDocParser } from './parser/TSDocParser';
+import type { ParsedDocComment } from './types';
 import { ConventionValidator } from './validator/ConventionValidator';
 
 export { CallGraphAnalyzer } from './analyzer/CallGraphAnalyzer';
@@ -47,27 +47,10 @@ export { BacklinkGenerator } from './doc-symbol/BacklinkGenerator';
 export { DocumentSymbolParser } from './doc-symbol/DocumentSymbolParser';
 export { DocumentSymbolRegistry } from './doc-symbol/DocumentSymbolRegistry';
 export { TSDocSymbolParser } from './doc-symbol/TSDocSymbolParser';
-// Fixer exports
-export {
-  DeadCodeTagger,
-  type DeadCodeTagOptions,
-  type TaggedDeadCodeSymbol,
-  type TagResult,
-} from './fixer/DeadCodeTagger';
 export { DocumentationFixer } from './fixer/DocumentationFixer';
-export { RecursiveImprover } from './fixer/RecursiveImprover';
-// Fold/Unfold exports
-export { CommentExporter } from './fold/CommentExporter';
-export { CommentImporter } from './fold/CommentImporter';
-export { CommentStateManager } from './fold/CommentStateManager';
 // Generator exports
-export { EnhancedMarkdownGenerator } from './generator/EnhancedMarkdownGenerator';
-export { InsightDocGenerator } from './generator/InsightDocGenerator';
-export { MarkdownGenerator } from './generator/MarkdownGenerator';
-// Module Specification Generator
-export { ModuleSpecGenerator } from './generator/ModuleSpecGenerator';
-export { ModuleSpecMarkdownFormatter } from './generator/ModuleSpecMarkdownFormatter';
-export { RelatedDocsGenerator } from './generator/RelatedDocsGenerator';
+export { LLMsTextGenerator } from './generator/LLMsTextGenerator';
+export { XMLContextGenerator } from './generator/XMLContextGenerator';
 // Graph and search exports
 export { DepthTraverser } from './graph/DepthTraverser';
 export { SymbolGraphBuilder } from './graph/SymbolGraphBuilder';
@@ -136,20 +119,11 @@ export type {
   ReturnSpec,
   SideEffectSpec,
 } from './types/spec/module-spec';
-// Comment state type exports
-export type * from './types/state';
 // Enhanced type exports
 export type * from './types/tags';
 // Validation exports
 export { ConnectivityValidator } from './validator/ConnectivityValidator';
 export { ConventionValidator } from './validator/ConventionValidator';
-export type {
-  ModuleSpecValidationResult,
-  ValidationIssue,
-  ValidationOptions,
-  ValidationSeverity,
-} from './validator/ModuleSpecValidator';
-export { ModuleSpecValidator } from './validator/ModuleSpecValidator';
 export { StrictModeValidator } from './validator/StrictModeValidator';
 
 /**
@@ -162,7 +136,6 @@ export { StrictModeValidator } from './validator/StrictModeValidator';
 export class TSDocEdge {
   private parser: TSDocParser;
   private validator: ConventionValidator;
-  private generator: MarkdownGenerator;
 
   /**
    * Creates a new TSDocEdge instance
@@ -172,28 +145,19 @@ export class TSDocEdge {
   constructor() {
     this.parser = new TSDocParser();
     this.validator = new ConventionValidator();
-    this.generator = new MarkdownGenerator();
   }
 
   /**
-   * Process a source file: parse, validate, and generate documentation
+   * Process a source file: parse and validate comments
    *
    * @param filePath - Path to the source file
    * @param sourceCode - Source code content
-   * @returns Markdown documentation string
+   * @returns Validation results for each parsed comment
    * @public
    */
-  processFile(filePath: string, sourceCode: string): string {
-    // Parse the file
+  processFile(filePath: string, sourceCode: string): ParsedDocComment[] {
     const parseResult = this.parser.parseFile(filePath, sourceCode);
-
-    // Validate each comment
-    const validatedComments = parseResult.comments.map((comment) =>
-      this.validator.validate(comment)
-    );
-
-    // Generate documentation
-    return this.generator.generateForComments(validatedComments);
+    return parseResult.comments.map((comment) => this.validator.validate(comment));
   }
 
   /**
@@ -214,15 +178,5 @@ export class TSDocEdge {
    */
   getValidator(): ConventionValidator {
     return this.validator;
-  }
-
-  /**
-   * Get the generator instance
-   *
-   * @returns MarkdownGenerator instance
-   * @public
-   */
-  getGenerator(): MarkdownGenerator {
-    return this.generator;
   }
 }

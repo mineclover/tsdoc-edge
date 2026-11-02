@@ -323,7 +323,7 @@ const summary = validator.getSummary(results);
 ## Related Components
 
 - [[SpecCompletenessValidator]]: Core validation logic
-- ModuleSpecValidator: Module spec parsing
+- [[SpecCompletenessValidator]]: Module spec parsing
 - [[Module Specification Framework]]: 7-aspect specification system
 
 ## Workflow
@@ -404,7 +404,6 @@ tsdoc-edge validate spec managed | grep "⚠️" -A 1
 - [[ValidationFeatures]] → managed/features/validation-features.md:286
 - [[CLI Command Development Guide]] → managed/guides/command-development-guide.md:736
 - [[ModuleSpecTypes]] → managed/types/ModuleSpecTypes.md:219
-- [[ModuleSpecValidator]] → managed/utilities/ModuleSpecValidator.md:179
 - [[SpecCompletenessValidator]] → managed/utilities/SpecCompletenessValidator.md:75
 
 ### Implemented By

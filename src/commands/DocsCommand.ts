@@ -6,7 +6,7 @@
  * @doc [[CliCommandSurfaceSpecification]]
  * @doc [[Document Symbol System]]
  * @context Unified `docs` command router in the 20-command CLI surface
- * @functionality Dispatches document indexing, backlinks, link checking, symbol-ref updates, generation, validation, move, fix, suggest, todos, and plans subcommands
+ * @functionality Dispatches document indexing, backlinks, link checking, symbol-ref updates, validation, move, fix, suggest, todos, and plans subcommands
  * @sideEffect console: Writes subcommand routing errors and available subcommand listings to stdout
  */
 
@@ -15,7 +15,6 @@ import { CheckLinksCommand } from './CheckLinksCommand';
 import { DocSymbolsCommand } from './DocSymbolsCommand';
 import { FindUnusedDocsCommand } from './FindUnusedDocsCommand';
 import { FixCommand } from './FixCommand';
-import { GenerateDocsCommand } from './GenerateDocsCommand';
 import { IndexDocsCommand } from './IndexDocsCommand';
 import { MoveCommand } from './MoveCommand';
 import { PlansCommand } from './PlansCommand';
@@ -30,7 +29,6 @@ const SUBCOMMANDS = {
   backlinks: { command: UpdateBacklinksCommand, description: 'Update backlinks in documents' },
   'check-links': { command: CheckLinksCommand, description: 'Check for broken links' },
   'update-refs': { command: UpdateSymbolRefsCommand, description: 'Update code symbol references' },
-  generate: { command: GenerateDocsCommand, description: 'Generate markdown documentation' },
   validate: { command: ValidateDocsCommand, description: 'Validate documentation' },
   'find-unused': { command: FindUnusedDocsCommand, description: 'Find unused documents' },
   move: { command: MoveCommand, description: 'Move documentation file and update references' },
@@ -81,7 +79,7 @@ export class DocsCommand extends BaseCommand {
    * @public
    */
   getDescription(): string {
-    return 'Unified docs operations (index|backlinks|check-links|generate|...)';
+    return 'Unified docs operations (index|backlinks|check-links|...)';
   }
 
   /**
@@ -103,7 +101,6 @@ Examples:
   tsdoc-edge docs index managed
   tsdoc-edge docs backlinks managed
   tsdoc-edge docs check-links managed
-  tsdoc-edge docs generate src
   tsdoc-edge docs validate managed
 
 Use 'tsdoc-edge docs <subcommand> --help' for subcommand details.`;

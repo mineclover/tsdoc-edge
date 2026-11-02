@@ -13,7 +13,6 @@ const modifiedFiles = [
   'managed/utilities/ConnectivityValidator.md',
   'managed/utilities/ConventionValidator.md',
   'managed/utilities/FileScanner.md',
-  'managed/utilities/ModuleSpecValidator.md',
   'managed/relationships/STANDARD-FORMAT.md',
   'managed/analyzers/CodeHealthChecker.md',
 ];

@@ -63,7 +63,6 @@ TSDoc Edge 코드베이스의 전반적인 건강도 평가 및 개선 권장사
 |-------|------|-------|
 | 1178 | Phase6Commands.ts | 🔴 **Multiple commands in one file** |
 | 1065 | Phase7Commands.ts | 🔴 **Multiple commands in one file** |
-| 990 | ModuleSpecGenerator.ts | 🟡 Complex generator logic |
 | 907 | WorkContextCommand.ts | 🟡 Rich context gathering |
 | 890 | SymbolRegistryManager.ts | 🟡 JSONL management |
 | 865 | Phase5Commands.ts | 🔴 **Multiple commands in one file** |

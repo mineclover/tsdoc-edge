@@ -782,14 +782,14 @@ done
 
 ### Referenced By
 
-- [[Commands Index]] → managed/COMMANDS.md:190
+- [[Commands Index]] → managed/COMMANDS.md:189
 - [[TSDoc Edge Documentation]] → managed/README.md:158
 - [[Complete Workflow Architecture]] → managed/architecture/diagrams/mermaid-workflow-complete.md:189
 - [[Semantic Graph Analysis and Relationship Model]] → managed/architecture/semantic-graph-analysis-and-relationship-model.md:1462
 - [[CoverageReportCommand]] → managed/commands/CoverageReportCommand.md:271
 - [[Feature Showcase]] → managed/examples/feature-showcase.md:268
 - [[Relationship Usage Examples]] → managed/examples/relationship-usage-examples.md:526
-- [[Codebase Health Report]] → managed/features/codebase-health-report.md:425
+- [[Codebase Health Report]] → managed/features/codebase-health-report.md:424
 - [[CoreFeatures]] → managed/features/core-features-catalog.md:34
 - [[Guides & Tutorials]] → managed/guides/index.md:22
 - [[Usage Scenarios]] → managed/guides/usage-scenarios.md:83

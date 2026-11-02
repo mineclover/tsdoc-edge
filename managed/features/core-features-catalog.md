@@ -52,7 +52,7 @@ tsdoc-edge work-context <file-path>
 - [ProjectIndexer](../../src/indexer/ProjectIndexer.ts#ProjectIndexer) - 프로젝트 인덱싱 및 스캔
 - [TSDocParser](../../src/parser/TSDocParser.ts#TSDocParser) - TSDoc 파싱
 - [ConventionValidator](../../src/validator/ConventionValidator.ts#ConventionValidator) - 컨벤션 검증
-- [MarkdownGenerator](../../src/generator/MarkdownGenerator.ts#MarkdownGenerator) - 문서 생성
+- [LLMsTextGenerator](../../src/generator/LLMsTextGenerator.ts#LLMsTextGenerator) - 문서 생성
 
 **사용 시나리오:**
 - TypeScript 프로젝트 자동 문서화
@@ -212,10 +212,10 @@ chmod +x .git/hooks/pre-commit
 > 다양한 형식의 문서 생성
 
 **주요 산출물:**
-- [MarkdownGenerator](../../src/generator/MarkdownGenerator.ts#MarkdownGenerator) - 기본 마크다운
-- [EnhancedMarkdownGenerator](../../src/generator/EnhancedMarkdownGenerator.ts#EnhancedMarkdownGenerator) - 확장 메타데이터
-- [RelatedDocsGenerator](../../src/generator/RelatedDocsGenerator.ts#RelatedDocsGenerator) - 관련 문서 연결
-- [InsightDocGenerator](../../src/generator/InsightDocGenerator.ts#InsightDocGenerator) - 깊이별 탐색 결과 문서화
+- [LLMsTextGenerator](../../src/generator/LLMsTextGenerator.ts#LLMsTextGenerator) - 기본 마크다운
+- [LLMsTextGenerator](../../src/generator/LLMsTextGenerator.ts#LLMsTextGenerator) - 확장 메타데이터
+- [LLMsTextGenerator](../../src/generator/LLMsTextGenerator.ts#LLMsTextGenerator) - 관련 문서 연결
+- [LLMsTextGenerator](../../src/generator/LLMsTextGenerator.ts#LLMsTextGenerator) - 깊이별 탐색 결과 문서화
 **생성 형식:**
 - API 문서 (마크다운)
 - 계약 명세 (@contract, @precondition 등)
@@ -229,7 +229,6 @@ chmod +x .git/hooks/pre-commit
 
 **주요 산출물:**
 - [DocumentationFixer](../../src/fixer/DocumentationFixer.ts#DocumentationFixer) - 자동 수정
-- [RecursiveImprover](../../src/fixer/RecursiveImprover.ts#RecursiveImprover) - 재귀적 개선
 **기능:**
 - 누락된 태그 추가
 - 포맷 정규화
@@ -241,19 +240,6 @@ tsdoc-edge improve --target=90        # 목표 점수까지 개선
 ```
 
 ---
-## 9. Fold/Unfold System
-
-> 주석 접기/펼치기로 대용량 주석 관리
-**주요 산출물:**
-- [CommentExporter](../../src/fold/CommentExporter.ts#CommentExporter) - 주석 추출
-- [CommentImporter](../../src/fold/CommentImporter.ts#CommentImporter) - 주석 재삽입
-- [CommentStateManager](../../src/fold/CommentStateManager.ts#CommentStateManager) - 상태 추적
-**사용 시나리오:**
-- 대용량 TSDoc 주석 외부 관리
-- 버전 관리 용이성
-- 팀 협업 워크플로우
----
-
 ## 10. Storage Features
 > 심볼 정보 영속화 및 관리
 

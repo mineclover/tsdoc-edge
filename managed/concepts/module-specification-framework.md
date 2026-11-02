@@ -170,7 +170,7 @@ What's the public interface? (API surface, visibility)
 ### Dependencies
 
 - [[SpecCompletenessValidator]]: Core validation logic
-- ModuleSpecValidator: Spec parsing
+- [[ModuleSpecTagParser]] / [[SpecCompletenessValidator]]: Spec parsing
 - [[FileSystem]]: File I/O operations
 
 ### Environment
@@ -390,7 +390,7 @@ tsdoc-edge health --spec-completeness
 
 - [[ValidateSpecCommand]]: Validate framework compliance
 - [[SpecCompletenessValidator]]: Core validation logic
-- ModuleSpecValidator: Spec parsing
+- [[ModuleSpecTagParser]] / [[SpecCompletenessValidator]]: Spec parsing
 - ModuleSpecTypes: TypeScript type definitions
 
 ## Examples

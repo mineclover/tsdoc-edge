@@ -57,7 +57,6 @@ Validator System은 코드와 문서의 품질을 다양한 관점에서 검증�
 - `ConnectivityValidator`: SSOT 연결성 검증
 - `ConventionValidator`: 코딩 규칙 검증
 - `StrictModeValidator`: 엄격 모드 규칙
-- `ModuleSpecValidator`: 모듈 명세 완성도
 - `GeneratedDocsValidator`: 생성 문서 검증
 
 ---
@@ -123,26 +122,6 @@ class StrictModeValidator {
 ```
 
 **Source**: `src/validator/StrictModeValidator.ts`
-
-### ModuleSpecValidator
-
-모듈 명세 완성도 검증
-
-```typescript
-import type { ModuleSpecTagParser } from '../parser/ModuleSpecTagParser';
-
-/**
- * @doc [[Validator System]]
- * @context ModuleSpecTagParser가 추출한 7-part 명세 태그 파싱 결과를 검증
- */
-class ModuleSpecValidator {
-  validate(spec: ModuleSpecTemplate): ModuleSpecValidationResult
-  checkRequiredSections(): ValidationIssue[]
-  calculateScore(): number
-}
-```
-
-**Source**: `src/validator/ModuleSpecValidator.ts`
 
 ### [[GeneratedDocsValidator]]
 
@@ -377,10 +356,5 @@ issues.forEach(issue => {
 - ConventionValidator → src/validator/ConventionValidator.ts:36
 - DocValidationResult → src/validator/GeneratedDocsValidator.ts:20
 - GeneratedDocsValidator → src/validator/GeneratedDocsValidator.ts:71
-- ValidationSeverity → src/validator/ModuleSpecValidator.ts:20
-- ValidationIssue → src/validator/ModuleSpecValidator.ts:28
-- ModuleSpecValidationResult → src/validator/ModuleSpecValidator.ts:41
-- ValidationOptions → src/validator/ModuleSpecValidator.ts:55
-- ModuleSpecValidator → src/validator/ModuleSpecValidator.ts:82
 - StrictModeValidator → src/validator/StrictModeValidator.ts:36
 

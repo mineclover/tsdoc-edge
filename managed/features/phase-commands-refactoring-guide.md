@@ -232,7 +232,6 @@ git commit -m "refactor: Remove Phase6Commands after extracting all commands"
 | InitCommand | 129 | ✅ Done | 243349c |
 | IdNewCommand | 130 | ✅ Done | 243349c |
 | ValidateSpecCommand | 180 | ✅ Done | 243349c |
-| GenerateDocsCommand | 161 | ✅ Done | 243349c |
 
 **Progress**: 5/5 (100%) ✅
 **Legacy File Deleted**: 243349c
@@ -450,7 +449,6 @@ Completed all 6 commands from Phase5Commands.ts:
 Completed all 5 commands from Phase4Commands.ts:
 
 **Commits**:
-1. 243349c - All 5 commands (SuggestCommand, InitCommand, IdNewCommand, ValidateSpecCommand, GenerateDocsCommand)
 
 **Results**:
 - ✅ Reduced from 1 file (706 lines) to 5 files (avg 153 lines each)

@@ -74,16 +74,6 @@ tsdoc-edge docs symbols [path]
 
 **Source**: `src/commands/DocSymbolsCommand.ts`
 
-### [[GenerateDocsCommand]]
-
-Generates Markdown API and enhanced 6-category symbol documentation from annotated TypeScript sources.
-
-```bash
-tsdoc-edge docs generate [path] [options]
-```
-
-**Source**: `src/commands/GenerateDocsCommand.ts`
-
 ### [[ValidateGeneratedDocsCommand]]
 
 Verifies that generated Markdown documentation remains synchronized with current TypeScript TSDoc comments.

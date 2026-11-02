@@ -457,6 +457,6 @@ Uses: DependencySpec, Functionality, FuturePlan, ProblemSolving, DecisionRecord,
 ### Referenced By
 
 - [[TSDoc Edge Documentation]] → managed/README.md:181
-- [[Types Index]] → managed/types/index.md:377
-- [[Utilities Index]] → managed/utilities/index.md:462
+- [[Types Index]] → managed/types/index.md:365
+- [[Utilities Index]] → managed/utilities/index.md:426
 

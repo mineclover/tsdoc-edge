@@ -22,7 +22,6 @@ Renders Mermaid relationship diagrams centered on a target symbol with configura
 ### Referenced By
 
 - [[CLI Commands]] → managed/CLI-COMMANDS.md:43
-- [[MermaidGenerator]] → managed/utilities/MermaidGenerator.md:133
 
 ### Implemented By
 

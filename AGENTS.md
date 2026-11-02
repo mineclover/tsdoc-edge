@@ -7,12 +7,12 @@ This file provides guidance to Codex (Codex.ai/code) when working with code in t
 | Metric | Value |
 |--------|-------|
 | CLI Commands | 20 top-level (10 Core + 7 Unified Groups + 3 Revision/Coverage) |
-| Test Cases | 3,276 (239 suites) |
-| Symbols | 9,207 (Enrichment DB, local function-body variables excluded) |
-| Canonical `@ttsc/graph` | 8,648 internal (8,901 total) nodes / 17,674 internal (21,964 total) edges |
+| Test Cases | 2,939 (225 suites) |
+| Symbols | 8,601 (Enrichment DB, local function-body variables excluded) |
+| Canonical `@ttsc/graph` | 8,349 internal (8,613 total) nodes / 16,870 internal (20,995 total) edges |
 | Normative `SpecGraph` | 8 `project-spec` docs · 63 nodes · 55 bindings (`55/55` satisfied) |
-| Managed Docs & Links | 309/309 `With [[Symbol]]` (`100%`) · 2,008 links (`0` broken) · `0` unused docs |
-| Code ↔ Doc `@doc` Coverage | 313/313 `src/` files + 6/6 `mcp-server/src/` files (`100%` file coverage · `78.9%` effective symbol coverage) |
+| Managed Docs & Links | 299/299 `With [[Symbol]]` (`100%`) · 1,995 links (`0` broken) · `0` unused docs |
+| Code ↔ Doc `@doc` Coverage | 297/297 `src/` files + 6/6 `mcp-server/src/` files (`100%` file coverage · `80.0%` effective symbol coverage) |
 | Custom TSDoc Tags | 22 + Standard 29 + `@ttsc/graph` 6 |
 | `@ttsc/lint` | 25 error rules (0 findings) |
 | Health Score | 90/100 (A) system-status · 89/100 (A) spec metrics · 93/100 (A+) core modules |

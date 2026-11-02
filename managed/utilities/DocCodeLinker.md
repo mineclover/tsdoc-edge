@@ -75,7 +75,7 @@ const symbols = index.docToSymbol.get('managed/services.md');
 
 - [[LinkingTypes]] → managed/types/LinkingTypes.md:153
 - [[LinkValidator]] → managed/utilities/LinkValidator.md:76
-- [[Utilities Index]] → managed/utilities/index.md:432
+- [[Utilities Index]] → managed/utilities/index.md:396
 
 ### Implemented By
 

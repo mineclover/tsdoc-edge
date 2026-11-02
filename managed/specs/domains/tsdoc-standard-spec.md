@@ -215,7 +215,6 @@ const result = parser.parseFile('UserService.ts', sourceText);
 ### Implemented By
 
 - TSDocStandardSpecification → src/parser/TSDocParser.ts:1
-- MarkdownGenerator → src/generator/MarkdownGenerator.ts:17
 - EnhancedDocExtractor → src/parser/EnhancedDocExtractor.ts:76
 - ModuleSpecTagParser → src/parser/ModuleSpecTagParser.ts:34
 - CustomTagSpec → src/parser/TSDocParser.ts:31

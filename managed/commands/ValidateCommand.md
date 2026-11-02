@@ -49,7 +49,6 @@ Validate codebase and documentation integrity.
 - [[ParseTypes]] → managed/types/ParseTypes.md:139
 - [[ConnectivityValidator]] → managed/utilities/ConnectivityValidator.md:174
 - [[ConventionValidator]] → managed/utilities/ConventionValidator.md:239
-- [[ModuleSpecValidator]] → managed/utilities/ModuleSpecValidator.md:180
 
 ### Implemented By
 

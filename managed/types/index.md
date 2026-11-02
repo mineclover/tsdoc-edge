@@ -15,10 +15,10 @@ codeImplementation: not-applicable
 
 TSDoc Edge의 모든 타입 정의를 카테고리별로 정리한 인덱스입니다. 각 타입은 시스템의 특정 영역(그래프, 파싱, 검증, 분석)을 담당합니다.
 
-**총 19개 타입 정의**
+**총 18개 타입 정의**
 
 Canonical type links: [[DocumentSymbol]], [[TestRelationships]], [[TypeChain]], [[ParseTypes]],
-[[CustomTagTypes]], [[EnhancedTagTypes]], [[CommentStateTypes]], [[ModuleSpecTypes]],
+[[CustomTagTypes]], [[EnhancedTagTypes]], [[ModuleSpecTypes]],
 [[ModuleSpecTagTypes]], [[SpecTypes]], [[FeatureTypes]], [[LinkingTypes]], [[CodeHealthMetrics]],
 [[DataFlowTypes]], [[InterfaceTypes]], [[RegistryTypes]]
 
@@ -154,18 +154,6 @@ TSDoc 파싱 결과를 표현하는 타입.
 
 ---
 
-### [[CommentStateTypes]]
-**Path**: `CommentStateTypes.md`
-**Priority**: ⭐ Medium
-
-주석 상태 추적 타입.
-
-**States**: Draft, Review, Approved, Deprecated
-
-**Used By**: CommentStateManager (if exists)
-
----
-
 ## Specification Types (명세 관련 타입)
 
 ### [[ModuleSpecTypes]]
@@ -183,7 +171,7 @@ TSDoc 파싱 결과를 표현하는 타입.
 - `effect`: 부수 효과
 - `scope`: 범위
 
-**Used By**: ModuleSpecValidator, SpecCompletenessValidator
+**Used By**: [[SpecCompletenessValidator]]
 
 ---
 
@@ -195,7 +183,7 @@ TSDoc 파싱 결과를 표현하는 타입.
 
 **Tags**: `@responsibility`, `@contract`, `@param`, `@returns`, `@precondition`, `@postcondition`, `@algorithm`, `@complexity`, `@sideEffect`
 
-**Used By**: ModuleSpecValidator
+**Used By**: [[ModuleSpecTagParser]] / [[SpecCompletenessValidator]]
 
 ---
 
@@ -359,7 +347,7 @@ ModuleSpec
 Uses: Symbol, UnifiedRelationships, TypeChain, RegistryTypes
 
 ### Parsing System
-Uses: ParseTypes, CustomTagTypes, EnhancedTagTypes, CommentStateTypes
+Uses: ParseTypes, CustomTagTypes, EnhancedTagTypes
 
 ### Validation System
 Uses: ModuleSpecTypes, ModuleSpecTagTypes, SpecTypes, LinkingTypes
@@ -387,7 +375,7 @@ Uses: DocumentSymbol, FeatureTypes, LinkingTypes
 
 - [[TSDoc Edge Documentation]] → managed/README.md:180
 - [[Primary Types Index]] → managed/primary-types/index.md:448
-- [[Utilities Index]] → managed/utilities/index.md:461
+- [[Utilities Index]] → managed/utilities/index.md:425
 
 ### Implemented By
 

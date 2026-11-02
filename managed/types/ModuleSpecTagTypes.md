@@ -252,7 +252,7 @@ Maps to framework sections:
 
 - ModuleSpecTypes: 7-part framework
 - ModuleSpecTagParser: Parses these tags
-- ModuleSpecValidator: Validates completeness
+- [[ModuleSpecTagParser]] / [[SpecCompletenessValidator]]: Validates completeness
 
 ---
 

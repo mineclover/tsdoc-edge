@@ -421,7 +421,7 @@ Storage (SQLite + JSONL)
 ### Referenced By
 
 - [[TSDoc Edge Documentation]] → managed/README.md:176
-- [[Code Generation]] → managed/code-generation/index.md:136
+- [[Code Generation]] → managed/code-generation/index.md:45
 - [[AnalyzerCommands]] → managed/commands/AnalyzerCommands.md:255
 - [[Phase Commands]] → managed/commands/PhaseCommands.md:86
 - [[Core Systems]] → managed/core/index.md:50
@@ -431,9 +431,9 @@ Storage (SQLite + JSONL)
 - [[Relationship Analysis Guide]] → managed/guides/relationship-analysis-guide.md:430
 - [[Parser Components]] → managed/parser/index.md:118
 - [[Quick Start Guide]] → managed/quick-start.md:261
-- [[Types Index]] → managed/types/index.md:380
+- [[Types Index]] → managed/types/index.md:368
 - [[TSDoc Edge User Guide]] → managed/user-guide.md:282
-- [[Utilities Index]] → managed/utilities/index.md:463
+- [[Utilities Index]] → managed/utilities/index.md:427
 
 ### Implemented By
 

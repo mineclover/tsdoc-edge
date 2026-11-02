@@ -19,6 +19,13 @@ Extracts `@algorithm`, `@complexity`, `@sideEffect`, and standard visibility mod
 
 ## Backlinks
 
+### Referenced By
+
+- [[Module Specification Framework]] → managed/concepts/module-specification-framework.md:393
+- [[ModuleSpecTagTypes]] → managed/types/ModuleSpecTagTypes.md:255
+- [[ModuleSpecTypes]] → managed/types/ModuleSpecTypes.md:217
+- [[Types Index]] → managed/types/index.md:186
+
 ### Implemented By
 
 - ModuleSpecTagParser → src/parser/ModuleSpecTagParser.ts:34

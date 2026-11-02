@@ -30,7 +30,6 @@ export { DocsCommand } from './DocsCommand';
 export { FindMethodCommand } from './FindMethodCommand';
 export { FindUnusedDocsCommand } from './FindUnusedDocsCommand';
 export { FixCommand } from './FixCommand';
-export { GenerateDocsCommand } from './GenerateDocsCommand';
 export { HealthCommand } from './HealthCommand';
 export { HelpCommand } from './HelpCommand';
 export { IndexDocsCommand } from './IndexDocsCommand';

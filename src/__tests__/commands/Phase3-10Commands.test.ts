@@ -13,7 +13,6 @@ import {
   FindMethodCommand,
   FindUnusedDocsCommand,
   FixCommand,
-  GenerateDocsCommand,
   HelpCommand,
   InitCommand,
   OrphansCommand,
@@ -82,14 +81,6 @@ describe('Phase 4 Commands', () => {
       const command = new InitCommand();
       expect(command.getName()).toBe('init');
       expect(command.getDescription()).toContain('Initialize');
-    });
-  });
-
-  describe('GenerateDocsCommand', () => {
-    it('should have correct name and description', () => {
-      const command = new GenerateDocsCommand();
-      expect(command.getName()).toBe('generate-docs');
-      expect(command.getDescription()).toContain('Generate');
     });
   });
 });

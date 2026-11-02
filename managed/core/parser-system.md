@@ -374,7 +374,7 @@ console.log(`${result.cases.length}개 테스트 케이스`);
 
 ### Referenced By
 
-- [[Code Generation]] → managed/code-generation/index.md:137
+- [[Code Generation]] → managed/code-generation/index.md:46
 - [[Analyzer System]] → managed/core/analyzer-system.md:442
 - [[Document Symbol System]] → managed/core/doc-symbol-system.md:391
 - [[Spec Management System]] → managed/core/spec-management-system.md:397

@@ -413,7 +413,7 @@ symbols.forEach(sym => {
 
 - [[TSDoc Edge Documentation]] → managed/README.md:292
 - [[Semantic Graph Analysis and Relationship Model]] → managed/architecture/semantic-graph-analysis-and-relationship-model.md:1461
-- [[Code Generation]] → managed/code-generation/index.md:138
+- [[Code Generation]] → managed/code-generation/index.md:47
 - [[CheckLinksCommand]] → managed/commands/CheckLinksCommand.md:29
 - [[IndexDocsCommand]] → managed/commands/IndexDocsCommand.md:79
 - [[PromoteSymbolCommand]] → managed/commands/PromoteSymbolCommand.md:30
@@ -435,7 +435,7 @@ symbols.forEach(sym => {
 ### Implemented By
 
 - Document Symbol System → src/doc-symbol/DocumentSymbolParser.ts:1
-- DocsCommand → src/commands/DocsCommand.ts:59
+- DocsCommand → src/commands/DocsCommand.ts:57
 - IndexDocsCommand → src/commands/IndexDocsCommand.ts:46
 - MoveCommand → src/commands/MoveCommand.ts:25
 

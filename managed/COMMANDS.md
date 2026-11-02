@@ -115,7 +115,6 @@ Document utilities are also detailed in [[UtilityCommands]].
 | `docs backlinks [dir]` | Update bidirectional `## Backlinks` sections |
 | `docs check-links [dir]` | Check for broken markdown and `[[Symbol]]` links |
 | `docs update-refs` | Update code symbol references |
-| `docs generate [src]` | Generate markdown documentation |
 | `docs validate [dir]` | Validate documentation integrity |
 | `docs find-unused [dir]` | Find unreferenced documentation files |
 | `docs move <from> <to>` | Move documentation file and update references |
@@ -198,7 +197,7 @@ See [[Convention Pack Check]] for the full contract and CI exit semantics.
 - [[CLI Commands]] → managed/CLI-COMMANDS.md:59
 - [[TSDoc Edge Documentation]] → managed/README.md:177
 - [[Complete Workflow Architecture]] → managed/architecture/diagrams/mermaid-workflow-complete.md:188
-- [[UtilityCommands]] → managed/commands/UtilityCommands.md:294
+- [[UtilityCommands]] → managed/commands/UtilityCommands.md:284
 - [[Guides & Tutorials]] → managed/guides/index.md:350
 - [[Usage Scenarios]] → managed/guides/usage-scenarios.md:511
 - [[Primary Types Index]] → managed/primary-types/index.md:451

@@ -65,7 +65,7 @@ for SpecGraph lifecycle operations, and `convention check --pack <file>` for rev
 ### Referenced By
 
 - [[Phase Commands]] → managed/commands/PhaseCommands.md:102
-- [[UtilityCommands]] → managed/commands/UtilityCommands.md:295
+- [[UtilityCommands]] → managed/commands/UtilityCommands.md:285
 - [[CLI Command Development Guide]] → managed/guides/command-development-guide.md:791
 - [[CliCommandSurfaceSpecification]] → managed/specs/domains/cli-command-surface-spec.md:332
 
@@ -76,7 +76,6 @@ for SpecGraph lifecycle operations, and `convention check --pack <file>` for rev
 - CoreApiCommand → src/commands/CoreApiCommand.ts:43
 - FindMethodCommand → src/commands/FindMethodCommand.ts:47
 - FindUnusedDocsCommand → src/commands/FindUnusedDocsCommand.ts:44
-- GenerateDocsCommand → src/commands/GenerateDocsCommand.ts:27
 - HelpCommand → src/commands/HelpCommand.ts:44
 - InitCommand → src/commands/InitCommand.ts:27
 - OrphansCommand → src/commands/OrphansCommand.ts:47

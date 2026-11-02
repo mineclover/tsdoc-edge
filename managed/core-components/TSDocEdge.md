@@ -21,5 +21,5 @@ Top-level programmatic SDK facade exposing TSDoc parsing, symbol graph construct
 
 ### Implemented By
 
-- TSDocEdge → src/index.ts:162
+- TSDocEdge → src/index.ts:136
 

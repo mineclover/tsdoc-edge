@@ -192,7 +192,7 @@ See implementation: ModuleSpecTemplate
 
 ### Generate Spec
 ```bash
-tsdoc-edge generate-docs src/services/UserService.ts
+tsdoc-edge dc src/services/UserService.ts
 # Generates module spec from code
 ```
 
@@ -214,8 +214,8 @@ tsdoc-edge improve src/services/UserService.ts
 
 ## Related
 
-- ModuleSpecGenerator: Generates specs
-- ModuleSpecValidator: Validates specs
+- [[ModuleSpecTagParser]]: Parses module specification tags
+- [[SpecCompletenessValidator]]: Validates specification completeness
 - [[ValidateSpecCommand]]: CLI validation
 
 ---

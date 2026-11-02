@@ -12,71 +12,9 @@ canonical: true
 
 ## Overview
 
-The code generation system transforms analyzed code and metadata into various output formats including markdown documentation, module specifications, and related documentation links.
+The code generation system transforms analyzed code and metadata into active context and structured output formats for AI-assisted workflows and machine-readable reports.
 
-## Comment Management
-
-### [[Code Generation]]
-
-**Source**: `src/fold/CommentExporter.ts`
-
-Exports TSDoc comments to external format for version control and editing.
-
-- Extracts comments from TypeScript files
-- Preserves structure and formatting
-- Supports incremental export
-
-### [[Code Generation]]
-
-**Source**: `src/fold/CommentImporter.ts`
-
-Imports comments from external sources back into code.
-
-- Merges external edits into source
-- Handles conflict resolution
-- Validates comment syntax
-
-### [[Code Generation]]
-
-**Source**: `src/fold/CommentStateManager.ts`
-
-Manages comment state during fold/unfold operations.
-
-- Tracks comment modifications
-- Maintains sync between code and docs
-- Detects stale comments
-
-## Documentation Generators
-
-### [[MarkdownGenerator]]
-
-**Source**: `src/generator/MarkdownGenerator.ts`
-
-Converts parsed `@microsoft/tsdoc` `DocComment` AST nodes into clean, standard Markdown API documentation.
-
-- Paragraphs, code spans, plain text
-- Consistent formatting
-- Extensible base class
-
-### [[EnhancedMarkdownGenerator]]
-
-**Source**: `src/generator/EnhancedMarkdownGenerator.ts`
-
-Renders 6-category `EnhancedSymbolDoc` metadata, contracts, and cross-references into rich Markdown pages.
-
-- Rich formatting options
-- Symbol linking support
-- Cross-reference generation
-
-### [[InsightDocGenerator]]
-
-**Source**: `src/generator/InsightDocGenerator.ts`
-
-Generates hierarchical architectural insight documents organized by dependency depth and symbol importance.
-
-- Pattern insights
-- Usage analytics
-- Best practice recommendations
+## Context Generators
 
 ### [[LLMsTextGenerator]]
 
@@ -84,58 +22,29 @@ Generates hierarchical architectural insight documents organized by dependency d
 
 Formats unified file, symbol, contract, and impact context into compact `llms.txt`-compatible prompts for AI agents.
 
-### [[RelatedDocsGenerator]]
+### [[XMLContextGenerator]]
 
-**Source**: `src/generator/RelatedDocsGenerator.ts`
+**Source**: `src/generator/XMLContextGenerator.ts`
 
-Generates context-aware related documentation and implementation links from symbol relationship neighborhoods.
+Produces structured XML context for downstream tooling and model consumption.
 
-- Similarity-based recommendations
-- Symbol relationship links
-- Context-aware suggestions
+## Structured Output
 
-## Module Specification
-
-### [[ModuleSpecGenerator]]
-
-**Source**: `src/generator/ModuleSpecGenerator.ts`
-
-Synthesizes 7-aspect `ModuleSpecTemplate` specifications from TypeScript AST signatures, imports, and TSDoc tags.
-
-- Purpose, input, output documentation
-- Dependency extraction
-- Effect documentation
-
-### [[ModuleSpecMarkdownFormatter]]
-
-**Source**: `src/generator/ModuleSpecMarkdownFormatter.ts`
-
-Formats `ModuleSpecTemplate` data structures into standardized 7-aspect Markdown specification documents.
-
-- Structured section output
-- Consistent formatting
-- Template-based generation
+Structured output builders in `src/output/index.ts` expose JSON and XML builders plus schema-backed serialization for command results.
 
 ## Usage
 
 ```typescript
-import { EnhancedMarkdownGenerator } from './generator/EnhancedMarkdownGenerator';
-import { ModuleSpecGenerator } from './generator/ModuleSpecGenerator';
-
-// Generate markdown documentation
-const mdGenerator = new EnhancedMarkdownGenerator();
-const markdown = mdGenerator.generate(symbolData);
-
-// Generate module spec
-const specGenerator = new ModuleSpecGenerator();
-const spec = specGenerator.generate(moduleAnalysis);
+import { LLMsTextGenerator } from './generator/LLMsTextGenerator';
+import { XMLContextGenerator } from './generator/XMLContextGenerator';
+import { createBuilder } from './output';
 ```
 
 ## Related
 
 - [[Analyzers & Extractors]] - Analysis that feeds generation
 - [[Parser System]] - Parsing that provides input data
-- [[Document Symbol System]] - Symbol linking in generated docs
+- [[Document Symbol System]] - Symbol linking in generated context
 
 ---
 
@@ -148,7 +57,7 @@ const spec = specGenerator.generate(moduleAnalysis);
 
 ### Implemented By
 
-- Code Generation → src/fold/CommentExporter.ts:1
+- Code Generation → src/generator/LLMsTextGenerator.ts:1
 - XMLContextGenerator → src/generator/XMLContextGenerator.ts:23
 - JsonBuilder → src/output/JsonBuilder.ts:36
 - XmlBuilder → src/output/XmlBuilder.ts:81

@@ -246,7 +246,7 @@ sqlite3 .tsdoc/symbols.db "SELECT type, COUNT(*) FROM unified_relationships GROU
 
 ### Referenced By
 
-- [[Commands Index]] → managed/COMMANDS.md:187
+- [[Commands Index]] → managed/COMMANDS.md:186
 - [[TSDoc Edge Documentation]] → managed/README.md:178
 - [[Analyzers & Extractors]] → managed/analyzers/index.md:398
 - [[AnalyzerCommands]] → managed/commands/AnalyzerCommands.md:256

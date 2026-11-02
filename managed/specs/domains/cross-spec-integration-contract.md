@@ -248,7 +248,6 @@ npm run verify:document-validation
 ### Implemented By
 
 - CrossSpecIntegrationContract → src/provider/ProviderSnapshotNormalizer.ts:1
-- ModuleSpecGenerator → src/generator/ModuleSpecGenerator.ts:76
 - TSDOC_EDGE_CUSTOM_TAGS → src/parser/TSDocParser.ts:49
 - SourceDocCheckpointReference → src/parser/TsdocCommentReader.ts:159
 - PROVIDER_DELTA_NORMALIZER_VERSION → src/provider/DeltaNormalizer.ts:51

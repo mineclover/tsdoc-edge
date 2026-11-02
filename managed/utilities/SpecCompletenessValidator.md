@@ -85,7 +85,11 @@ console.log(`Missing: ${result.missingSections.join(', ')}`);
 - [[ValidateSpecCommand]] → managed/commands/ValidateSpecCommand.md:308
 - [[Module Specification Framework]] → managed/concepts/module-specification-framework.md:392
 - [[ValidationFeatures]] → managed/features/validation-features.md:290
+- [[ModuleSpecTagTypes]] → managed/types/ModuleSpecTagTypes.md:255
+- [[ModuleSpecTypes]] → managed/types/ModuleSpecTypes.md:218
 - [[SpecTypes]] → managed/types/SpecTypes.md:227
+- [[Types Index]] → managed/types/index.md:174
+- [[ConventionValidator]] → managed/utilities/ConventionValidator.md:237
 - [[SpecStatusManager]] → managed/utilities/SpecStatusManager.md:93
 
 ### Implemented By

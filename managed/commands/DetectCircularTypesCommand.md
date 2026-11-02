@@ -97,7 +97,6 @@ Uses DFS (Depth-First Search) to detect cycles:
 - [[SymbolGraphFeatures]] → managed/features/symbol-graph.md:282
 - [[ValidationFeatures]] → managed/features/validation-features.md:278
 - [[TypeChain]] → managed/types/TypeChain.md:124
-- [[MermaidGenerator]] → managed/utilities/MermaidGenerator.md:135
 
 ### Implemented By
 

@@ -59,8 +59,8 @@ TSDoc Edge의 메인 워크플로우는 TypeScript 소스 코드를 스캔하여
 - Public API 문서화 강제
 
 ### 5. 문서 생성
-- [MarkdownGenerator](../../src/generator/MarkdownGenerator.ts#MarkdownGenerator) - 기본 마크다운 생성
-- [EnhancedMarkdownGenerator](../../src/generator/EnhancedMarkdownGenerator.ts#EnhancedMarkdownGenerator) - 확장 메타데이터 포함
+- [LLMsTextGenerator](../../src/generator/LLMsTextGenerator.ts#LLMsTextGenerator) - LLM 컨텍스트 생성
+- [XMLContextGenerator](../../src/generator/XMLContextGenerator.ts#XMLContextGenerator) - 구조화된 XML 컨텍스트 생성
 **출력 형식:**
 - 구조화된 마크다운
 - 계약, 책임, 테스트 시나리오 포함
@@ -195,5 +195,5 @@ TSDoc Edge의 메인 워크플로우는 TypeScript 소스 코드를 스캔하여
 
 ### Implemented By
 
-- TSDocEdge → src/index.ts:162
+- TSDocEdge → src/index.ts:136
 

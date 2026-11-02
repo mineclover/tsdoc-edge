@@ -16,7 +16,6 @@ const modifiedFiles = [
   'managed/types/TypeChain.md',
   'managed/types/AnalyticsTypes.md',
   'managed/types/CodeHealthMetrics.md',
-  'managed/types/CommentStateTypes.md',
   'managed/types/DataFlowTypes.md',
   'managed/types/EnhancedTagTypes.md',
   'managed/types/LinkingTypes.md',

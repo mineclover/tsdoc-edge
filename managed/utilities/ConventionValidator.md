@@ -234,7 +234,7 @@ tsdoc-edge validate --strict --json > report.json
 
 ## Related
 
-- ModuleSpecValidator: Validates module specs
+- [[SpecCompletenessValidator]]: Validates module specs
 - StrictModeValidator: Strict mode enforcement
 - [[ValidateCommand]]: CLI validation
 
