@@ -50,14 +50,15 @@ type specIndexState struct {
 	exists      bool
 	managedDir  string
 	checkpoints map[string]bool
+	paths       map[string]string
 	hints       []specHintItem
 	graphNodes  []rule.GraphNode
 }
 
-func (specIndexRule) Name() string                   { return specIndexRuleName }
-func (specIndexRule) NeedsTypeChecker() bool         { return false }
-func (specIndexRule) AcceptsTtscLintOptions() bool   { return true }
-func (specIndexRule) UsesProjectInputReader() bool   { return true }
+func (specIndexRule) Name() string                 { return specIndexRuleName }
+func (specIndexRule) NeedsTypeChecker() bool       { return false }
+func (specIndexRule) AcceptsTtscLintOptions() bool { return true }
+func (specIndexRule) UsesProjectInputReader() bool { return true }
 
 func (specIndexRule) ProjectInputs(ctx *rule.ProjectInputContext) []rule.ProjectInput {
 	var opts specIndexOptions
@@ -91,8 +92,10 @@ func (specIndexRule) Check(ctx *rule.ProjectContext) {
 	}
 	if !exists {
 		ctx.SetState(&specIndexState{
-			exists:     false,
-			managedDir: managedDir,
+			exists:      false,
+			managedDir:  managedDir,
+			checkpoints: map[string]bool{},
+			paths:       map[string]string{},
 		})
 		return
 	}
@@ -138,6 +141,7 @@ func (specIndexRule) Check(ctx *rule.ProjectContext) {
 		exists:      true,
 		managedDir:  managedDir,
 		checkpoints: make(map[string]bool, len(files)*4),
+		paths:       make(map[string]string, len(files)*6),
 	}
 	seenHint := make(map[string]bool, len(files)*2)
 
@@ -170,15 +174,17 @@ func (specIndexRule) Hints(ctx *rule.HintContext) []rule.Hint {
 	}
 	out := make([]rule.Hint, 0, len(state.hints))
 	for _, item := range state.hints {
-		out = append(out, rule.Hint{
-			Insert: item.checkpoint,
-			Label:  "[[" + item.checkpoint + "]]",
-			Detail: item.relPath,
-			Trigger: rule.HintTrigger{
-				Scope: rule.HintScopeJSDoc,
-				After: "@doc [[",
-			},
-		})
+		for _, after := range []string{"@doc [[", "@evidence [["} {
+			out = append(out, rule.Hint{
+				Insert: item.checkpoint,
+				Label:  "[[" + item.checkpoint + "]]",
+				Detail: item.relPath,
+				Trigger: rule.HintTrigger{
+					Scope: rule.HintScopeJSDoc,
+					After: after,
+				},
+			})
+		}
 	}
 	return out
 }
@@ -206,8 +212,12 @@ func indexMarkdownSpecFile(state *specIndexState, seenHint map[string]bool, relP
 	base := path.Base(relPath)
 	ext := path.Ext(base)
 	baseName := base[:len(base)-len(ext)]
+	primaryCheckpoint := baseName
+	subRel := strings.TrimPrefix(relPath, state.managedDir+"/")
 	if baseName != "" {
 		state.checkpoints[baseName] = true
+		state.paths[relPath] = primaryCheckpoint
+		state.paths[subRel] = primaryCheckpoint
 	}
 
 	text := strings.TrimPrefix(string(raw), "\xef\xbb\xbf")
@@ -231,12 +241,11 @@ func indexMarkdownSpecFile(state *specIndexState, seenHint map[string]bool, relP
 	})
 
 	var (
-		fenceChar         byte
-		fenceLen          int
-		inBacklinks       bool
-		primaryCheckpoint string
-		sectionParent     [7]string
-		slugCounts        = make(map[string]int)
+		fenceChar     byte
+		fenceLen      int
+		inBacklinks   bool
+		sectionParent [7]string
+		slugCounts    = make(map[string]int)
 	)
 
 	for idx := startIdx; idx < len(lines); idx++ {
@@ -290,6 +299,9 @@ func indexMarkdownSpecFile(state *specIndexState, seenHint map[string]bool, relP
 			if level == 1 && primaryCheckpoint == "" {
 				primaryCheckpoint = cp
 			}
+			if level == 1 && primaryCheckpoint == baseName {
+				primaryCheckpoint = cp
+			}
 			state.checkpoints[cp] = true
 			aliases = append(aliases, "[["+cp+"]]")
 			if !seenHint[cp] {
@@ -305,6 +317,10 @@ func indexMarkdownSpecFile(state *specIndexState, seenHint map[string]bool, relP
 				aliases = append(aliases, "[["+qualified+"]]")
 			}
 		}
+		if level == 1 {
+			state.paths[relPath] = primaryCheckpoint
+			state.paths[subRel] = primaryCheckpoint
+		}
 
 		for l := level; l <= 6; l++ {
 			sectionParent[l] = ""
@@ -318,11 +334,24 @@ func indexMarkdownSpecFile(state *specIndexState, seenHint map[string]bool, relP
 		}
 
 		baseSlug := githubSlug(headingText)
+		state.checkpoints[baseSlug] = true
 		count := slugCounts[baseSlug]
 		slugCounts[baseSlug] = count + 1
 		slug := baseSlug
 		if count > 0 {
 			slug = fmt.Sprintf("%s-%d", baseSlug, count)
+		}
+		if primaryCheckpoint != "" {
+			sectionCheckpoint := baseSlug
+			if len(checkpoints) > 0 && level >= 2 {
+				sectionCheckpoint = checkpoints[0]
+			}
+			value := primaryCheckpoint
+			if level >= 2 {
+				value += "#" + sectionCheckpoint
+			}
+			state.paths[relPath+"#"+slug] = value
+			state.paths[subRel+"#"+slug] = value
 		}
 		addr := relPath + "#" + slug
 		sectionParent[level] = addr
@@ -338,6 +367,11 @@ func indexMarkdownSpecFile(state *specIndexState, seenHint map[string]bool, relP
 		})
 	}
 
+	if primaryCheckpoint == "" {
+		primaryCheckpoint = baseName
+	}
+	state.paths[relPath] = primaryCheckpoint
+	state.paths[subRel] = primaryCheckpoint
 	state.graphNodes[docNodeIdx].Readable = docTitle
 }
 

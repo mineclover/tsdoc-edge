@@ -232,14 +232,62 @@ func applyEdits(t *testing.T, src string, findings []recordedFinding) string {
 
 func TestRegisteredRulesInventory(t *testing.T) {
 	wantProjects := map[string]bool{
-		"tsdoc-edge/tsdoc-config": true,
-		"tsdoc-edge/spec-index":   true,
+		"tsdoc-edge/tsdoc-config":  true,
+		"tsdoc-edge/spec-index":    true,
+		"tsdoc-edge/spec-bindings": true,
 	}
 	for _, pr := range rule.RegisteredProjects() {
 		delete(wantProjects, pr.Name())
 	}
 	if len(wantProjects) != 0 {
 		t.Fatalf("missing registered project rules: %v", wantProjects)
+	}
+}
+
+func TestSpecBindingsRuleValidAndInvalidDocuments(t *testing.T) {
+	dir := t.TempDir()
+	managed := filepath.Join(dir, "managed")
+	if err := os.MkdirAll(managed, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	valid := strings.Join([]string{
+		"---", "type: project-spec", "---", "# [[ValidSpec]]", "", "```tsdoc-spec",
+		`{"requirements":[{"id":"REQ-VALID-001"}],"edges":[{"from":"spec:ValidSpec","to":"REQ-VALID-001"}],"bindings":[{"id":"BIND-VALID-001","specNodeId":"REQ-VALID-001","target":{"type":"code-node","canonicalNodeId":"src/valid.ts#valid:function"}}]}`,
+		"```", "",
+	}, "\n")
+	if err := os.MkdirAll(filepath.Join(dir, "src"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(dir, "src", "valid.ts"), []byte("export function valid() {}\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(managed, "valid.md"), []byte(valid), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	invalid := strings.Join([]string{
+		"---", "type: project-spec", "---", "# [[InvalidSpec]]", "", "```tsdoc-spec", "{not-json}", "```", "",
+	}, "\n")
+	if err := os.WriteFile(filepath.Join(managed, "invalid.md"), []byte(invalid), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	rep := &testProjectReporter{}
+	ctx := rule.NewProjectContext(rule.ProjectIdentity{PhysicalProjectRoot: dir}, nil, nil, rule.SeverityError, nil, rep)
+	ctx.Inputs = &recordingInputReader{}
+	specBindingsRule{}.Check(ctx)
+	if !rep.failed || len(rep.messages) == 0 {
+		t.Fatalf("expected malformed tsdoc-spec finding, got %+v", rep.messages)
+	}
+
+	if err := os.Remove(filepath.Join(managed, "invalid.md")); err != nil {
+		t.Fatal(err)
+	}
+	rep = &testProjectReporter{}
+	ctx = rule.NewProjectContext(rule.ProjectIdentity{PhysicalProjectRoot: dir}, nil, nil, rule.SeverityError, nil, rep)
+	ctx.Inputs = &recordingInputReader{}
+	specBindingsRule{}.Check(ctx)
+	if rep.failed {
+		t.Fatalf("valid tsdoc-spec unexpectedly failed: %+v", rep.messages)
 	}
 }
 
@@ -510,15 +558,18 @@ func TestSpecIndexDocLinkSyntaxAndTarget(t *testing.T) {
 		State:    projRep.state,
 		Severity: rule.SeverityError,
 	})
-	if len(hints) != 2 {
-		t.Fatalf("expected 2 hints (Hover Support, LSP Integration), got %+v", hints)
+	if len(hints) != 4 {
+		t.Fatalf("expected 4 hints (two triggers for Hover Support, LSP Integration), got %+v", hints)
 	}
 	if hints[0].Insert != "Hover Support" || hints[0].Label != "[[Hover Support]]" ||
 		hints[0].Trigger.Scope != rule.HintScopeJSDoc || hints[0].Trigger.After != "@doc [[" {
 		t.Fatalf("unexpected hint[0]: %+v", hints[0])
 	}
-	if hints[1].Insert != "LSP Integration" || hints[1].Detail != "managed/features/lsp-integration.md" {
-		t.Fatalf("unexpected hint[1]: %+v", hints[1])
+	if hints[1].Insert != "Hover Support" || hints[1].Trigger.After != "@evidence [[" ||
+		hints[2].Insert != "LSP Integration" || hints[2].Trigger.After != "@doc [[" ||
+		hints[3].Insert != "LSP Integration" || hints[3].Trigger.After != "@evidence [[" ||
+		hints[2].Detail != "managed/features/lsp-integration.md" {
+		t.Fatalf("unexpected hints: %+v", hints)
 	}
 
 	// Verify GraphNodes (1 document + 4 non-backlink/non-fenced headings with deduplicated slugs).
@@ -553,10 +604,12 @@ func TestSpecIndexDocLinkSyntaxAndTarget(t *testing.T) {
 		` * @doc [[Hover Support]]`,
 		` * @doc [[LSP Integration#Hover Support]]`,
 		` * @doc [[LSP Integration#CustomHeading]]`,
+		` * @evidence [[LSP Integration]]`,
+		` * @evidence managed/features/lsp-integration.md#hover-support`,
+		` * @evidenceReview specs/order.tsp#OrderSubmissionPhase #65a0cfc`,
 		" * Prose mention of `@doc` in backticks is ignored.",
 		` *`,
 		` * Invalid syntax:`,
-		` * @doc managed/features/lsp-integration.md`,
 		` * @doc [[]]`,
 		` *`,
 		` * Invalid targets:`,
@@ -569,8 +622,8 @@ func TestSpecIndexDocLinkSyntaxAndTarget(t *testing.T) {
 	tsFile := parseTestTS(t, tsSrc)
 
 	syntaxFindings := runFileRule(t, docLinkSyntaxRule{}, tsFile, nil, results)
-	if len(syntaxFindings) != 2 {
-		t.Fatalf("expected 2 doc-link-syntax findings, got %d: %+v", len(syntaxFindings), syntaxFindings)
+	if len(syntaxFindings) != 1 {
+		t.Fatalf("expected 1 doc-link-syntax finding, got %d: %+v", len(syntaxFindings), syntaxFindings)
 	}
 
 	targetFindings := runFileRule(t, docLinkTargetRule{}, tsFile, nil, results)

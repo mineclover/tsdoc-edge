@@ -1,6 +1,7 @@
 package tsdocedge
 
 import (
+	"path/filepath"
 	"strings"
 
 	shimast "github.com/microsoft/typescript-go/shim/ast"
@@ -47,7 +48,7 @@ func (docLinkSyntaxRule) Check(ctx *rule.Context, _ *shimast.Node) {
 				ctx.ReportRange(
 					tag.tagStart,
 					tag.lineEnd,
-					"TSDoc @doc tag must reference a document checkpoint in [[Checkpoint]] format (escape prose mentions as `@doc` in backticks).",
+					"TSDoc citation tag must reference [[Checkpoint]] or a .md/.mdx/.tsp/.yaml/.json path (escape prose mentions in backticks).",
 				)
 			}
 		})
@@ -84,6 +85,19 @@ func (docLinkTargetRule) Check(ctx *rule.Context, _ *shimast.Node) {
 			}
 			target := strings.TrimSpace(tag.target)
 			base := strings.TrimSpace(strings.SplitN(target, "#", 2)[0])
+			if tag.isPathRef {
+				ext := strings.ToLower(filepath.Ext(base))
+				if ext == ".tsp" || ext == ".yaml" || ext == ".json" {
+					return
+				}
+				validScope := strings.HasPrefix(base, state.managedDir+"/") || !strings.Contains(base, "..")
+				hasFragment := strings.Contains(target, "#")
+				matched := state.paths[target] != "" || (!hasFragment && state.paths[base] != "")
+				if !validScope || !matched {
+					ctx.ReportRange(tag.bracketStart, tag.bracketEnd, "TSDoc citation path \""+target+"\" does not match a Markdown document or # heading under "+state.managedDir+"/.")
+				}
+				return
+			}
 			if !state.checkpoints[target] && !state.checkpoints[base] {
 				ctx.ReportRange(
 					tag.bracketStart,
@@ -102,6 +116,7 @@ type parsedDocTagLine struct {
 	bracketStart int
 	bracketEnd   int
 	target       string
+	isPathRef    bool
 }
 
 func forEachDocTagLine(src string, block docBlock, visit func(parsedDocTagLine)) {
@@ -124,10 +139,17 @@ func forEachDocTagLine(src string, block docBlock, visit func(parsedDocTagLine))
 			effectiveEnd--
 		}
 
-		if effectiveEnd-trimmedStart >= 4 &&
-			src[trimmedStart:trimmedStart+4] == "@doc" &&
-			(trimmedStart+4 == effectiveEnd || src[trimmedStart+4] == ' ' || src[trimmedStart+4] == '\t') {
-			visit(parseDocTagLine(src, trimmedStart, effectiveEnd))
+		if effectiveEnd-trimmedStart >= 4 {
+			name := ""
+			for _, candidate := range []string{"@doc", "@evidenceReview", "@evidence"} {
+				if strings.HasPrefix(src[trimmedStart:effectiveEnd], candidate) && (trimmedStart+len(candidate) == effectiveEnd || src[trimmedStart+len(candidate)] == ' ' || src[trimmedStart+len(candidate)] == '\t') {
+					name = candidate
+					break
+				}
+			}
+			if name != "" {
+				visit(parseDocTagLine(src, trimmedStart, effectiveEnd))
+			}
 		}
 
 		lineStart = rawLineEnd + 1
@@ -139,11 +161,41 @@ func parseDocTagLine(src string, tagStart, lineEnd int) parsedDocTagLine {
 		tagStart: tagStart,
 		lineEnd:  lineEnd,
 	}
-	pos := tagStart + 4
+	nameLen := 4
+	if strings.HasPrefix(src[tagStart:lineEnd], "@evidenceReview") {
+		nameLen = len("@evidenceReview")
+	} else if strings.HasPrefix(src[tagStart:lineEnd], "@evidence") {
+		nameLen = len("@evidence")
+	}
+	pos := tagStart + nameLen
 	for pos < lineEnd && (src[pos] == ' ' || src[pos] == '\t') {
 		pos++
 	}
-	if lineEnd-pos < 5 || src[pos:pos+2] != "[[" {
+	if lineEnd-pos < 2 {
+		return res
+	}
+	if src[pos:pos+2] != "[[" {
+		fields := strings.Fields(src[pos:lineEnd])
+		if len(fields) == 0 {
+			return res
+		}
+		candidate := strings.Trim(fields[0], "`\"'")
+		if strings.HasPrefix(candidate, "http://") || strings.HasPrefix(candidate, "https://") {
+			return res
+		}
+		base := candidate
+		if idx := strings.IndexByte(base, '#'); idx >= 0 {
+			base = base[:idx]
+		}
+		ext := strings.ToLower(filepath.Ext(base))
+		if ext != ".md" && ext != ".mdx" && ext != ".tsp" && ext != ".yaml" && ext != ".json" {
+			return res
+		}
+		res.validSyntax = true
+		res.bracketStart = pos
+		res.bracketEnd = pos + len(fields[0])
+		res.target = candidate
+		res.isPathRef = true
 		return res
 	}
 	innerStart := pos + 2
