@@ -102,6 +102,11 @@ TSDoc Edge는 세 계층 SSOT를 함께 동기화합니다. `@microsoft/tsdoc`�
 `tsdoc_work_context`, `tsdoc_design_context`, `tsdoc_trace_data`,
 `tsdoc_sync_check`.
 
+또한 `/Users/junwoobang/workflow/ttsc-doc/plugin/index.cjs`는 기존 7개 `@ttsc/lint` Go 규칙에 더해
+8번째 규칙인 `tsdoc-edge/spec-bindings`(`type: project-spec`의 `tsdoc-spec` 블록 내 `REQ-*`/`BIND-*` 무결성 컴파일 타임 검증)를
+포함하며, `@ttsc/evidence`의 `@evidence <doc.md#slug>` 및 `@ttsc/graph`의 `{@link}`(`doc_ref`) 간선을
+`## Backlinks`, `wc`, `dc`, `trace`에 양방향으로 통합합니다.
+
 ### 양 엔진 호환 문서·SpecGraph 작성 규칙
 
 새 문서와 주석은 다음 형태를 지켜야 `tsdoc-edge`와 `ttsc-doc`에서 100% 같은 체크포인트,
