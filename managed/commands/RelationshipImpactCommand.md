@@ -21,7 +21,7 @@ Computes direct and transitive downstream/upstream change impact for a given sym
 
 ### Referenced By
 
-- [[MCP Integration]] → managed/features/mcp-integration.md:69
+- [[MCP Integration]] → managed/features/mcp-integration.md:71
 
 ### Implemented By
 

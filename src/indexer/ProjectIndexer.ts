@@ -156,7 +156,19 @@ function stableJson(value: unknown): string {
   return JSON.stringify(canonicalJsonClone(value, 'fingerprint'));
 }
 
+const ARTIFACT_NODE_KINDS = new Set([
+  'markdown_document',
+  'markdown_section',
+  'prisma_model',
+  'prisma_column',
+  'prisma_relation',
+  'swagger_operation',
+]);
+
 function requireCanonicalNodeId(id: string, kind: string, index: number): void {
+  if (ARTIFACT_NODE_KINDS.has(kind)) {
+    return;
+  }
   const hash = id.lastIndexOf('#');
   const kindSeparator = id.lastIndexOf(':');
   if (hash <= 0 || kindSeparator <= hash + 1 || id.slice(kindSeparator + 1) !== kind) {

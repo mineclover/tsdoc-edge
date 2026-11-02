@@ -299,5 +299,5 @@ Cache TSDoc database between runs:
 
 ### Referenced By
 
-- [[Features Index]] → managed/features/index.md:218
+- [[Features Index]] → managed/features/index.md:232
 

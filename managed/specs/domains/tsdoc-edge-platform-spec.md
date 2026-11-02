@@ -272,11 +272,11 @@ node dist/cli.js spec metrics --dir managed/specs --detail
 ### Referenced By
 
 - [[DesignContextCommand]] → managed/commands/DesignContextCommand.md:41
-- [[MCP Integration]] → managed/features/mcp-integration.md:65
+- [[MCP Integration]] → managed/features/mcp-integration.md:67
 - [[ConventionCheck]] → managed/specs/conventions/convention-check.md:200
 - [[CliCommandSurfaceSpecification]] → managed/specs/domains/cli-command-surface-spec.md:399
 - [[CrossSpecIntegrationContract]] → managed/specs/domains/cross-spec-integration-contract.md:17
-- [[GraphAndPersistencePlaneSpecification]] → managed/specs/domains/graph-and-persistence-plane-spec.md:255
+- [[GraphAndPersistencePlaneSpecification]] → managed/specs/domains/graph-and-persistence-plane-spec.md:276
 - [[LspAndCoverageSurfaceSpecification]] → managed/specs/domains/lsp-and-coverage-surface-spec.md:267
 - [[TSDocStandardSpecification]] → managed/specs/domains/tsdoc-standard-spec.md:16
 - [[TtscPlatformSpecification]] → managed/specs/domains/ttsc-platform-spec.md:16

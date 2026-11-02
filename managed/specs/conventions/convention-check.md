@@ -266,7 +266,7 @@ tsdoc-edge convention check \
 ### Referenced By
 
 - [[Convention Pack Check]] → managed/features/convention-pack-check.md:440
-- [[GraphAndPersistencePlaneSpecification]] → managed/specs/domains/graph-and-persistence-plane-spec.md:260
+- [[GraphAndPersistencePlaneSpecification]] → managed/specs/domains/graph-and-persistence-plane-spec.md:281
 - [[AuthoredProjectSpecifications]] → managed/specs/index.md:47
 
 ### Implemented By

@@ -6,12 +6,13 @@
  * @doc [[CliCommandSurfaceSpecification]]
  * @doc [[SymbolQueryCommand]]
  * @context Unified `symbol` command group in the 20-command CLI surface
- * @functionality Routes 13 symbol subcommands (`query`, `deps`, `who-uses`, `orphans`, `find-method`, `tree`, `core-api`, `undocumented`, `untested`, `parse`, `promote`, `fix`, `rename`)
+ * @functionality Routes 14 symbol subcommands (`query`, `trace`, `deps`, `who-uses`, `orphans`, `find-method`, `tree`, `core-api`, `undocumented`, `untested`, `parse`, `promote`, `fix`, `rename`)
  * @sideEffect console: Writes subcommand routing errors and subcommand listings to stdout
  */
 
 import { BaseCommand, type CommandResult } from './BaseCommand';
 import { CoreApiCommand } from './CoreApiCommand';
+import { DataTraceCommand } from './DataTraceCommand';
 import { DepsCommand } from './DepsCommand';
 import { FindMethodCommand } from './FindMethodCommand';
 import { OrphansCommand } from './OrphansCommand';
@@ -29,6 +30,10 @@ const SUBCOMMANDS = {
   query: {
     command: SymbolQueryCommand,
     description: 'Query code symbols (Canonical @ttsc/graph) and [[Symbol]] checkpoints',
+  },
+  trace: {
+    command: DataTraceCommand,
+    description: 'Trace 3-tier data flow (type/field roles, cross-boundary lineage, AST slice)',
   },
   deps: { command: DepsCommand, description: 'Show symbol dependencies' },
   'who-uses': { command: WhoUsesCommand, description: 'Show who uses a symbol' },

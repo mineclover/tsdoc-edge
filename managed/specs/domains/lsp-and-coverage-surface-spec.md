@@ -278,7 +278,7 @@ tsdoc-edge spec metrics --dir managed/specs --detail
 
 ### Referenced By
 
-- [[MCP Integration]] → managed/features/mcp-integration.md:66
+- [[MCP Integration]] → managed/features/mcp-integration.md:68
 - [[TsdocEdgePlatformSpecification]] → managed/specs/domains/tsdoc-edge-platform-spec.md:206
 - [[AuthoredProjectSpecifications]] → managed/specs/index.md:46
 

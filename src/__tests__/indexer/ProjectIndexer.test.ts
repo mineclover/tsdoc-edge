@@ -65,6 +65,25 @@ describe('ProjectIndexer', () => {
     );
   });
 
+  it('accepts @ttsc/graph non-TS artifact node kinds (markdown, prisma, swagger)', async () => {
+    const input = graphInput(false);
+    input.nodes.push(
+      { id: 'docs/spec.md#overview', kind: 'markdown_section', name: 'overview' },
+      { id: 'prisma:User.email', kind: 'prisma_column', name: 'email' },
+      { id: 'POST:/users', kind: 'swagger_operation', name: 'createUser' }
+    );
+    input.edges.push({
+      kind: 'doc_ref',
+      from: 'src/a.ts#A:class',
+      to: 'docs/spec.md#overview',
+    });
+
+    const graph = (await new ProjectIndexer(sourceFor(input)).index({ rootDir })).graph;
+    expect(graph.nodes.map((node) => node.kind)).toEqual(
+      expect.arrayContaining(['markdown_section', 'prisma_column', 'swagger_operation'])
+    );
+  });
+
   it('accepts external URI ids and uses locale-independent code-unit order', async () => {
     const input = graphInput(false);
     input.nodes = [

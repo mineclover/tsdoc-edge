@@ -318,7 +318,7 @@ chmod +x .git/hooks/pre-commit
 
 - [[TSDoc Edge Documentation]] → managed/README.md:295
 - [[CoreFeatures]] → managed/features/core-features-catalog.md:183
-- [[Features Index]] → managed/features/index.md:301
+- [[Features Index]] → managed/features/index.md:315
 - [[Guides & Tutorials]] → managed/guides/index.md:408
 
 ### Implemented By

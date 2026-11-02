@@ -256,7 +256,7 @@ if (violations.length > 0) {
 
 ### Referenced By
 
-- [[Commands Index]] → managed/COMMANDS.md:100
+- [[Commands Index]] → managed/COMMANDS.md:102
 - [[AnalyzerCommands]] → managed/commands/AnalyzerCommands.md:166
 - [[Co-Requirement]] → managed/relationships/co-requirement.md:242
 

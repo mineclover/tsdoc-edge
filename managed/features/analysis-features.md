@@ -452,7 +452,7 @@ jobs:
 - [[SuggestCommand]] → managed/commands/SuggestCommand.md:485
 - [[CoreFeatures]] → managed/features/core-features-catalog.md:65
 - [[CoreWorkflow]] → managed/features/core-workflow.md:152
-- [[Features Index]] → managed/features/index.md:293
+- [[Features Index]] → managed/features/index.md:307
 - [[LSP Integration]] → managed/features/lsp-integration.md:479
 - [[SymbolGraphFeatures]] → managed/features/symbol-graph.md:376
 - [[ValidationFeatures]] → managed/features/validation-features.md:410

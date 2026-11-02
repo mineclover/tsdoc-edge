@@ -11,6 +11,12 @@
 export { CanonicalGraphIndex } from './CanonicalGraphIndex';
 export * from './contracts';
 export {
+  DataTraceService,
+  type DataTraceServiceOptions,
+  formatDataTraceLlmMarkdown,
+} from './DataTraceService';
+export * from './data-trace-contracts';
+export {
   CONTAINMENT_GRAPH_EDGE_KINDS,
   DEPENDENCY_GRAPH_EDGE_KINDS,
   type GraphEdgeSemantic,

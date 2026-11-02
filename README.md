@@ -102,6 +102,7 @@ The `work-context` command provides everything you need before modifying code:
 | Work Context | `wc <file>` | Complete context before file modification |
 | Design Context | `dc <file>` | Spec bindings, `@contract`, and `@decision` view |
 | Symbol Query | `symbol query <name>` | Code symbol (`@ttsc/graph`) + `[[Symbol]]` checkpoint lookup |
+| 3-Tier Data Trace | `symbol trace <target>` / `relationship trace <target> [to]` | Trace Type/Field roles (`DTO.field`), cross-boundary lineage (`SpecGraph`/`@samchon/typespec-evidence`/`oa-sdk`), and AST code slices |
 | Relationship Analysis | `relationship stats` | Canonical `@ttsc/graph` + project relationship metrics |
 | Impact Analysis | `relationship impact <symbol>` | Change impact assessment |
 | Validation | `validate docs` / `validate tsdoc` | Checkpoint SSOT & Microsoft TSDoc syntax validation |

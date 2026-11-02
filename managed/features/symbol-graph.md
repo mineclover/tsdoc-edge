@@ -399,7 +399,7 @@ tsdoc-edge tree
 - [[AnalysisFeatures]] → managed/features/analysis-features.md:433
 - [[CoreFeatures]] → managed/features/core-features-catalog.md:102
 - [[CoreWorkflow]] → managed/features/core-workflow.md:154
-- [[Features Index]] → managed/features/index.md:296
+- [[Features Index]] → managed/features/index.md:310
 - [[LSP Integration]] → managed/features/lsp-integration.md:478
 - [[ValidationFeatures]] → managed/features/validation-features.md:411
 - [[Guides & Tutorials]] → managed/guides/index.md:406

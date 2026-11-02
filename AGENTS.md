@@ -7,12 +7,12 @@ This file provides guidance to Codex (Codex.ai/code) when working with code in t
 | Metric | Value |
 |--------|-------|
 | CLI Commands | 20 top-level (10 Core + 7 Unified Groups + 3 Revision/Coverage) |
-| Test Cases | 3,269 (237 suites) |
-| Symbols | 9,088 (Enrichment DB, local function-body variables excluded) |
-| Canonical `@ttsc/graph` | 8,381 internal (8,634 total) nodes / 17,118 internal (21,335 total) edges |
-| Normative `SpecGraph` | 8 `project-spec` docs · 62 nodes · 54 bindings (`54/54` satisfied) |
-| Managed Docs & Links | 308/308 `With [[Symbol]]` (`100%`) · 1,996 links (`0` broken) · `0` unused docs |
-| Code ↔ Doc `@doc` Coverage | 310/310 `src/` files + 6/6 `mcp-server/src/` files (`100%` file coverage · `78.7%` effective symbol coverage) |
+| Test Cases | 3,276 (239 suites) |
+| Symbols | 9,207 (Enrichment DB, local function-body variables excluded) |
+| Canonical `@ttsc/graph` | 8,648 internal (8,901 total) nodes / 17,674 internal (21,964 total) edges |
+| Normative `SpecGraph` | 8 `project-spec` docs · 63 nodes · 55 bindings (`55/55` satisfied) |
+| Managed Docs & Links | 309/309 `With [[Symbol]]` (`100%`) · 2,008 links (`0` broken) · `0` unused docs |
+| Code ↔ Doc `@doc` Coverage | 313/313 `src/` files + 6/6 `mcp-server/src/` files (`100%` file coverage · `78.9%` effective symbol coverage) |
 | Custom TSDoc Tags | 22 + Standard 29 + `@ttsc/graph` 6 |
 | `@ttsc/lint` | 25 error rules (0 findings) |
 | Health Score | 90/100 (A) system-status · 89/100 (A) spec metrics · 93/100 (A+) core modules |
@@ -56,6 +56,7 @@ tsdoc-edge sync --force --json   # 전체 재생성 및 기계 판독 결과
 tsdoc-edge wc <file-path> --llm  # 모듈 개요 + 전체 export API + 의존/피의존/테스트
 tsdoc-edge dc <file-path>        # 규범 명세 바인딩 + 계약(@contract) + ADR(@decision)
 tsdoc-edge symbol query <name>   # 코드 심볼(@ttsc/graph) + [[Symbol]] 체크포인트 통합 조회
+tsdoc-edge symbol trace <target> # 3계층 데이터 추적 (Type/Field 흐름 + 경계 간 계보 + AST 슬라이싱)
 tsdoc-edge symbol find-method <name> # 메서드 이름으로 심볼 검색
 tsdoc-edge convention check --pack managed/conventions/tsdoc-edge-core.json
 
@@ -99,6 +100,9 @@ tsdoc-edge dc src/commands/BuildCommand.ts --json
 ```bash
 # 변경 영향 분석
 tsdoc-edge relationship impact <symbol-id>
+
+# 3계층 데이터 흐름·계보·슬라이싱 추적 (Type.field / 경계 간 계보 / AST 변수·파라미터 슬라이스)
+tsdoc-edge relationship trace <target> [to-target]
 
 # 중요 심볼 찾기
 tsdoc-edge relationship metrics --top 10

@@ -6,12 +6,13 @@
  * @doc [[RelationshipCommands]]
  * @doc [[CliCommandSurfaceSpecification]]
  * @context Unified `relationship` command group in the 20-command CLI surface
- * @functionality Routes 15 relationship subcommands (`query`, `impact`, `path`, `clusters`, `metrics`, `validate`, `export`, `stats`, `check`, `visualize`, `analyze`, `type-chain`, `cycles`, `roots`, `help`)
+ * @functionality Routes 16 relationship subcommands (`query`, `trace`, `impact`, `path`, `clusters`, `metrics`, `validate`, `export`, `stats`, `check`, `visualize`, `analyze`, `type-chain`, `cycles`, `roots`, `help`)
  * @sideEffect console: Writes subcommand routing diagnostics and available subcommand help to stdout
  */
 
 import { AnalyzeRelationshipsCommand } from './AnalyzeRelationshipsCommand';
 import { BaseCommand, type CommandResult } from './BaseCommand';
+import { DataTraceCommand } from './DataTraceCommand';
 import { RelationshipCheckCommand } from './RelationshipCheckCommand';
 import { RelationshipClustersCommand } from './RelationshipClustersCommand';
 import { RelationshipExportCommand } from './RelationshipExportCommand';
@@ -31,6 +32,10 @@ import {
 
 const SUBCOMMANDS = {
   query: { command: RelationshipQueryCommand, description: 'Query relationships for a symbol' },
+  trace: {
+    command: DataTraceCommand,
+    description: 'Trace 3-tier data flow & shared-state/repository junctions',
+  },
   impact: { command: RelationshipImpactCommand, description: 'Analyze change impact' },
   path: { command: RelationshipPathCommand, description: 'Find paths between symbols' },
   clusters: { command: RelationshipClustersCommand, description: 'Discover architectural modules' },

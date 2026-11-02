@@ -80,7 +80,7 @@ tsdoc-edge work-context src/analyzer/CallGraphAnalyzer.ts
 - [[Module Specification Framework]] → managed/concepts/module-specification-framework.md:401
 - [[Impact Analysis]] → managed/features/ImpactAnalysis.md:202
 - [[CoreWorkflow]] → managed/features/core-workflow.md:90
-- [[MCP Integration]] → managed/features/mcp-integration.md:67
+- [[MCP Integration]] → managed/features/mcp-integration.md:69
 - [[Guides & Tutorials]] → managed/guides/index.md:215
 - [[Mermaid Symbol Extractor]] → managed/parser/MermaidSymbolExtractor.md:81
 - [[CliCommandSurfaceSpecification]] → managed/specs/domains/cli-command-surface-spec.md:403

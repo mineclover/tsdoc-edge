@@ -782,7 +782,7 @@ done
 
 ### Referenced By
 
-- [[Commands Index]] → managed/COMMANDS.md:188
+- [[Commands Index]] → managed/COMMANDS.md:190
 - [[TSDoc Edge Documentation]] → managed/README.md:158
 - [[Complete Workflow Architecture]] → managed/architecture/diagrams/mermaid-workflow-complete.md:189
 - [[Semantic Graph Analysis and Relationship Model]] → managed/architecture/semantic-graph-analysis-and-relationship-model.md:1462

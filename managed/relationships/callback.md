@@ -401,7 +401,7 @@ tsdoc-edge analyze --callback-depth
 
 ### Referenced By
 
-- [[Commands Index]] → managed/COMMANDS.md:100
+- [[Commands Index]] → managed/COMMANDS.md:102
 - [[CallGraphAnalyzer]] → managed/analyzers/CallGraphAnalyzer.md:408
 - [[AnalyzerCommands]] → managed/commands/AnalyzerCommands.md:177
 - [[Unified Relationship Taxonomy]] → managed/concepts/unified-relationship-taxonomy.md:503

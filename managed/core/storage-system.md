@@ -353,7 +353,7 @@ registry.save();
 - [[Spec Management System]] → managed/core/spec-management-system.md:399
 - [[Symbol Graph System]] → managed/core/symbol-graph.md:39
 - [[Core Components]] → managed/core-components/index.md:35
-- [[GraphAndPersistencePlaneSpecification]] → managed/specs/domains/graph-and-persistence-plane-spec.md:258
+- [[GraphAndPersistencePlaneSpecification]] → managed/specs/domains/graph-and-persistence-plane-spec.md:279
 
 ### Implemented By
 

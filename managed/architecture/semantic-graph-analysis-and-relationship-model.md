@@ -1490,7 +1490,8 @@ interface ConformanceReport {
 - [[ProjectIndexer]] → managed/architecture/project-indexer.md:189
 - [[Spec Management System]] → managed/core/spec-management-system.md:394
 - [[Convention Pack Check]] → managed/features/convention-pack-check.md:437
-- [[GraphAndPersistencePlaneSpecification]] → managed/specs/domains/graph-and-persistence-plane-spec.md:257
+- [[Data Lineage and Slicing]] → managed/features/data-lineage-and-trace.md:76
+- [[GraphAndPersistencePlaneSpecification]] → managed/specs/domains/graph-and-persistence-plane-spec.md:278
 - [[AuthoredProjectSpecifications]] → managed/specs/index.md:127
 - [[Semantic Graph Spec Governance Completed Work]] → managed/workflows/semantic-graph-spec-governance-completed.md:135
 - [[Semantic Graph Spec Governance Roadmap]] → managed/workflows/semantic-graph-spec-governance-roadmap.md:273
@@ -1516,10 +1517,10 @@ interface ConformanceReport {
 - GraphEdgeSemantic → src/graph-analysis/edge-semantics.ts:37
 - RelationSemanticFamily → src/graph-analysis/edge-semantics.ts:58
 - RelationQueryPolicies → src/graph-analysis/edge-semantics.ts:72
-- graphEdgeSemantic → src/graph-analysis/edge-semantics.ts:261
-- PROJECTABLE_GRAPH_EDGE_KINDS → src/graph-analysis/edge-semantics.ts:271
-- DEPENDENCY_GRAPH_EDGE_KINDS → src/graph-analysis/edge-semantics.ts:284
-- CONTAINMENT_GRAPH_EDGE_KINDS → src/graph-analysis/edge-semantics.ts:297
+- graphEdgeSemantic → src/graph-analysis/edge-semantics.ts:279
+- PROJECTABLE_GRAPH_EDGE_KINDS → src/graph-analysis/edge-semantics.ts:289
+- DEPENDENCY_GRAPH_EDGE_KINDS → src/graph-analysis/edge-semantics.ts:302
+- CONTAINMENT_GRAPH_EDGE_KINDS → src/graph-analysis/edge-semantics.ts:315
 - assertValidatedBindingResolutionSet → src/semantic-graph/EffectiveAnalysisService.ts:59
 - EffectiveAnalysisService → src/semantic-graph/EffectiveAnalysisService.ts:77
 - createRuleSetRevision → src/semantic-graph/EffectiveAnalysisService.ts:300

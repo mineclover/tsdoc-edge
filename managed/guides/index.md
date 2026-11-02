@@ -448,7 +448,7 @@ tsdoc-edge parse-mermaid <diagram>
 - [[TSDoc Edge Documentation]] → managed/README.md:38
 - [[SpecCommands]] → managed/commands/SpecCommands.md:110
 - [[Concepts Index]] → managed/concepts/index.md:282
-- [[Features Index]] → managed/features/index.md:351
+- [[Features Index]] → managed/features/index.md:365
 - [[Quick Start Guide]] → managed/quick-start.md:213
 - [[TSDoc Edge User Guide]] → managed/user-guide.md:30
 - [[Workflows Index]] → managed/workflows/index.md:284

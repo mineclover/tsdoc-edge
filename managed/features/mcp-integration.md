@@ -29,9 +29,9 @@ Provide AI coding assistants (Claude Code, Codex, Antigravity, Cursor) with dete
 - **Context**: Reads `.tsdoc/canonical-graph.db` (`GraphRepository` active revision), `.tsdoc/spec-graph.db` (`SpecGraphRepository` active revision), `.tsdoc.db` (`DatabaseManager` enrichment/doc database), and `managed/` checkpoints.
 - **Logic**: `TsDocService` (`mcp-server/src/services/tsdocService.ts`) opens read-only SQLite handles, resolves canonical `@ttsc/graph` nodes/edges and `SpecGraph` bindings first with enrichment fallback, and caches invariant relationship projections in memory for sub-millisecond repeated queries.
 - **Effect**: Strictly read-only (`readonly: true` SQLite connections; never mutates workspace files or databases).
-- **Scope**: 9 registered MCP tools across symbol discovery, pre-edit context, impact traversal, and normative specification governance.
+- **Scope**: 10 registered MCP tools across symbol discovery, pre-edit context, impact traversal, 3-Tier Data Trace, and normative specification governance.
 
-## 9대 MCP 도구 카탈로그 (Exposed Tools)
+## 10대 MCP 도구 카탈로그 (Exposed Tools)
 
 | Tool Name | Primary Data Plane | Purpose |
 | --- | --- | --- |
@@ -41,6 +41,7 @@ Provide AI coding assistants (Claude Code, Codex, Antigravity, Cursor) with dete
 | `tsdoc_get_design_context` | Enrichment + `SpecGraph` | Normative spec bindings, `@contract`/`@invariant`, inline ADR triad (`@decision`/`@rationale`/`@consequences`), and error patterns |
 | `tsdoc_get_impact` | `@ttsc/graph` Canonical Graph | Multi-hop upstream/downstream change impact analysis across canonical compiler edges |
 | `tsdoc_get_spec_bindings` | `.tsdoc/spec-graph.db` | Query authored `tsdoc-spec` requirement nodes and exact `CanonicalNodeId` implementation bindings |
+| `tsdoc_trace_data` | `@ttsc/graph` + `SpecGraph` + AST | Unified 3-Tier Data Trace (`type-flow`, `boundary-lineage`, `code-slice`) with trust-boundary detection |
 | `tsdoc_query_relationships` | `@ttsc/graph` + Unified Ontology | Depth-bounded incoming/outgoing relationship traversal for a target symbol |
 | `tsdoc_list_relationships` | `@ttsc/graph` + Unified Ontology | Paginated relationship listing filtered by relationship kind or file scope |
 | `tsdoc_get_ontology_stats` | `@ttsc/graph` + Unified Ontology | Aggregate node, canonical edge, and relationship-category distribution metrics |
@@ -55,13 +56,14 @@ tsdoc-edge sync
 cd mcp-server && npm run build
 node dist/index.js
 
-# 3. 서비스 계층(9/9) 및 상세 시나리오(13/13) 검증
+# 3. 서비스 계층(10/10) 및 상세 시나리오(14/14) 검증
 cd mcp-server && node basic-test.js && node detailed-test.js
 ```
 
 ## 관련 문서 (Related Concepts)
 
 - [[MCP Testing Strategy]]
+- [[Data Lineage and Slicing]]
 - [[TsdocEdgePlatformSpecification]]
 - [[LspAndCoverageSurfaceSpecification]]
 - [[WorkContextCommand]]
@@ -76,6 +78,7 @@ cd mcp-server && node basic-test.js && node detailed-test.js
 ### Referenced By
 
 - [[DesignContextCommand]] → managed/commands/DesignContextCommand.md:29
+- [[Data Lineage and Slicing]] → managed/features/data-lineage-and-trace.md:78
 - [[MCP Testing Strategy]] → managed/features/mcp-testing-strategy.md:22
 - [[LspAndCoverageSurfaceSpecification]] → managed/specs/domains/lsp-and-coverage-surface-spec.md:270
 - [[TsdocEdgePlatformSpecification]] → managed/specs/domains/tsdoc-edge-platform-spec.md:206

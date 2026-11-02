@@ -95,6 +95,20 @@ graph policy 메트릭의 정의와 현재 구현 상태를 관리하는 기준 
 
 ---
 
+### [[Data Lineage and Slicing]]
+**Path**: `data-lineage-and-trace.md` (source-backed)
+
+3계층 통합 데이터 추적 엔진 (`DataTraceService` + `symbol trace` / `relationship trace` + MCP `tsdoc_trace_data`).
+
+**주요 기능**:
+- Tier 1: TypeScript 타입/필드(`DTO.field`) 흐름, Producer/Transformer/Writer/Reader/Consumer 분류, 공유 상태 접합점(`junctionsBetween`)
+- Tier 2: 경계 간 도메인 계보(`[[Checkpoint]]`, `SpecGraph`, `@samchon/typespec-evidence`, `oa-sdk`, Repository Read/Write 브리지)
+- Tier 3: 온디맨드 AST 변수·매개변수 Def-Use 슬라이싱 및 신뢰 상실 경계(`boundary:any`, `boundary:double-assertion`, `boundary:unvalidated-deserialize`, `boundary:dynamic-index`) 탐지
+
+**Commands**: `symbol trace`, `relationship trace`
+
+---
+
 ### Dependency Analysis
 **Path**: `DependencyAnalysis.md` (source-backed) | **Link**: [[Dependency Analysis]]
 

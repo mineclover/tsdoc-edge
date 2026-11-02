@@ -26,6 +26,7 @@ import {
   ListRelationshipsSchema,
   QueryRelationshipsSchema,
   SearchSymbolsSchema,
+  TraceDataSchema,
 } from './schemas/index.js';
 import { TsDocService } from './services/tsdocService.js';
 
@@ -40,6 +41,7 @@ import {
   listRelationshipsTool,
   queryRelationshipsTool,
   searchSymbolsTool,
+  traceDataTool,
 } from './tools/index.js';
 
 async function main() {
@@ -220,6 +222,24 @@ async function main() {
     },
     async (params: unknown) =>
       getSymbolDetailsTool(GetSymbolDetailsSchema.parse(params), tsdocService)
+  );
+
+  // 10. 3-Tier Data Trace Tool
+  server.registerTool(
+    'tsdoc_trace_data',
+    {
+      title: 'Trace 3-Tier Data Flow & Lineage',
+      description:
+        'Trace Type/Field flow (Producer/Transformer/Writer/Reader/Consumer/Junctions), Cross-Boundary Domain Lineage (Checkpoints, SpecGraph, @samchon/typespec-evidence, oa-sdk, Repository Bridges), and AST variable/parameter dataflow slices with trust-loss boundaries',
+      inputSchema: TraceDataSchema,
+      annotations: {
+        readOnlyHint: true,
+        destructiveHint: false,
+        idempotentHint: true,
+        openWorldHint: false,
+      },
+    },
+    async (params: unknown) => traceDataTool(TraceDataSchema.parse(params), tsdocService)
   );
 
   // Connect to stdio transport

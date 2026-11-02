@@ -303,7 +303,7 @@ Break large impacts into smaller steps:
 ### Referenced By
 
 - [[Dependency Analysis]] → managed/features/DependencyAnalysis.md:222
-- [[Features Index]] → managed/features/index.md:114
+- [[Features Index]] → managed/features/index.md:128
 
 ### Implemented By
 

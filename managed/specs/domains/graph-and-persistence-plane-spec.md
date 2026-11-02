@@ -53,6 +53,11 @@ tags:
       "id": "REQ-GRAPH-ANALYSIS-IMMUTABLE-INDEX",
       "title": "CanonicalGraphIndex must build frozen forward/reverse adjacency indexes over canonical nodes and semantic edge policies",
       "tags": ["graph-analysis", "adjacency-index"]
+    },
+    {
+      "id": "REQ-GRAPH-ANALYSIS-DATA-TRACE-SERVICE",
+      "title": "DataTraceService must execute deterministic 3-tier data tracing (Type/Field roles and shared-state junctions, non-collapsing cross-boundary domain lineage, and fail-closed AST variable/parameter slicing) over canonical graph revisions",
+      "tags": ["graph-analysis", "data-trace", "lineage", "ast-slicing"]
     }
   ],
   "edges": [
@@ -90,6 +95,11 @@ tags:
       "kind": "contains",
       "from": "spec:GraphAndPersistencePlaneSpecification",
       "to": "REQ-GRAPH-ANALYSIS-IMMUTABLE-INDEX"
+    },
+    {
+      "kind": "contains",
+      "from": "spec:GraphAndPersistencePlaneSpecification",
+      "to": "REQ-GRAPH-ANALYSIS-DATA-TRACE-SERVICE"
     }
   ],
   "bindings": [
@@ -168,6 +178,17 @@ tags:
         "workspaceId": "tsdoc-edge",
         "graphNamespace": "ttsc:tsdoc-edge",
         "canonicalNodeId": "src/graph-analysis/CanonicalGraphIndex.ts#CanonicalGraphIndex:class"
+      }
+    },
+    {
+      "id": "BIND-GRAPH-ANALYSIS-DATA-TRACE-SERVICE",
+      "kind": "implementation",
+      "specNodeId": "REQ-GRAPH-ANALYSIS-DATA-TRACE-SERVICE",
+      "target": {
+        "type": "code-node",
+        "workspaceId": "tsdoc-edge",
+        "graphNamespace": "ttsc:tsdoc-edge",
+        "canonicalNodeId": "src/graph-analysis/DataTraceService.ts#DataTraceService:class"
       }
     }
   ]
@@ -265,6 +286,7 @@ tsdoc-edge convention check \
 
 ### Referenced By
 
+- [[Data Lineage and Slicing]] → managed/features/data-lineage-and-trace.md:75
 - [[LspAndCoverageSurfaceSpecification]] → managed/specs/domains/lsp-and-coverage-surface-spec.md:268
 - [[TsdocEdgePlatformSpecification]] → managed/specs/domains/tsdoc-edge-platform-spec.md:206
 - [[AuthoredProjectSpecifications]] → managed/specs/index.md:45
@@ -274,6 +296,7 @@ tsdoc-edge convention check \
 - GraphAndPersistencePlaneSpecification → src/storage/GraphRepository.ts:1
 - CanonicalGraphCommand → src/commands/CanonicalGraphCommand.ts:30
 - CanonicalGraphIndex → src/graph-analysis/CanonicalGraphIndex.ts:28
+- DataTraceService → src/graph-analysis/DataTraceService.ts:123
 - RelationshipProjectionOptions → src/graph-analysis/GraphAnalysisService.ts:40
 - GraphAnalysisService → src/graph-analysis/GraphAnalysisService.ts:58
 - SymbolResolution → src/graph-analysis/contracts.ts:63
@@ -282,7 +305,7 @@ tsdoc-edge convention check \
 - GraphAnalysisSummary → src/graph-analysis/contracts.ts:138
 - RELATION_SEMANTIC_REGISTRY_VERSION → src/graph-analysis/edge-semantics.ts:28
 - GraphEdgeSemantic → src/graph-analysis/edge-semantics.ts:37
-- graphEdgeSemantic → src/graph-analysis/edge-semantics.ts:261
+- graphEdgeSemantic → src/graph-analysis/edge-semantics.ts:279
 - ANALYSIS_INPUT_REVISION_REPOSITORY_SCHEMA_VERSION → src/storage/AnalysisInputRevisionRepository.ts:36
 - StoredAnalysisInputPlane → src/storage/AnalysisInputRevisionRepository.ts:45
 - AnalysisInputRevisionByPlane → src/storage/AnalysisInputRevisionRepository.ts:54

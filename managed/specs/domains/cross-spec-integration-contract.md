@@ -239,7 +239,7 @@ npm run verify:document-validation
 - [[ProjectIndexer]] → managed/architecture/project-indexer.md:76
 - [[Lint Governance]] → managed/features/lint-governance.md:16
 - [[ConventionCheck]] → managed/specs/conventions/convention-check.md:200
-- [[GraphAndPersistencePlaneSpecification]] → managed/specs/domains/graph-and-persistence-plane-spec.md:256
+- [[GraphAndPersistencePlaneSpecification]] → managed/specs/domains/graph-and-persistence-plane-spec.md:277
 - [[TsdocEdgePlatformSpecification]] → managed/specs/domains/tsdoc-edge-platform-spec.md:257
 - [[TSDocStandardSpecification]] → managed/specs/domains/tsdoc-standard-spec.md:160
 - [[TtscPlatformSpecification]] → managed/specs/domains/ttsc-platform-spec.md:182

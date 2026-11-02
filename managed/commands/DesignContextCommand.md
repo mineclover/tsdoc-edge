@@ -48,7 +48,7 @@ tsdoc-edge dc src/convention/ConventionCheckService.ts --json
 
 ### Referenced By
 
-- [[MCP Integration]] → managed/features/mcp-integration.md:68
+- [[MCP Integration]] → managed/features/mcp-integration.md:70
 - [[CliCommandSurfaceSpecification]] → managed/specs/domains/cli-command-surface-spec.md:404
 
 ### Implemented By

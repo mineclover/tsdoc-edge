@@ -300,7 +300,7 @@ tsdoc-edge docs move <from> <to>
 
 ### Referenced By
 
-- [[Commands Index]] → managed/COMMANDS.md:108
+- [[Commands Index]] → managed/COMMANDS.md:110
 
 ### Implemented By
 

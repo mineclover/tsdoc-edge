@@ -425,7 +425,7 @@ symbols.forEach(sym => {
 - [[SSOT]] → managed/concepts/ssot.md:70
 - [[Spec Management System]] → managed/core/spec-management-system.md:60
 - [[Storage System]] → managed/core/storage-system.md:331
-- [[Features Index]] → managed/features/index.md:292
+- [[Features Index]] → managed/features/index.md:306
 - [[Guides & Tutorials]] → managed/guides/index.md:407
 - [[Usage Scenarios]] → managed/guides/usage-scenarios.md:163
 - [[Parser Components]] → managed/parser/index.md:119

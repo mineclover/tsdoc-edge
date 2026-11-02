@@ -189,6 +189,18 @@ async function runTests() {
     console.log(`  Revision: ${bindings.revisionId}, nodes: ${bindings.nodes.length}, bindings: ${bindings.bindings.length}`);
   });
 
+  await test('3-Tier Data Trace (traceData)', async () => {
+    const traced = await service.traceData({
+      target: 'SpecGraphRevision.bindings',
+      tier: 'all',
+      maxDepth: 2,
+    });
+    if (!traced || !traced.report || traced.report.status === 'missing' || !traced.markdown) {
+      throw new Error('Invalid traceData result');
+    }
+    console.log(`  Trace status: ${traced.report.status}, markdown length: ${traced.markdown.length}`);
+  });
+
   service.close();
 
   // Summary

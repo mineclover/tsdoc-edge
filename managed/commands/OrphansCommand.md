@@ -209,7 +209,7 @@ Source: `src/commands/Phase5Commands.ts`
 - [[CI/CD Integration]] → managed/features/CICDIntegration.md:249
 - [[Dependency Analysis]] → managed/features/DependencyAnalysis.md:160
 - [[AnalysisFeatures]] → managed/features/analysis-features.md:282
-- [[Features Index]] → managed/features/index.md:129
+- [[Features Index]] → managed/features/index.md:143
 - [[ValidationFeatures]] → managed/features/validation-features.md:270
 - [[DataFlowTypes]] → managed/types/DataFlowTypes.md:174
 - [[Workflows Index]] → managed/workflows/index.md:74

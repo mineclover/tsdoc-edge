@@ -220,6 +220,24 @@ const EDGE_SEMANTICS = new Map<string, GraphEdgeSemantic>([
     }),
   ],
   [
+    'doc_ref',
+    dependencySemantic({
+      category: 'structural',
+      family: 'verification',
+      sourceRole: 'documented-symbol',
+      targetRole: 'documentation-anchor',
+    }),
+  ],
+  [
+    'dispatches',
+    dependencySemantic({
+      category: 'behavioral',
+      family: 'execution',
+      sourceRole: 'interface-member',
+      targetRole: 'concrete-implementation',
+    }),
+  ],
+  [
     'contains',
     nonDependencySemantic(
       {

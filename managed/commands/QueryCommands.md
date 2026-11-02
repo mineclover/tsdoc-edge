@@ -145,7 +145,7 @@ Provides programmatic traversal, pathfinding, filtering, and subgraph querying o
 
 - [[Dependency Analysis]] → managed/features/DependencyAnalysis.md:246
 - [[Impact Analysis]] → managed/features/ImpactAnalysis.md:291
-- [[Features Index]] → managed/features/index.md:297
+- [[Features Index]] → managed/features/index.md:311
 
 ### Implemented By
 

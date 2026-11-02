@@ -37,6 +37,7 @@
  */
 
 import * as fs from 'node:fs';
+import { createRequire } from 'node:module';
 import * as path from 'node:path';
 import Database from 'better-sqlite3';
 import { ERROR_MESSAGES } from '../constants.js';
@@ -1738,5 +1739,81 @@ export class TsDocService {
       return true;
     });
     return { revisionId: spec.revisionId, nodes, bindings };
+  }
+
+  /**
+   * Execute a 3-Tier Data Trace query (`type-flow`, `boundary-lineage`, `code-slice`, or `all`).
+   *
+   * @param params - Data trace query options (`target`, `toTarget`, `tier`, `maxDepth`, `includeTests`, `includeExternal`)
+   * @returns Structured `DataTraceReport` and LLM-friendly Markdown summary
+   * @doc [[MCP Integration]]
+   * @doc [[Data Lineage and Slicing]]
+   * @public
+   */
+  async traceData(params: {
+    target: string;
+    toTarget?: string;
+    tier?: 'all' | 'type-flow' | 'boundary-lineage' | 'code-slice';
+    maxDepth?: number;
+    includeTests?: boolean;
+    includeExternal?: boolean;
+  }): Promise<{
+    report: Record<string, unknown>;
+    markdown: string;
+  }> {
+    const canonical = this.getCanonicalSnapshot();
+    if (!canonical) {
+      throw new Error(
+        'Canonical @ttsc/graph database (.tsdoc/canonical-graph.db) is not available. Run `tsdoc-edge sync` first.'
+      );
+    }
+    const spec = this.getSpecSnapshot();
+    const requireCjs = createRequire(import.meta.url);
+    const coreModule = requireCjs('../../../dist/index.js') as {
+      DataTraceService: new (
+        graph: unknown,
+        options?: { specGraph?: unknown; workspaceRoot?: string }
+      ) => { trace: (req: unknown) => Record<string, unknown> };
+      formatDataTraceLlmMarkdown: (report: unknown) => string;
+    };
+
+    const graphPayload = {
+      contractVersion: '1.0',
+      rootDir: this.workspaceRoot,
+      tsconfigPath: path.join(this.workspaceRoot, 'tsconfig.json'),
+      fingerprint: canonical.revisionId,
+      provenance: { adapter: 'mcp-canonical-snapshot', producer: '@ttsc/graph' },
+      nodes: canonical.nodes.map((n) => ({ ...n, sourceId: n.id })),
+      edges: canonical.edges,
+    };
+
+    const specPayload = spec
+      ? {
+          contractVersion: '1.0',
+          revisionId: spec.revisionId,
+          workspaceId: path.basename(this.workspaceRoot),
+          createdAt: new Date().toISOString(),
+          sourceManifestDigest: spec.revisionId,
+          nodes: spec.nodes,
+          edges: spec.edges,
+          bindings: spec.bindings,
+        }
+      : null;
+
+    const traceService = new coreModule.DataTraceService(graphPayload, {
+      specGraph: specPayload,
+      workspaceRoot: this.workspaceRoot,
+    });
+    const report = traceService.trace({
+      target: params.target,
+      toTarget: params.toTarget,
+      tier: params.tier ?? 'all',
+      maxDepth: params.maxDepth ?? 3,
+      includeTests: params.includeTests ?? false,
+      includeExternal: params.includeExternal ?? false,
+      workspaceRoot: this.workspaceRoot,
+    });
+    const markdown = coreModule.formatDataTraceLlmMarkdown(report);
+    return { report, markdown };
   }
 }

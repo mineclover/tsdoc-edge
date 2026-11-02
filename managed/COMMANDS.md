@@ -65,11 +65,12 @@ domain operations without top-level command clutter.
 
 ## 2. Unified Command Groups (7 Top-Level Commands)
 
-### `symbol` (`sym`) — 13 Subcommands
+### `symbol` (`sym`) — 14 Subcommands
 
 | Subcommand | Description |
 |------------|-------------|
 | `symbol query <name\|lookup\|search\|stats>` | Query code symbols (`@ttsc/graph`) and defined `[[Symbol]]` checkpoints with fail-closed homonym provenance |
+| `symbol trace <target> [to-target]` | Trace 3-tier data flow (`type-flow`, `boundary-lineage`, `code-slice`) via [[Data Lineage and Slicing]] |
 | `symbol deps <symbol>` | Show dependencies of a symbol |
 | `symbol who-uses <symbol>` | Show reverse dependencies of a symbol |
 | `symbol orphans` | Find symbols without dependents |
@@ -83,11 +84,12 @@ domain operations without top-level command clutter.
 | `symbol fix` | Fix `[[Symbol]]` reference issues |
 | `symbol rename <old> <new>` | Rename `[[Symbol]]` across docs and code |
 
-### `relationship` (`rel`, `r`) — 15 Subcommands
+### `relationship` (`rel`, `r`) — 16 Subcommands
 
 | Subcommand | Description |
 |------------|-------------|
 | `relationship query <id>` | Query relationships for a symbol |
+| `relationship trace <target> [to-target]` | Trace 3-tier data flow, shared-state junctions (`junctionsBetween`), and repository bridges ([[Data Lineage and Slicing]]) |
 | `relationship impact <id>` | Analyze upstream/downstream change impact |
 | `relationship path <from> <to>` | Find shortest dependency path between symbols |
 | `relationship clusters` | Discover architectural clusters |

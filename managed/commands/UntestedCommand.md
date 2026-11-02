@@ -237,13 +237,13 @@ Low Priority:
 ### Referenced By
 
 - [[CLI Commands]] → managed/CLI-COMMANDS.md:42
-- [[Commands Index]] → managed/COMMANDS.md:80
+- [[Commands Index]] → managed/COMMANDS.md:81
 - [[TSDoc Edge Documentation]] → managed/README.md:67
 - [[UndocumentedCommand]] → managed/commands/UndocumentedCommand.md:177
 - [[Integration Test Traceability]] → managed/concepts/integration-test-traceability.md:545
 - [[CI/CD Integration]] → managed/features/CICDIntegration.md:246
 - [[AnalysisFeatures]] → managed/features/analysis-features.md:296
-- [[Features Index]] → managed/features/index.md:136
+- [[Features Index]] → managed/features/index.md:150
 - [[TestRelationships]] → managed/types/TestRelationships.md:124
 - [[UnifiedRelationships]] → managed/types/UnifiedRelationships.md:205
 

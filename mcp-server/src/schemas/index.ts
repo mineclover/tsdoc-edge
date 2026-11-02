@@ -276,3 +276,58 @@ export const GetSpecBindingsSchema = z
  * @public
  */
 export type GetSpecBindingsInput = z.infer<typeof GetSpecBindingsSchema>;
+
+/**
+ * Input schema for `tsdoc_trace_data`.
+ *
+ * @doc [[MCP Integration]]
+ * @doc [[Data Lineage and Slicing]]
+ * @public
+ */
+export const TraceDataSchema = z
+  .object({
+    target: z
+      .string()
+      .min(1)
+      .max(300)
+      .describe('Target symbol ID, Type.field, Class.method, [[Checkpoint]], or func(param)'),
+    toTarget: z
+      .string()
+      .min(1)
+      .max(300)
+      .optional()
+      .describe(
+        'Optional destination symbol for Producer -> Shared-State/Repository -> Consumer bridging'
+      ),
+    tier: z
+      .enum(['all', 'type-flow', 'boundary-lineage', 'code-slice'])
+      .default('all')
+      .describe('Data trace tier to execute (all | type-flow | boundary-lineage | code-slice)'),
+    maxDepth: z
+      .number()
+      .int()
+      .min(1)
+      .max(6)
+      .default(3)
+      .describe('Maximum traversal and call-binding depth (1-6)'),
+    includeTests: z.boolean().default(false).describe('Include test symbols in usages and slices'),
+    includeExternal: z
+      .boolean()
+      .default(false)
+      .describe('Include external and standard library symbols'),
+    format: z.enum(['markdown', 'json']).optional().describe('Response format (default: markdown)'),
+    response_format: z
+      .enum(['markdown', 'json'])
+      .optional()
+      .describe('Backward-compatible alias for format'),
+  })
+  .strict();
+
+/**
+ * Inferred input payload for `tsdoc_trace_data`.
+ *
+ * @doc [[MCP Integration]]
+ * @doc [[Data Lineage and Slicing]]
+ * @public
+ */
+export type TraceDataInput = z.infer<typeof TraceDataSchema>;

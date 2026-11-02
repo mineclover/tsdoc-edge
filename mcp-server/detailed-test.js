@@ -237,6 +237,29 @@ async function runDetailedTests() {
       },
     },
 
+    {
+      name: '🧬 Tool 10: 3-Tier Data Trace - Field & Lineage (format: json)',
+      request: createMessage('tools/call', {
+        name: 'tsdoc_trace_data',
+        arguments: {
+          target: 'SpecGraphRevision.bindings',
+          tier: 'all',
+          maxDepth: 2,
+          format: 'json',
+        },
+      }),
+      validate: (res) => {
+        const content = res.result?.content?.[0]?.text || '';
+        const parsed = JSON.parse(content);
+        log(
+          'DETAIL',
+          `Data trace status: ${parsed.status}, usages: ${parsed.typeFlow?.roleClassifiedUsages?.length || 0}`,
+          colors.blue
+        );
+        return Boolean(parsed.status === 'found' && parsed.typeFlow && parsed.boundaryLineage);
+      },
+    },
+
     // Edge cases
     {
       name: '⚠️  Edge Case: Non-existent Symbol',

@@ -238,6 +238,6 @@ Alert if any operation:
 
 ### Referenced By
 
-- [[Features Index]] → managed/features/index.md:269
-- [[MCP Integration]] → managed/features/mcp-integration.md:64
+- [[Features Index]] → managed/features/index.md:283
+- [[MCP Integration]] → managed/features/mcp-integration.md:65
 

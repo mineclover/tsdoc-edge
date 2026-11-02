@@ -122,7 +122,7 @@ tsdoc-edge analyze-events --trace user:created
 
 ### Referenced By
 
-- [[Commands Index]] → managed/COMMANDS.md:100
+- [[Commands Index]] → managed/COMMANDS.md:102
 - [[AnalyzerCommands]] → managed/commands/AnalyzerCommands.md:188
 - [[Callback Pattern]] → managed/relationships/callback.md:309
 - [[Collaboration]] → managed/relationships/collaboration.md:308

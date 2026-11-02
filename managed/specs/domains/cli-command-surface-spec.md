@@ -413,6 +413,7 @@ tsdoc-edge relationship impact ProjectIndexer
 - [[DesignContextCommand]] → managed/commands/DesignContextCommand.md:42
 - [[SyncCommand]] → managed/commands/SyncCommand.md:30
 - [[SystemStatusCommand]] → managed/commands/SystemStatusCommand.md:45
+- [[Data Lineage and Slicing]] → managed/features/data-lineage-and-trace.md:77
 - [[TsdocEdgePlatformSpecification]] → managed/specs/domains/tsdoc-edge-platform-spec.md:206
 - [[AuthoredProjectSpecifications]] → managed/specs/index.md:44
 
@@ -425,11 +426,12 @@ tsdoc-edge relationship impact ProjectIndexer
 - colors → src/commands/BaseCommand.ts:55
 - BaseCommand → src/commands/BaseCommand.ts:91
 - CanonicalGraphCommand → src/commands/CanonicalGraphCommand.ts:30
+- DataTraceCommand → src/commands/DataTraceCommand.ts:37
 - DocsCommand → src/commands/DocsCommand.ts:59
 - MoveCommand → src/commands/MoveCommand.ts:25
 - OntologyCommand → src/commands/OntologyCommand.ts:31
-- RelationshipCommand → src/commands/RelationshipCommand.ts:60
-- SymbolUnifiedCommand → src/commands/SymbolUnifiedCommand.ts:60
+- RelationshipCommand → src/commands/RelationshipCommand.ts:65
+- SymbolUnifiedCommand → src/commands/SymbolUnifiedCommand.ts:65
 - ValidateUnifiedCommand → src/commands/ValidateUnifiedCommand.ts:43
 - DEFAULT_SPEC_GRAPH_DATABASE → src/commands/canonicalReadHelper.ts:31
 - CanonicalGraphPlaneSnapshot → src/commands/canonicalReadHelper.ts:42

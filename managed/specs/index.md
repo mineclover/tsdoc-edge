@@ -136,11 +136,11 @@ tsdoc-edge convention check --pack managed/conventions/tsdoc-edge-core-policy.js
 ### Referenced By
 
 - [[SyncCommand]] → managed/commands/SyncCommand.md:25
-- [[MCP Integration]] → managed/features/mcp-integration.md:70
+- [[MCP Integration]] → managed/features/mcp-integration.md:72
 - [[ConventionCheck]] → managed/specs/conventions/convention-check.md:195
 - [[CliCommandSurfaceSpecification]] → managed/specs/domains/cli-command-surface-spec.md:398
 - [[CrossSpecIntegrationContract]] → managed/specs/domains/cross-spec-integration-contract.md:225
-- [[GraphAndPersistencePlaneSpecification]] → managed/specs/domains/graph-and-persistence-plane-spec.md:254
+- [[GraphAndPersistencePlaneSpecification]] → managed/specs/domains/graph-and-persistence-plane-spec.md:275
 - [[LspAndCoverageSurfaceSpecification]] → managed/specs/domains/lsp-and-coverage-surface-spec.md:266
 - [[TsdocEdgePlatformSpecification]] → managed/specs/domains/tsdoc-edge-platform-spec.md:254
 - [[TSDocStandardSpecification]] → managed/specs/domains/tsdoc-standard-spec.md:197

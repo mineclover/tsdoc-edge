@@ -18,6 +18,7 @@ import type {
   ListRelationshipsInput,
   QueryRelationshipsInput,
   SearchSymbolsInput,
+  TraceDataInput,
 } from '../schemas/index.js';
 import type { TsDocService } from '../services/tsdocService.js';
 
@@ -486,6 +487,44 @@ export async function getSymbolDetailsTool(params: GetSymbolDetailsInput, servic
       markdown += `\n*Use tsdoc_query_relationships to see all relationships for this symbol.*\n`;
     }
 
+    return formatResponse(markdown, 'markdown');
+  } catch (error) {
+    return {
+      content: [
+        {
+          type: 'text' as const,
+          text: `Error: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        },
+      ],
+      isError: true,
+    };
+  }
+}
+
+/**
+ * Execute a 3-Tier Data Trace query (Type/Field Flow, Cross-Boundary Domain Lineage, and AST Dataflow Slice).
+ *
+ * @param params - Validated data trace arguments
+ * @param service - TSDoc database service
+ * @returns MCP-formatted 3-Tier Data Trace response
+ * @doc [[MCP Integration]]
+ * @doc [[Data Lineage and Slicing]]
+ * @public
+ */
+export async function traceDataTool(params: TraceDataInput, service: TsDocService) {
+  try {
+    const { report, markdown } = await service.traceData({
+      target: params.target,
+      toTarget: params.toTarget,
+      tier: params.tier,
+      maxDepth: params.maxDepth,
+      includeTests: params.includeTests,
+      includeExternal: params.includeExternal,
+    });
+    const outputFormat = params.format ?? params.response_format ?? 'markdown';
+    if (outputFormat === 'json') {
+      return formatResponse(JSON.stringify(report, null, 2), 'json');
+    }
     return formatResponse(markdown, 'markdown');
   } catch (error) {
     return {

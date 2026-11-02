@@ -182,5 +182,5 @@ tsdoc-edge relationship help
 
 - RelationshipCommands → src/commands/RelationshipCommand.ts:1
 - AnalyzeRelationshipsCommand → src/commands/AnalyzeRelationshipsCommand.ts:42
-- RelationshipCommand → src/commands/RelationshipCommand.ts:60
+- RelationshipCommand → src/commands/RelationshipCommand.ts:65
 

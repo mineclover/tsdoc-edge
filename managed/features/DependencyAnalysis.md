@@ -258,7 +258,7 @@ tsdoc-edge validate-architecture \
 ### Referenced By
 
 - [[Impact Analysis]] → managed/features/ImpactAnalysis.md:288
-- [[Features Index]] → managed/features/index.md:99
+- [[Features Index]] → managed/features/index.md:113
 
 ### Implemented By
 

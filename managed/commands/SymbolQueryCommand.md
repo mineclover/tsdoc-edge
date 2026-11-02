@@ -268,5 +268,5 @@ tsdoc-edge symbol query managed info "BuildCommand"
 ### Implemented By
 
 - SymbolQueryCommand → src/commands/SymbolQueryCommand.ts:85
-- SymbolUnifiedCommand → src/commands/SymbolUnifiedCommand.ts:60
+- SymbolUnifiedCommand → src/commands/SymbolUnifiedCommand.ts:65
 

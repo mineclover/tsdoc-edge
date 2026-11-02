@@ -16,10 +16,22 @@ describe('relation semantic registry', () => {
       'type_ref',
     ]);
     expect(DEPENDENCY_GRAPH_EDGE_KINDS).toEqual(
-      expect.arrayContaining(['calls', 'imports', 'tests', 'type_ref'])
+      expect.arrayContaining(['calls', 'dispatches', 'doc_ref', 'imports', 'tests', 'type_ref'])
     );
     expect(DEPENDENCY_GRAPH_EDGE_KINDS).not.toContain('contains');
     expect(DEPENDENCY_GRAPH_EDGE_KINDS).not.toContain('exports');
+    expect(graphEdgeSemantic('dispatches')).toMatchObject({
+      category: 'behavioral',
+      family: 'execution',
+      sourceRole: 'interface-member',
+      targetRole: 'concrete-implementation',
+    });
+    expect(graphEdgeSemantic('doc_ref')).toMatchObject({
+      category: 'structural',
+      family: 'verification',
+      sourceRole: 'documented-symbol',
+      targetRole: 'documentation-anchor',
+    });
   });
 
   it('describes containment without treating it as change-impact dependency', () => {

@@ -22,6 +22,7 @@ export { ConventionRetentionCommand } from './ConventionRetentionCommand';
 export { CoreApiCommand } from './CoreApiCommand';
 export { CoverageBaselineCommand } from './CoverageBaselineCommand';
 export { CoverageReportCommand } from './CoverageReportCommand';
+export { DataTraceCommand, formatDataTraceLlmMarkdown } from './DataTraceCommand';
 export { DepsCommand } from './DepsCommand';
 export { DesignContextCommand } from './DesignContextCommand';
 export { DocSymbolsCommand } from './DocSymbolsCommand';
