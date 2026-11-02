@@ -72,7 +72,7 @@ export class CoreApiCommand extends BaseCommand {
    * @public
    */
   protected getUsage(): string {
-    return `tsdoc-edge core-api [options]
+    return `tsdoc-edge symbol core-api [options]
 
   Options:
     --exclude-tests  Exclude symbols from test files (__tests__, .test.ts, .spec.ts)`;

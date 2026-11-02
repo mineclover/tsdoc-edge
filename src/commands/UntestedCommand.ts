@@ -54,7 +54,7 @@ export class UntestedCommand extends BaseCommand {
    * @public
    */
   protected getUsage(): string {
-    return `tsdoc-edge untested [options]
+    return `tsdoc-edge symbol untested [options]
 
   Options:
     --exclude-tests  Exclude symbols from test files (__tests__, .test.ts, .spec.ts)`;

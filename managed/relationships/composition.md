@@ -295,7 +295,7 @@ tsdoc-edge deps Engine --reverse --type=composition
 ### Referenced By
 
 - [[Commands Index]] → managed/COMMANDS.md:100
-- [[AnalyzerCommands]] → managed/commands/AnalyzerCommands.md:96
+- [[AnalyzerCommands]] → managed/commands/AnalyzerCommands.md:98
 - [[Unified Relationship Taxonomy]] → managed/concepts/unified-relationship-taxonomy.md:502
 - [[Co-Requirement]] → managed/relationships/co-requirement.md:243
 - [[Collaboration]] → managed/relationships/collaboration.md:306

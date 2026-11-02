@@ -3,7 +3,7 @@
  */
 
 import { SymbolGraphBuilder } from '../../graph/SymbolGraphBuilder';
-import { SymbolSearchEngine } from '../../graph/SymbolSearchEngine';
+import { isTestArtifactSymbol, SymbolSearchEngine } from '../../graph/SymbolSearchEngine';
 import type { Symbol } from '../../types/graph';
 
 describe('SymbolSearchEngine', () => {
@@ -421,6 +421,124 @@ describe('SymbolSearchEngine', () => {
 
         const nonExistent = engine.findByTag('nonExistentTag');
         expect(nonExistent).toHaveLength(0);
+      });
+    });
+
+    describe('test artifact and private helper filtering', () => {
+      it('excludes test-case, test-suite, __tests__/, and *.test.ts/*.spec.ts symbols while preserving test.ts fixtures', () => {
+        const testBuilder = new SymbolGraphBuilder();
+
+        const prodFixture: Symbol = {
+          id: 'prod-fixture',
+          name: 'ProdHelper',
+          type: 'function',
+          filePath: 'test.ts',
+          line: 1,
+          column: 0,
+          isExported: true,
+          isPublic: true,
+          tests: [],
+          designDecisions: [],
+        };
+
+        const privateConst: Symbol = {
+          id: 'private-const',
+          name: 'INTERNAL_LIMIT',
+          type: 'constant',
+          filePath: 'src/config.ts',
+          line: 2,
+          column: 0,
+          isExported: false,
+          isPublic: false,
+          summary: 'Internal limit',
+          tests: [],
+          designDecisions: [],
+        };
+
+        const testArtifacts: Symbol[] = [
+          {
+            id: 'jest-suite',
+            name: 'UserService suite',
+            type: 'test-suite',
+            filePath: 'src/UserService.ts',
+            line: 1,
+            column: 0,
+            isExported: false,
+            isPublic: false,
+            tests: [],
+            designDecisions: [],
+          },
+          {
+            id: 'jest-case',
+            name: 'should create user',
+            type: 'test-case',
+            filePath: 'src/UserService.ts',
+            line: 2,
+            column: 0,
+            isExported: false,
+            isPublic: false,
+            tests: [],
+            designDecisions: [],
+          },
+          {
+            id: 'tests-dir-helper',
+            name: 'createFixture',
+            type: 'function',
+            filePath: 'src/__tests__/helpers/fixture.ts',
+            line: 1,
+            column: 0,
+            isExported: false,
+            isPublic: true,
+            tests: [],
+            designDecisions: [],
+          },
+          {
+            id: 'dot-test-helper',
+            name: 'mockAdapter',
+            type: 'function',
+            filePath: 'src/foo.test.ts',
+            line: 1,
+            column: 0,
+            isExported: false,
+            isPublic: true,
+            tests: [],
+            designDecisions: [],
+          },
+          {
+            id: 'dot-spec-helper',
+            name: 'specMock',
+            type: 'function',
+            filePath: 'src/bar.spec.tsx',
+            line: 1,
+            column: 0,
+            isExported: false,
+            isPublic: true,
+            tests: [],
+            designDecisions: [],
+          },
+        ];
+
+        testBuilder.addSymbol(prodFixture);
+        testBuilder.addSymbol(privateConst);
+        for (const sym of testArtifacts) {
+          testBuilder.addSymbol(sym);
+          expect(isTestArtifactSymbol(sym)).toBe(true);
+        }
+        expect(isTestArtifactSymbol(prodFixture)).toBe(false);
+
+        const engine = new SymbolSearchEngine(testBuilder);
+
+        expect(engine.findUndocumented().map((s) => s.id)).toEqual(['prod-fixture']);
+        expect(engine.findUntested().map((s) => s.id)).toEqual(['prod-fixture']);
+        expect(engine.findWithoutResponsibility().map((s) => s.id)).toEqual([
+          'prod-fixture',
+          'private-const',
+        ]);
+        expect(engine.findWithoutContract().map((s) => s.id)).toEqual([
+          'prod-fixture',
+          'private-const',
+        ]);
+        expect(engine.findOrphaned().map((s) => s.id)).toEqual(['private-const']);
       });
     });
   });

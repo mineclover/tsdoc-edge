@@ -339,7 +339,7 @@ touch managed/features/my-new-feature.md
 
 #### Step 2: 문서 템플릿 작성
 
-```markdown
+````markdown
 ---
 title: My New Feature
 type: feature
@@ -359,9 +359,9 @@ updated: 2025-12-26
 ## Usage
 
 ### Basic Usage
-\`\`\`typescript
+```typescript
 // 사용 예시
-\`\`\`
+```
 
 ## Implementation
 
@@ -375,7 +375,7 @@ updated: 2025-12-26
 
 - [[ExistingFeature]] - 관련 기능
 - [[SomeCommand]] - 관련 명령어
-```
+````
 
 #### Step 3: 코드에 문서 연결
 
@@ -523,8 +523,4 @@ tsdoc-edge system-status
 
 - [[Guides & Tutorials]] → managed/guides/index.md:28
 - [[TSDoc Edge User Guide]] → managed/user-guide.md:177
-
-### Implemented By
-
-- Usage Scenarios → src/path/to/implementation.ts:1
 

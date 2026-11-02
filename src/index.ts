@@ -5,6 +5,8 @@
  * validating them against conventions, and generating documentation.
  *
  * @packageDocumentation
+ * @doc [[CoreWorkflow]]
+ * @doc [[TSDocEdge]]
  */
 
 import { MarkdownGenerator } from './generator/MarkdownGenerator';

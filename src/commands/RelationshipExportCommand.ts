@@ -70,7 +70,7 @@ export class RelationshipExportCommand extends BaseCommand {
    * @public
    */
   protected getUsage(): string {
-    return `tsdoc-edge relationship-export [options]
+    return `tsdoc-edge relationship export [options]
 
 Export relationships to various formats for analysis with external tools.
 
@@ -92,19 +92,19 @@ Formats:
 
 Examples:
   # Export to JSON
-  tsdoc-edge relationship-export --format json --output relationships.json
+  tsdoc-edge relationship export --format json --output relationships.json
 
   # Export to GraphML for Gephi
-  tsdoc-edge relationship-export --format graphml --output graph.graphml
+  tsdoc-edge relationship export --format graphml --output graph.graphml
 
   # Export to DOT for Graphviz
-  tsdoc-edge relationship-export --format dot --output graph.dot
+  tsdoc-edge relationship export --format dot --output graph.dot
 
   # Filter and export
-  tsdoc-edge relationship-export --format json --category structural --output structural.json
+  tsdoc-edge relationship export --format json --category structural --output structural.json
 
   # Export high-confidence only
-  tsdoc-edge relationship-export --format json --min-confidence 0.8 --output high-conf.json`;
+  tsdoc-edge relationship export --format json --min-confidence 0.8 --output high-conf.json`;
   }
 
   /**

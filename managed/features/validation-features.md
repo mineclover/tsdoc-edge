@@ -448,6 +448,6 @@ cycle_rate = symbols_in_cycles / total_symbols
 ### Implemented By
 
 - ValidateUnifiedCommand → src/commands/ValidateUnifiedCommand.ts:43
-- ConnectivityValidator (Connectivity) → src/validator/ConnectivityValidator.ts:44
+- ConnectivityValidator (Connectivity) → src/validator/ConnectivityValidator.ts:48
 - StrictModeValidator (StrictMode) → src/validator/StrictModeValidator.ts:36
 

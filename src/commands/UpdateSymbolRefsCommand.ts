@@ -77,7 +77,7 @@ export class UpdateSymbolRefsCommand extends BaseCommand {
    * @public
    */
   protected getUsage(): string {
-    return 'tsdoc-edge update-symbol-refs [docs-directory]\n\n  Default: managed';
+    return 'tsdoc-edge docs update-refs [docs-directory]\n\n  Default: managed';
   }
 
   /**
@@ -107,7 +107,7 @@ export class UpdateSymbolRefsCommand extends BaseCommand {
       // Check if symbol registry exists
       const registryPath = path.join(process.cwd(), '.tsdoc', 'registry.jsonl');
       if (!fs.existsSync(registryPath)) {
-        this.printWarning('No symbol registry found. Run "tsdoc-edge id new" first.');
+        this.printWarning('No symbol registry found. Run "tsdoc-edge sync" first.');
         console.log();
         return this.failure('Symbol registry not found');
       }

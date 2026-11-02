@@ -6,6 +6,37 @@
 import type { Symbol, SymbolQuery, SymbolQueryResult } from '../types/graph';
 import type { SymbolGraphBuilder } from './SymbolGraphBuilder';
 
+const TEST_FILE_PATH_PATTERN = /(?:^|[\\/])__tests__[\\/]|(?:\.test|\.spec)\.[cm]?[jt]sx?$/i;
+
+/**
+ * Check whether a symbol belongs to a test suite, test case, or test file artifact.
+ *
+ * @param symbol - Candidate symbol from the symbol graph
+ * @returns True when the symbol is a test block or declared inside a test file
+ * @doc [[SymbolGraphFeatures#Search]]
+ * @public
+ */
+export function isTestArtifactSymbol(symbol: Symbol): boolean {
+  return (
+    symbol.type === 'test-case' ||
+    symbol.type === 'test-suite' ||
+    symbol.type === 'test-scenario' ||
+    TEST_FILE_PATH_PATTERN.test(symbol.filePath)
+  );
+}
+
+/**
+ * Check whether a symbol is an unexported module-private top-level declaration.
+ *
+ * @param symbol - Candidate symbol from the symbol graph
+ * @returns True when the symbol is top-level (not a class/interface member) and unexported
+ * @doc [[SymbolGraphFeatures#Search]]
+ * @public
+ */
+export function isUnexportedTopLevelSymbol(symbol: Symbol): boolean {
+  return symbol.isExported === false && symbol.type !== 'method' && symbol.type !== 'property';
+}
+
 /**
  * Search engine for finding symbols based on various criteria
  *
@@ -150,47 +181,55 @@ export class SymbolSearchEngine {
 
   /**
    * Find symbols with no documentation
-   * @returns Undocumented symbols
+   * @returns Undocumented implementation symbols
    */
   findUndocumented(): Symbol[] {
-    return this.graphBuilder.getAllSymbols().filter((s) => !s.summary || s.summary.trim() === '');
+    return this.graphBuilder
+      .getAllSymbols()
+      .filter((s) => !isTestArtifactSymbol(s) && (!s.summary || s.summary.trim() === ''));
   }
 
   /**
    * Find symbols with no tests
-   * Excludes test-related symbol types (test-suite, test-case, test-scenario)
-   * since they ARE tests themselves
+   * Excludes test artifacts (`test-suite`, `test-case`, `test-scenario`, test files)
+   * and unexported module-private top-level declarations
    * @returns Untested symbols
    */
   findUntested(): Symbol[] {
-    const testTypes = ['test-suite', 'test-case', 'test-scenario'];
     return this.graphBuilder
       .getAllSymbols()
-      .filter((s) => s.tests.length === 0 && !testTypes.includes(s.type));
+      .filter(
+        (s) => !isTestArtifactSymbol(s) && !isUnexportedTopLevelSymbol(s) && s.tests.length === 0
+      );
   }
 
   /**
    * Find symbols with no defined responsibility
-   * @returns Symbols without responsibility
+   * @returns Implementation symbols without responsibility
    */
   findWithoutResponsibility(): Symbol[] {
-    return this.graphBuilder.getAllSymbols().filter((s) => !s.responsibility);
+    return this.graphBuilder
+      .getAllSymbols()
+      .filter((s) => !isTestArtifactSymbol(s) && !s.responsibility);
   }
 
   /**
    * Find symbols with no contract
-   * @returns Symbols without contract
+   * @returns Implementation symbols without contract
    */
   findWithoutContract(): Symbol[] {
-    return this.graphBuilder.getAllSymbols().filter((s) => !s.contract);
+    return this.graphBuilder.getAllSymbols().filter((s) => !isTestArtifactSymbol(s) && !s.contract);
   }
 
   /**
    * Find orphaned symbols (no relationships)
-   * @returns Orphaned symbols
+   * @returns Orphaned implementation symbols
    */
   findOrphaned(): Symbol[] {
     return this.graphBuilder.getAllSymbols().filter((s) => {
+      if (isTestArtifactSymbol(s)) {
+        return false;
+      }
       const deps = this.graphBuilder.getDependencies(s.id);
       const dependents = this.graphBuilder.getDependents(s.id);
       return deps.length === 0 && dependents.length === 0 && !s.isExported;

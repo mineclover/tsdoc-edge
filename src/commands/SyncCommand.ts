@@ -268,8 +268,9 @@ export class SyncCommand extends BaseCommand {
         const validateCmd = this.dependencies.validateDocsCommandFactory
           ? this.dependencies.validateDocsCommandFactory()
           : new ValidateDocsCommand();
+        const validateArgs = checkOnly ? [docsDir, '--verify-sources'] : [docsDir];
         const docsStage = await this.runStage('docs', jsonMode, () =>
-          this.runMuted(jsonMode, () => validateCmd.execute([docsDir]))
+          this.runMuted(jsonMode, () => validateCmd.execute(validateArgs))
         );
         stages.push(docsStage.report);
         if (docsStage.result.exitCode !== 0) {
@@ -298,7 +299,7 @@ export class SyncCommand extends BaseCommand {
             if (indexRes.exitCode !== 0) {
               return indexRes;
             }
-            return validateCmd.execute([docsDir]);
+            return validateCmd.execute([docsDir, '--verify-sources']);
           })
         );
         stages.push(docsStage.report);
@@ -350,7 +351,7 @@ export class SyncCommand extends BaseCommand {
         }
       }
 
-      // Stage 4: Executable SpecGraph Extraction
+      // Stage 4: Executable SpecGraph Extraction / Drift Verification
       const authoredSpecDirs = config.specGovernance?.authoredSpecDirs ?? [];
       const hasAuthoredSpecDir = authoredSpecDirs.some((dir) =>
         fs.existsSync(path.resolve(rootDir, dir))
@@ -362,12 +363,12 @@ export class SyncCommand extends BaseCommand {
           durationMs: 0,
           message: 'Skipped via --skip-specs',
         });
-      } else if (readOnlyMode) {
+      } else if (dryRun) {
         stages.push({
           stage: 'specs',
           status: 'skipped',
           durationMs: 0,
-          message: 'Skipped SpecGraph write in read-only (--dry-run/--check) mode',
+          message: 'Skipped SpecGraph write in --dry-run mode',
         });
       } else if (!hasAuthoredSpecDir) {
         stages.push({
@@ -377,11 +378,12 @@ export class SyncCommand extends BaseCommand {
           message: 'No configured authoredSpecDirs directory present on disk',
         });
       } else {
+        const specArgs = checkOnly ? ['--check'] : [];
         const specCmd = this.dependencies.specExtractCommandFactory
           ? this.dependencies.specExtractCommandFactory()
           : new SpecExtractCommand();
         const specStage = await this.runStage('specs', jsonMode, () =>
-          this.runMuted(jsonMode, () => specCmd.execute([]))
+          this.runMuted(jsonMode, () => specCmd.execute(specArgs))
         );
         stages.push(specStage.report);
         if (specStage.result.exitCode !== 0) {

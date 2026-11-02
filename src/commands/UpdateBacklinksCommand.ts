@@ -80,7 +80,7 @@ export class UpdateBacklinksCommand extends BaseCommand {
    * @public
    */
   protected getUsage(): string {
-    return `tsdoc-edge update-backlinks [docs-directory] [options]
+    return `tsdoc-edge docs backlinks [docs-directory] [options]
 
   Default: managed (if exists), otherwise docs
 

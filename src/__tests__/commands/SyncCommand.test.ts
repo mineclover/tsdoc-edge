@@ -105,7 +105,7 @@ describe('SyncCommand', () => {
     expect(result.exitCode).toBe(0);
     expect(buildStub.calls).toEqual([['src', '--force', '--canonical-graph']]);
     expect(indexStub.calls).toEqual([['managed']]);
-    expect(validateStub.calls).toEqual([['managed']]);
+    expect(validateStub.calls).toEqual([['managed', '--verify-sources']]);
     expect(specStub.calls).toEqual([[]]);
     expect(backlinksStub.calls).toEqual([['managed']]);
 
@@ -148,7 +148,7 @@ describe('SyncCommand', () => {
     expect(result.exitCode).toBe(1);
     expect(buildStub.calls).toEqual([]);
     expect(indexStub.calls).toEqual([]);
-    expect(validateStub.calls).toEqual([['managed']]);
+    expect(validateStub.calls).toEqual([['managed', '--verify-sources']]);
     expect(specStub.calls).toEqual([]);
     expect(backlinksStub.calls).toEqual([['managed', '--check']]);
 
@@ -156,6 +156,42 @@ describe('SyncCommand', () => {
     const report = parsed as SyncPipelineReport;
     expect(report.status).toBe('failed');
     expect(report.mode).toBe('check');
+  });
+
+  it('forwards --check to spec-extract after backlinks pass and fails closed on SpecGraph drift', async () => {
+    const validateStub = new StubStageCommand('validate-docs');
+    const backlinksStub = new StubStageCommand('update-backlinks');
+    const specStub = new StubStageCommand('spec-extract', () => ({
+      exitCode: 1,
+      message: 'Managed SpecGraph out of sync',
+    }));
+    const logSpy = jest.spyOn(console, 'log').mockImplementation(() => undefined);
+
+    const command = new SyncCommand({
+      configManager,
+      buildCommandFactory: () => new StubStageCommand('build'),
+      indexDocsCommandFactory: () => new StubStageCommand('index-docs'),
+      validateDocsCommandFactory: () => validateStub,
+      specExtractCommandFactory: () => specStub,
+      updateBacklinksCommandFactory: () => backlinksStub,
+    });
+
+    const result = await command.execute(['--check', '--json']);
+
+    expect(result.exitCode).toBe(1);
+    expect(validateStub.calls).toEqual([['managed', '--verify-sources']]);
+    expect(backlinksStub.calls).toEqual([['managed', '--check']]);
+    expect(specStub.calls).toEqual([['--check']]);
+
+    const parsed: unknown = JSON.parse(logSpy.mock.calls.flat().join('\n'));
+    const report = parsed as SyncPipelineReport;
+    expect(report.status).toBe('failed');
+    expect(report.stages.map((s) => `${s.stage}:${s.status}`)).toEqual([
+      'build:skipped',
+      'docs:passed',
+      'backlinks:passed',
+      'specs:failed',
+    ]);
   });
 
   it('rejects unknown flags fail-closed without executing stages', async () => {

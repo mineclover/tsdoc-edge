@@ -391,6 +391,7 @@ tsdoc-edge symbol fix managed --dry-run
 ### Referenced By
 
 - [[SymbolQueryCommand]] → managed/commands/SymbolQueryCommand.md:180
+- [[DocumentSymbolSystem]] → managed/concepts/document-symbol-system.md:177
 
 ### Implemented By
 

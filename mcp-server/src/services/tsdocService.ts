@@ -316,6 +316,63 @@ export class TsDocService {
       }));
   }
 
+  /** Check whether the enrichment SQLite database (`.tsdoc.db`) exists on disk. @internal */
+  /**
+   * Check whether the enrichment SQLite database (`.tsdoc.db`) exists on disk.
+   *
+   * @returns True when the enrichment database file exists
+   * @internal
+   */
+  private hasEnrichmentDatabase(): boolean {
+    if (!fs.existsSync(this.dbPath)) {
+      this.dbPath = this.resolveDatabasePath(this.workspaceRoot);
+    }
+    return fs.existsSync(this.dbPath);
+  }
+
+  /**
+   * Compose canonical `@ttsc/graph` structural edges with retained `.tsdoc.db`
+   * non-structural enrichment relationships (`testing`, `verification`, `semantic`,
+   * `architectural`, `constraint`) per the C2 Capability Owner Matrix.
+   *
+   * @param includeExternal - Whether to include external library edges from `@ttsc/graph`
+   * @returns Combined canonical structural and retained enrichment relationships
+   * @internal
+   */
+  private getComposedRelationships(includeExternal: boolean): Relationship[] {
+    const canonical = this.getCanonicalSnapshot();
+    if (!canonical) {
+      return this.getAllUnifiedRelationships();
+    }
+    const structural = this.canonicalRelationships(canonical, includeExternal);
+    if (!this.hasEnrichmentDatabase()) {
+      return structural;
+    }
+    const retainedEnrichment = this.getAllUnifiedRelationships().filter(
+      (rel) => rel.category !== 'structural'
+    );
+    return [...structural, ...retainedEnrichment];
+  }
+
+  /**
+   * Match relationship type names across canonical `@ttsc/graph` and legacy enrichment aliases.
+   *
+   * @param actual - Stored relationship type identifier
+   * @param requested - Requested filter relationship type identifier
+   * @returns True when `actual` and `requested` refer to the same relationship kind
+   * @internal
+   */
+  private matchesRelationshipType(actual: string, requested: string): boolean {
+    if (actual === requested) return true;
+    const aliasGroups: ReadonlyArray<ReadonlySet<string>> = [
+      new Set(['calls', 'call']),
+      new Set(['type_ref', 'type-reference', 'type-dependency']),
+      new Set(['extends', 'inheritance']),
+      new Set(['implements', 'implementation']),
+    ];
+    return aliasGroups.some((group) => group.has(actual) && group.has(requested));
+  }
+
   /**
    * Resolve SQLite database path from `.tsdoc.config.json`, `.tsdoc.db`, or legacy `.tsdoc/symbols.db`.
    *
@@ -544,13 +601,26 @@ export class TsDocService {
     const canonical = this.getCanonicalSnapshot();
     if (canonical) {
       const nodes = canonical.nodes.filter((node) => includeExternal || !this.isExternalNode(node));
-      const relationships = this.canonicalRelationships(canonical, includeExternal);
+      const structuralRelationships = this.canonicalRelationships(canonical, includeExternal);
+      const composedRelationships = this.getComposedRelationships(includeExternal);
       const byType = new Map<string, number>();
       for (const node of nodes) byType.set(node.kind, (byType.get(node.kind) ?? 0) + 1);
       const byRelType = new Map<string, number>();
-      for (const rel of relationships) byRelType.set(rel.type, (byRelType.get(rel.type) ?? 0) + 1);
+      const byRelCategory = new Map<string, number>();
+      const byRelStrength = new Map<string, number>();
+      const byRelDirection = new Map<string, number>();
+      let explicit = 0;
+      let inferred = 0;
+      for (const rel of composedRelationships) {
+        byRelType.set(rel.type, (byRelType.get(rel.type) ?? 0) + 1);
+        byRelCategory.set(rel.category, (byRelCategory.get(rel.category) ?? 0) + 1);
+        byRelStrength.set(rel.strength, (byRelStrength.get(rel.strength) ?? 0) + 1);
+        byRelDirection.set(rel.direction, (byRelDirection.get(rel.direction) ?? 0) + 1);
+        if (rel.properties?.inferred === true) inferred += 1;
+        else explicit += 1;
+      }
       const degree = new Map<string, number>();
-      for (const rel of relationships) {
+      for (const rel of structuralRelationships) {
         for (const id of [rel.from, rel.to])
           degree.set(String(id), (degree.get(String(id)) ?? 0) + 1);
       }
@@ -562,16 +632,16 @@ export class TsDocService {
           byKind: Object.fromEntries(byType),
         },
         relationships: {
-          total: relationships.length,
+          total: composedRelationships.length,
           byType: Object.fromEntries(byRelType),
-          byCategory: { structural: relationships.length },
-          byStrength: { strong: relationships.length },
-          byDirection: { unidirectional: relationships.length },
-          explicit: relationships.length,
-          inferred: 0,
+          byCategory: Object.fromEntries(byRelCategory),
+          byStrength: Object.fromEntries(byRelStrength),
+          byDirection: Object.fromEntries(byRelDirection),
+          explicit,
+          inferred,
         },
         metrics: {
-          density: nodes.length ? relationships.length / nodes.length : 0,
+          density: nodes.length ? structuralRelationships.length / nodes.length : 0,
           avgDegree: degrees.length
             ? degrees.reduce((sum, value) => sum + value, 0) / degrees.length
             : 0,
@@ -725,14 +795,14 @@ export class TsDocService {
     offset?: number;
     includeExternal?: boolean;
   }): Promise<{ total: number; relationships: Relationship[] }> {
-    const canonical = this.getCanonicalSnapshot();
-    let relationships = canonical
-      ? this.canonicalRelationships(canonical, params.includeExternal ?? false)
-      : this.getAllUnifiedRelationships();
+    let relationships = this.getComposedRelationships(params.includeExternal ?? false);
 
     // Apply filters
-    if (params.type) {
-      relationships = relationships.filter((r) => r.type === params.type);
+    const requestedType = params.type;
+    if (requestedType) {
+      relationships = relationships.filter((r) =>
+        this.matchesRelationshipType(r.type, requestedType)
+      );
     }
     if (params.category) {
       relationships = relationships.filter((r) => r.category === params.category);

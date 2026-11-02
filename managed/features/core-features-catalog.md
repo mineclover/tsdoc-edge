@@ -49,7 +49,7 @@ tsdoc-edge work-context <file-path>
 
 **주요 산출물:**
 - [TSDocEdge](../../src/index.ts#TSDocEdge) - 메인 진입점
-- [FileScanner](../../src/scanner/FileScanner.ts#FileScanner) - 파일 스캔
+- [ProjectIndexer](../../src/indexer/ProjectIndexer.ts#ProjectIndexer) - 프로젝트 인덱싱 및 스캔
 - [TSDocParser](../../src/parser/TSDocParser.ts#TSDocParser) - TSDoc 파싱
 - [ConventionValidator](../../src/validator/ConventionValidator.ts#ConventionValidator) - 컨벤션 검증
 - [MarkdownGenerator](../../src/generator/MarkdownGenerator.ts#MarkdownGenerator) - 문서 생성
@@ -72,7 +72,7 @@ tsdoc-edge work-context <file-path>
 
 ### 통계 추적
 - [TrackableStatsCollector](../../src/analyzer/TrackableStatsCollector.ts#TrackableStatsCollector) - 중요도별 통계
-- [StatsComparator](../../src/analyzer/StatsComparator.ts#StatsComparator) - 회귀 탐지
+- [CoverageBaselineCommand](../../src/commands/CoverageBaselineCommand.ts#CoverageBaselineCommand) - 회귀 탐지
 - [StatsHistoryManager](../../src/analyzer/StatsHistoryManager.ts#StatsHistoryManager) - 트렌드 분석
 
 ### 중요도 분류
@@ -81,10 +81,10 @@ tsdoc-edge work-context <file-path>
   - **Important**: 구조적 타입, 높은 연결성 (≥5)
   - **Normal**: Private 헬퍼
 ### 도메인 분석
-- [DomainStructureAnalyzer](../../src/analyzer/DomainStructureAnalyzer.ts#DomainStructureAnalyzer) - 레이어 분리 검증
+- [LayerDependencyAnalyzer](../../src/analyzer/LayerDependencyAnalyzer.ts#LayerDependencyAnalyzer) - 레이어 분리 검증
 - [InterfaceAnalyzer](../../src/analyzer/InterfaceAnalyzer.ts#InterfaceAnalyzer) - 인터페이스 관계 분석
 - [InterfaceDependencyMapper](../../src/analyzer/InterfaceDependencyMapper.ts#InterfaceDependencyMapper) - 의존성 매핑
-- [DataFlowAnalyzer](../../src/analyzer/DataFlowAnalyzer.ts#DataFlowAnalyzer) - DTO 패턴 및 데이터 흐름 분석
+- [IODependencyAnalyzer](../../src/analyzer/IODependencyAnalyzer.ts#IODependencyAnalyzer) - DTO 패턴 및 데이터 흐름 분석
 
 ### 테스트 분석
 - [TestCoverageAnalyzer](../../src/analyzer/TestCoverageAnalyzer.ts#TestCoverageAnalyzer) - @testScenario 기반 커버리지
@@ -107,7 +107,7 @@ tsdoc-edge untested             # 미테스트 심볼
 - [SymbolSearchEngine](../../src/graph/SymbolSearchEngine.ts#SymbolSearchEngine) - 다양한 조건 검색
 - [DepthTraverser](../../src/graph/DepthTraverser.ts#DepthTraverser) - 깊이별 탐색
 - [ASTSymbolExtractor](../../src/analyzer/ASTSymbolExtractor.ts#ASTSymbolExtractor) - AST 심볼 추출
-- [DependencyResolver](../../src/analyzer/DependencyResolver.ts#DependencyResolver) - Import 해석
+- [ImportAnalyzer](../../src/analyzer/ImportAnalyzer.ts#ImportAnalyzer) - Import 해석
 **탐색 방향:**
 - `dependencies`: 하위 의존성 (이 코드가 사용하는 것)
 - `dependents`: 상위 의존성 (이 코드를 사용하는 것)
@@ -177,7 +177,7 @@ tsdoc-edge update-backlinks [path]       # 백링크 생성
 tsdoc-edge find-doc <symbol>             # 심볼 찾기
 ```
 
-[📖 상세 문서](./document-symbol-system.md)
+[📖 상세 문서](../concepts/document-symbol-system.md)
 ---
 
 ## 6. [[AutoIndexing]]
@@ -421,7 +421,7 @@ tsdoc-edge coverage-report              # 문서화(@doc) 커버리지 리포트
 ## 관련 문서
 
 ### 가이드
-- [기본 사용법](../../USAGE_GUIDE.md)
+- [기본 사용법](../user-guide.md)
 - [Strict Mode](../../STRICT_MODE_GUIDE.md)
 ### 설계 문서
 - [TSDoc 스펙 지원](../../reference/TSDOC_SPEC_SUPPORT.md)

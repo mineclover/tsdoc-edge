@@ -732,5 +732,111 @@ describe('ConnectivityValidator', () => {
       expect(contractIssues[0].missingItems).toContain('preconditions');
       expect(contractIssues[0].missingItems).toContain('postconditions');
     });
+
+    it('should exclude test artifacts and not flag unexported top-level helpers as public APIs missing tests', () => {
+      const perfect: Symbol = {
+        id: 'perfect',
+        name: 'Perfect',
+        type: 'function',
+        filePath: '/test/perfect.ts',
+        line: 1,
+        column: 0,
+        isExported: true,
+        isPublic: true,
+        summary: 'Perfect function',
+        contract: {
+          symbolName: 'Perfect',
+          description: 'Perfect contract',
+          preconditions: ['valid'],
+          postconditions: ['valid'],
+          invariants: [],
+          filePath: '/test/perfect.ts',
+        },
+        responsibility: {
+          symbolName: 'Perfect',
+          description: 'Perfect responsibility',
+          shouldDo: ['do good'],
+          shouldNotDo: ['do bad'],
+        },
+        tests: [
+          {
+            symbolName: 'Perfect',
+            testFilePath: '/test/perfect.test.ts',
+            testName: 'test perfect',
+            scenarios: ['perfect'],
+          },
+        ],
+        designDecisions: [],
+      };
+
+      const privateHelper: Symbol = {
+        id: 'private-helper',
+        name: 'hasItems',
+        type: 'function',
+        filePath: '/test/perfect.ts',
+        line: 20,
+        column: 0,
+        isExported: false,
+        isPublic: true,
+        summary: 'Internal module helper',
+        tests: [],
+        designDecisions: [],
+      };
+
+      const testSuite: Symbol = {
+        id: 'suite-1',
+        name: 'describe Perfect',
+        type: 'test-suite',
+        filePath: 'src/__tests__/perfect.test.ts',
+        line: 1,
+        column: 0,
+        isExported: false,
+        isPublic: true,
+        tests: [],
+        designDecisions: [],
+      };
+
+      const testCase: Symbol = {
+        id: 'case-1',
+        name: 'it works',
+        type: 'test-case',
+        filePath: 'src/perfect.test.ts',
+        line: 5,
+        column: 2,
+        isExported: false,
+        isPublic: true,
+        tests: [],
+        designDecisions: [],
+      };
+
+      builder.addSymbol(perfect);
+      builder.addSymbol(privateHelper);
+      builder.addSymbol(testSuite);
+      builder.addSymbol(testCase);
+      builder.addRelationship({
+        type: 'dependsOn',
+        from: 'perfect',
+        to: 'private-helper',
+        filePath: '/test/perfect.ts',
+      });
+
+      expect(validator.validateSymbol(testSuite)).toEqual([]);
+      expect(validator.validateSymbol(testCase)).toEqual([]);
+      expect(validator.validateSymbol(privateHelper)).toEqual([]);
+
+      const analysis = validator.analyze();
+      expect(analysis.undocumented).toHaveLength(0);
+      expect(analysis.untested).toHaveLength(0);
+
+      const report = validator.generateDetailedReport();
+      expect(report.totalSymbols).toBe(2);
+      expect(report.allIssues.some((i) => i.symbolId === 'suite-1')).toBe(false);
+      expect(report.allIssues.some((i) => i.symbolId === 'case-1')).toBe(false);
+      expect(
+        report.allIssues.some(
+          (i) => i.symbolId === 'private-helper' && i.issueType === 'missing-tests'
+        )
+      ).toBe(false);
+    });
   });
 });

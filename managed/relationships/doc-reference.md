@@ -69,6 +69,6 @@ Related: [[OrderProcessor]], [[PaymentGateway]]
 
 ### Referenced By
 
-- [[AnalyzerCommands]] → managed/commands/AnalyzerCommands.md:219
+- [[AnalyzerCommands]] → managed/commands/AnalyzerCommands.md:221
 - [[Conceptual Relation]] → managed/relationships/conceptual-relation.md:255
 

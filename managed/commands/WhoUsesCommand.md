@@ -195,7 +195,6 @@ Source: `src/commands/Phase5Commands.ts`
 - [[DepsCommand]] → managed/commands/DepsCommand.md:145
 - [[OrphansCommand]] → managed/commands/OrphansCommand.md:180
 - [[DatabaseManager]] → managed/core-components/DatabaseManager.md:290
-- [[Dead Code Detection]] → managed/features/DeadCodeDetection.md:110
 - [[Dependency Analysis]] → managed/features/DependencyAnalysis.md:156
 - [[Impact Analysis]] → managed/features/ImpactAnalysis.md:198
 - [[AnalysisFeatures]] → managed/features/analysis-features.md:275

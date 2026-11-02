@@ -53,7 +53,7 @@ export class RelationshipValidateCommand extends BaseCommand {
    * @public
    */
   protected getUsage(): string {
-    return `tsdoc-edge relationship-validate [options]
+    return `tsdoc-edge relationship validate [options]
 
 Validates the integrity of relationship data in the database.
 
@@ -69,10 +69,10 @@ Checks performed:
   • Malformed bidirectional relationship endpoints
 
 Examples:
-  tsdoc-edge relationship-validate
-  tsdoc-edge relationship-validate --verbose
-  tsdoc-edge relationship-validate --fix
-  tsdoc-edge relationship-validate --min-confidence 0.7`;
+  tsdoc-edge relationship validate
+  tsdoc-edge relationship validate --verbose
+  tsdoc-edge relationship validate --fix
+  tsdoc-edge relationship validate --min-confidence 0.7`;
   }
 
   /**

@@ -72,7 +72,7 @@ export class PlansCommand extends BaseCommand {
    * @public
    */
   protected getUsage(): string {
-    return `tsdoc-edge plans [--status=<status>]
+    return `tsdoc-edge docs plans [--status=<status>]
 
   Options:
     --status=<status>  Filter by status (planned, in-progress, completed, cancelled)`;

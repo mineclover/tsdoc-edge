@@ -8,11 +8,17 @@ canonical: true
 
 # [[AnalyzeTypesCommand]]
 
-**Source**: `src/commands/AnalyzeTypesCommand.ts`
+**Source**: `src/commands/AnalyzeRelationshipsCommand.ts`
 
 ## Purpose
 
-Analyze type dependencies and usage.
+Analyze type dependencies and usage via the unified relationship analyzer.
+
+## Usage
+
+```bash
+tsdoc-edge relationship analyze --type=types [options]
+```
 
 ## Features
 
@@ -40,5 +46,5 @@ Analyze type dependencies and usage.
 
 ### Implemented By
 
-- AnalyzeTypesCommand → src/commands/AnalyzeTypesCommand.ts:1
+- AnalyzeTypesCommand → src/commands/AnalyzeRelationshipsCommand.ts:1
 

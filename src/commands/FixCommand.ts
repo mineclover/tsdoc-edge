@@ -61,7 +61,7 @@ export class FixCommand extends BaseCommand {
    * @public
    */
   protected getUsage(): string {
-    return `tsdoc-edge fix [directory] [options]
+    return `tsdoc-edge docs fix [directory] [options]
 
   Default: src
   Options:

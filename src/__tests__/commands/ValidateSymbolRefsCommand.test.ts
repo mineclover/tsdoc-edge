@@ -243,5 +243,159 @@ More documentation.
       expect(result.exitCode).toBe(0);
       // Should report statistics
     });
+
+    it('resolves [[Symbol#Section]] references against both H1 primary and unique H2 auxiliary hub definitions', async () => {
+      fs.writeFileSync(
+        path.join(docsDir, 'hub.md'),
+        `# [[CliCommands]]
+
+## [[ValidateRefsHub]]
+
+Hub section details.
+`,
+        'utf-8'
+      );
+
+      fs.writeFileSync(
+        path.join(docsDir, 'consumer.md'),
+        `# [[ConsumerDoc]]
+
+See [[CliCommands#validate-refs]] and [[ValidateRefsHub#options]].
+`,
+        'utf-8'
+      );
+
+      const logSpy = jest.spyOn(console, 'log').mockImplementation();
+      try {
+        const result = await command.execute([docsDir, '--json']);
+        expect(result.exitCode).toBe(0);
+        const payload = JSON.parse(String(logSpy.mock.calls[0]?.[0])) as {
+          valid: boolean;
+          statistics: { brokenReferences: number; totalReferences: number };
+        };
+        expect(payload.valid).toBe(true);
+        expect(payload.statistics.brokenReferences).toBe(0);
+        expect(payload.statistics.totalReferences).toBe(2);
+      } finally {
+        logSpy.mockRestore();
+      }
+    });
+
+    it('does not treat ## Backlinks entries as authored references or circular dependencies', async () => {
+      fs.writeFileSync(
+        path.join(docsDir, 'alpha.md'),
+        `# [[AlphaNode]]
+
+Authored reference to [[BetaNode]].
+`,
+        'utf-8'
+      );
+
+      fs.writeFileSync(
+        path.join(docsDir, 'beta.md'),
+        `# [[BetaNode]]
+
+Target node without outgoing authored references.
+
+## Backlinks
+
+### Referenced By
+
+- [[AlphaNode]] → docs/alpha.md:3
+- [[DeletedGhostSymbol]] → docs/deleted.md:1
+`,
+        'utf-8'
+      );
+
+      const logSpy = jest.spyOn(console, 'log').mockImplementation();
+      try {
+        const result = await command.execute([docsDir, '--json']);
+        expect(result.exitCode).toBe(0);
+        const payload = JSON.parse(String(logSpy.mock.calls[0]?.[0])) as {
+          valid: boolean;
+          statistics: {
+            brokenReferences: number;
+            circularDependencies: number;
+            totalReferences: number;
+          };
+        };
+        expect(payload.valid).toBe(true);
+        expect(payload.statistics.brokenReferences).toBe(0);
+        expect(payload.statistics.circularDependencies).toBe(0);
+        expect(payload.statistics.totalReferences).toBe(1);
+      } finally {
+        logSpy.mockRestore();
+      }
+    });
+
+    it('ignores raw .mmd Mermaid files and fenced mermaid subroutine [[Label]] syntax', async () => {
+      fs.writeFileSync(
+        path.join(docsDir, 'diagram.mmd'),
+        `flowchart TD
+  check[[isExported = false]] --> next[[Continue traversal]]
+`,
+        'utf-8'
+      );
+
+      fs.writeFileSync(
+        path.join(docsDir, 'architecture.md'),
+        `# [[ArchitectureFlow]]
+
+\`\`\`mermaid
+flowchart TD
+  step1[[isExported = false]] --> step2[[Continue traversal]]
+\`\`\`
+`,
+        'utf-8'
+      );
+
+      const logSpy = jest.spyOn(console, 'log').mockImplementation();
+      try {
+        const result = await command.execute([docsDir, '--json']);
+        expect(result.exitCode).toBe(0);
+        const payload = JSON.parse(String(logSpy.mock.calls[0]?.[0])) as {
+          valid: boolean;
+          statistics: { brokenReferences: number; totalReferences: number };
+        };
+        expect(payload.valid).toBe(true);
+        expect(payload.statistics.brokenReferences).toBe(0);
+        expect(payload.statistics.totalReferences).toBe(0);
+      } finally {
+        logSpy.mockRestore();
+      }
+    });
+
+    it('reports authored circular dependencies as info without failing exit code and rejects unknown flags', async () => {
+      fs.writeFileSync(
+        path.join(docsDir, 'one.md'),
+        '# [[CycleOne]]\n\nRelated to [[CycleTwo]].\n',
+        'utf-8'
+      );
+      fs.writeFileSync(
+        path.join(docsDir, 'two.md'),
+        '# [[CycleTwo]]\n\nRelated to [[CycleOne]].\n',
+        'utf-8'
+      );
+
+      const logSpy = jest.spyOn(console, 'log').mockImplementation();
+      try {
+        const result = await command.execute([docsDir, '--json']);
+        expect(result.exitCode).toBe(0);
+        const payload = JSON.parse(String(logSpy.mock.calls[0]?.[0])) as {
+          valid: boolean;
+          statistics: { circularDependencies: number };
+          counts: { errors: number; info: number };
+        };
+        expect(payload.valid).toBe(true);
+        expect(payload.statistics.circularDependencies).toBe(1);
+        expect(payload.counts.errors).toBe(0);
+        expect(payload.counts.info).toBe(1);
+      } finally {
+        logSpy.mockRestore();
+      }
+
+      const badFlagResult = await command.execute([docsDir, '--unknown-flag']);
+      expect(badFlagResult.exitCode).not.toBe(0);
+    });
   });
 });

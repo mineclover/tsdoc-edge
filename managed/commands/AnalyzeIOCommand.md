@@ -8,11 +8,17 @@ canonical: true
 
 # [[AnalyzeIOCommand]]
 
-**Source**: `src/commands/AnalyzeIOCommand.ts`
+**Source**: `src/commands/AnalyzeRelationshipsCommand.ts`
 
 ## Purpose
 
-Analyze file I/O dependencies.
+Analyze file and DTO I/O dependencies via the unified relationship analyzer.
+
+## Usage
+
+```bash
+tsdoc-edge relationship analyze --type=io [options]
+```
 
 ## Features
 
@@ -44,5 +50,5 @@ Analyze file I/O dependencies.
 
 ### Implemented By
 
-- AnalyzeIOCommand → src/commands/AnalyzeIOCommand.ts:1
+- AnalyzeIOCommand → src/commands/AnalyzeRelationshipsCommand.ts:1
 

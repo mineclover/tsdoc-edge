@@ -47,5 +47,5 @@ Validate documentation completeness and quality.
 
 ### Implemented By
 
-- ValidateDocsCommand → src/commands/ValidateDocsCommand.ts:46
+- ValidateDocsCommand → src/commands/ValidateDocsCommand.ts:47
 

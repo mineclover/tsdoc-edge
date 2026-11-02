@@ -54,7 +54,7 @@ export class SuggestCommand extends BaseCommand {
    * @public
    */
   protected getUsage(): string {
-    return `tsdoc-edge suggest [directory] [options]
+    return `tsdoc-edge docs suggest [directory] [options]
 
   Default directory: src
 

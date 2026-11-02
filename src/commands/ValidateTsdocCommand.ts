@@ -92,7 +92,7 @@ export class ValidateTsdocCommand extends BaseCommand {
    * @public
    */
   protected getUsage(): string {
-    return `tsdoc-edge validate-tsdoc [path] [options]
+    return `tsdoc-edge validate tsdoc [path] [options]
 
   Options:
     --config <path>   Custom path to tsdoc.json

@@ -71,7 +71,7 @@ lastUpdated: 2025-01-15
   - Critical/Important/Normal 분류
   - 시계열 추적용 스냅샷
 
-- [StatsComparator](../../src/analyzer/StatsComparator.ts#StatsComparator) - 회귀 탐지
+- [CoverageBaselineCommand](../../src/commands/CoverageBaselineCommand.ts#CoverageBaselineCommand) - 회귀 탐지
   - 이전 스냅샷과 비교
   - 문서화율 하락 경고
   - Critical 심볼 삭제 감지
@@ -84,14 +84,14 @@ lastUpdated: 2025-01-15
   - Public API, 계약, 연결성 기반
   - 3단계 우선순위 자동 할당
 ### Domain Analysis
-- [DomainStructureAnalyzer](../../src/analyzer/DomainStructureAnalyzer.ts#DomainStructureAnalyzer) - 도메인 구조 분석
+- [LayerDependencyAnalyzer](../../src/analyzer/LayerDependencyAnalyzer.ts#LayerDependencyAnalyzer) - 도메인 구조 및 레이어 분석
   - 레이어 분리 검증 (UI, Domain, Infrastructure)
   - 도메인 경계 탐지
 - [InterfaceAnalyzer](../../src/analyzer/InterfaceAnalyzer.ts#InterfaceAnalyzer) - 인터페이스 관계
   - 정의와 구현 관계 분석
 - [InterfaceDependencyMapper](../../src/analyzer/InterfaceDependencyMapper.ts#InterfaceDependencyMapper) - 의존성 매핑
   - 인터페이스 간 의존성 그래프
-- [DataFlowAnalyzer](../../src/analyzer/DataFlowAnalyzer.ts#DataFlowAnalyzer) - 데이터 흐름 분석
+- [IODependencyAnalyzer](../../src/analyzer/IODependencyAnalyzer.ts#IODependencyAnalyzer) - 데이터 흐름 분석
   - DTO 패턴 분류 (Request, Response, Domain, Internal)
   - 데이터 변환 경로 추적
   - 변환 체인 탐지 및 검증
@@ -109,7 +109,7 @@ lastUpdated: 2025-01-15
   - Export 정보 및 접근 제어자
   - Import 문 분석
 
-- [DependencyResolver](../../src/analyzer/DependencyResolver.ts#DependencyResolver) - Import 경로 해석
+- [ImportAnalyzer](../../src/analyzer/ImportAnalyzer.ts#ImportAnalyzer) - Import 경로 해석
   - 모듈 경로 해석 (.ts, .tsx, index)
   - Import 문과 심볼 매핑
 ## 사용 시나리오
@@ -448,7 +448,7 @@ jobs:
 ### Referenced By
 
 - [[TSDoc Edge Documentation]] → managed/README.md:133
-- [[Phase Commands]] → managed/commands/PhaseCommands.md:60
+- [[Phase Commands]] → managed/commands/PhaseCommands.md:62
 - [[SuggestCommand]] → managed/commands/SuggestCommand.md:485
 - [[CoreFeatures]] → managed/features/core-features-catalog.md:65
 - [[CoreWorkflow]] → managed/features/core-workflow.md:152

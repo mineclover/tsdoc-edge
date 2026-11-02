@@ -102,7 +102,7 @@ export class CheckDuplicatesCommand extends BaseCommand {
    * @public
    */
   protected getUsage(): string {
-    return 'tsdoc-edge check-duplicates [docs-directory]\n\n  Default: managed';
+    return 'tsdoc-edge spec duplicates [docs-directory]\n\n  Default: managed';
   }
 
   /**

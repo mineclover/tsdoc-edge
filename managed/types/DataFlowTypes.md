@@ -147,19 +147,19 @@ See implementation: DataFlowAnalysisResult
 
 ### Identify DTOs
 ```bash
-tsdoc-edge analyze-io
+tsdoc-edge relationship analyze --type=io
 # Finds all DTOs by naming pattern
 ```
 
 ### Track Transformations
 ```bash
-tsdoc-edge analyze-chains
+tsdoc-edge relationship analyze --type=chains
 # Shows transformation chains
 ```
 
-### Find Dead Code
+### Find Orphaned & Unused Symbols
 ```bash
-tsdoc-edge detect-dead-code
+tsdoc-edge symbol orphans
 # Includes orphaned DTOs and transformers
 ```
 

@@ -260,6 +260,7 @@ tsdoc-edge symbol query managed info "BuildCommand"
 ### Referenced By
 
 - [[SymbolFixCommand]] → managed/commands/SymbolFixCommand.md:326
+- [[DocumentSymbolSystem]] → managed/concepts/document-symbol-system.md:176
 - [[DocumentSymbolParser]] → managed/features/DocumentSymbolParser.md:185
 - [[DocumentSymbolRegistry]] → managed/features/DocumentSymbolRegistry.md:291
 - [[CliCommandSurfaceSpecification]] → managed/specs/domains/cli-command-surface-spec.md:405

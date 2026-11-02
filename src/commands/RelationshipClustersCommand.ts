@@ -59,7 +59,7 @@ export class RelationshipClustersCommand extends BaseCommand {
    * @public
    */
   protected getUsage(): string {
-    return `tsdoc-edge relationship-clusters [options]
+    return `tsdoc-edge relationship clusters [options]
 
 Discovers architectural modules/components by analyzing relationship density.
 Uses a greedy modularity optimization algorithm to group highly connected symbols.
@@ -76,16 +76,16 @@ Metrics:
 
 Examples:
   # Find architectural modules
-  tsdoc-edge relationship-clusters
+  tsdoc-edge relationship clusters
 
   # Focus on structural relationships
-  tsdoc-edge relationship-clusters --category structural
+  tsdoc-edge relationship clusters --category structural
 
   # Find large modules only
-  tsdoc-edge relationship-clusters --min-size 10
+  tsdoc-edge relationship clusters --min-size 10
 
   # Show detailed symbol lists
-  tsdoc-edge relationship-clusters --detailed --max-clusters 10`;
+  tsdoc-edge relationship clusters --detailed --max-clusters 10`;
   }
 
   /**

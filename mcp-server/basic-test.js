@@ -120,11 +120,24 @@ async function runTests() {
     console.log(`  Total relationships: ${stats.relationships.total}`);
   });
 
-  // Test 3: List relationships
+  // Test 3: List relationships (both canonical structural and retained enrichment)
   await test('List relationships', async () => {
-    const result = await service.listRelationships({ type: 'imports', limit: 10 });
-    const count = result.relationships ? result.relationships.length : 0;
-    console.log(`  Found ${count} relationships`);
+    const structural = await service.listRelationships({ type: 'calls', limit: 10 });
+    const testing = await service.listRelationships({
+      type: 'test-coverage',
+      category: 'testing',
+      limit: 10,
+    });
+    const structuralCount = structural.relationships ? structural.relationships.length : 0;
+    const testingCount = testing.relationships ? testing.relationships.length : 0;
+    if (structuralCount === 0 || testingCount === 0) {
+      throw new Error(
+        `Expected non-zero composed relationships (structural=${structuralCount}, testing=${testingCount})`
+      );
+    }
+    console.log(
+      `  Found ${structural.total} call relationships and ${testing.total} test-coverage relationships`
+    );
   });
 
   // Test 4: Get work context

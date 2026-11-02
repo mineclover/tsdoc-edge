@@ -15,6 +15,7 @@ import * as path from 'node:path';
 import { ConfigManager } from '../config/ConfigManager';
 import { DocumentSymbolParser } from '../doc-symbol/DocumentSymbolParser';
 import { DocumentSymbolRegistry } from '../doc-symbol/DocumentSymbolRegistry';
+import type { DocSymbolError } from '../types/feature';
 import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 
 /**
@@ -76,13 +77,18 @@ export class ValidateDocsCommand extends BaseCommand {
    * @public
    */
   protected getUsage(): string {
-    return 'tsdoc-edge validate-docs [docs-directory]\n\n  Default: docs';
+    return (
+      'tsdoc-edge validate docs [docs-directory] [--verify-sources]\n\n' +
+      '  Default: docs\n' +
+      '  Options:\n' +
+      '    --verify-sources   Verify declared source file paths exist on disk'
+    );
   }
 
   /**
    * execute method
    * @param args - args parameter
-   * @returns Returns Promise<CommandResult>
+   * @returns Returns `Promise<CommandResult>`
    * @public
    */
   execute(args: string[]): Promise<CommandResult> {
@@ -92,12 +98,19 @@ export class ValidateDocsCommand extends BaseCommand {
         return this.displayHelp();
       }
 
+      const flagError = this.validateAllowedFlags(args, ['--verify-sources']);
+      if (flagError) {
+        return flagError;
+      }
+
       // Deprecation warning (only when called directly as legacy command)
       if (this.showDeprecationWarning) {
         this.printDeprecationWarning('tsdoc-edge validate docs');
       }
 
-      const docsDir = args[0] || 'docs';
+      const verifySources = this.hasFlag(args, '--verify-sources');
+      const positionalArgs = this.getPositionalArgs(args);
+      const docsDir = positionalArgs[0] || 'docs';
       const docsPath = path.resolve(process.cwd(), docsDir);
 
       if (!fs.existsSync(docsPath)) {
@@ -110,17 +123,39 @@ export class ValidateDocsCommand extends BaseCommand {
       const markdownFiles = this.findMarkdownFiles(docsPath);
       const parser = this.parser || new DocumentSymbolParser();
       const registry = this.registry || new DocumentSymbolRegistry();
+      const sourceErrors: DocSymbolError[] = [];
 
       for (const filePath of markdownFiles) {
         try {
           const parsed = parser.parse(filePath);
           if (parsed) {
+            let shouldRegisterSourceConnection = Boolean(parsed.sourceFilePath);
+
+            if (parsed.sourceFilePath) {
+              const cleanSourcePath = parsed.sourceFilePath.split(':')[0].trim();
+              const isGlobSource = cleanSourcePath.includes('*');
+              const resolvedSourcePath = path.resolve(process.cwd(), cleanSourcePath);
+              const sourceExists =
+                isGlobSource || (cleanSourcePath.length > 0 && fs.existsSync(resolvedSourcePath));
+
+              if (verifySources && !sourceExists) {
+                sourceErrors.push({
+                  type: 'broken_source_path',
+                  symbolName: parsed.primary?.name ?? path.basename(filePath, '.md'),
+                  filePath,
+                  line: 1,
+                  message: `Declared source file does not exist: ${parsed.sourceFilePath}`,
+                });
+                shouldRegisterSourceConnection = false;
+              }
+            }
+
             registry.registerDocument(parsed);
 
             // Keep source connections deterministic on a clean checkout. The
             // optional document-symbol index can still contribute @doc links,
             // but validation must not depend on a generated ignored artifact.
-            if (parsed.primary && parsed.sourceFilePath) {
+            if (parsed.primary && parsed.sourceFilePath && shouldRegisterSourceConnection) {
               registry.registerCodeConnection({
                 codeSymbol: parsed.primary.name,
                 filePath: parsed.sourceFilePath,
@@ -160,6 +195,10 @@ export class ValidateDocsCommand extends BaseCommand {
 
       // Validate
       const validation = registry.validate();
+      if (sourceErrors.length > 0) {
+        validation.errors.push(...sourceErrors);
+        validation.valid = false;
+      }
 
       // Print errors
       if (validation.errors.length > 0) {

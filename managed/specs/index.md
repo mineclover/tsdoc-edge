@@ -151,7 +151,7 @@ tsdoc-edge convention check --pack managed/conventions/tsdoc-edge-core-policy.js
 
 - AuthoredProjectSpecifications → src/spec-graph/ManagedSpecExtractor.ts:1
 - SpecCommand → src/commands/SpecCommand.ts:54
-- SpecExtractCommand → src/commands/SpecExtractCommand.ts:26
+- SpecExtractCommand → src/commands/SpecExtractCommand.ts:27
 - SpecGraphCommand → src/commands/SpecGraphCommand.ts:26
 - EXACT_BINDING_RESOLVER_ID → src/spec-graph/BindingResolver.ts:43
 - EXACT_BINDING_RESOLVER_VERSION → src/spec-graph/BindingResolver.ts:52

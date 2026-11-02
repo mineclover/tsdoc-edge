@@ -1268,7 +1268,7 @@ export class DesignContextCommand extends BaseCommand {
       console.log(`  ${colors.yellow}❌ No tests found for this file${colors.reset}`);
       console.log(`  ${colors.blue}   💡 Create test file in src/__tests__/${colors.reset}`);
       console.log(
-        `  ${colors.blue}   💡 Run: tsdoc-edge untested to see all untested symbols${colors.reset}`
+        `  ${colors.blue}   💡 Run: tsdoc-edge symbol untested to see all untested symbols${colors.reset}`
       );
       console.log();
     }

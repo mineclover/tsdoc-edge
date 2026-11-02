@@ -50,7 +50,7 @@ export class RelationshipStatsCommand extends BaseCommand {
    * @public
    */
   protected getUsage(): string {
-    return `tsdoc-edge relationship-stats [options]
+    return `tsdoc-edge relationship stats [options]
 
 Options:
   --detailed           Show detailed breakdown of all relationship types
@@ -320,7 +320,7 @@ Options:
     } else {
       this.printSection('Quick Tips');
       console.log(
-        `  ${this.colors.blue}ℹ${this.colors.reset} Run ${this.colors.cyan}tsdoc-edge relationship-stats --detailed${this.colors.reset} for full per-type breakdown`
+        `  ${this.colors.blue}ℹ${this.colors.reset} Run ${this.colors.cyan}tsdoc-edge relationship stats --detailed${this.colors.reset} for full per-type breakdown`
       );
       console.log(
         `  ${this.colors.blue}ℹ${this.colors.reset} Run ${this.colors.cyan}tsdoc-edge relationship query <symbol>${this.colors.reset} to inspect symbol edges`

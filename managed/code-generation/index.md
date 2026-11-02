@@ -18,7 +18,7 @@ The code generation system transforms analyzed code and metadata into various ou
 
 ### [[Code Generation]]
 
-**Source**: `src/generator/CommentExporter.ts`
+**Source**: `src/fold/CommentExporter.ts`
 
 Exports TSDoc comments to external format for version control and editing.
 
@@ -28,7 +28,7 @@ Exports TSDoc comments to external format for version control and editing.
 
 ### [[Code Generation]]
 
-**Source**: `src/generator/CommentImporter.ts`
+**Source**: `src/fold/CommentImporter.ts`
 
 Imports comments from external sources back into code.
 
@@ -38,7 +38,7 @@ Imports comments from external sources back into code.
 
 ### [[Code Generation]]
 
-**Source**: `src/generator/CommentStateManager.ts`
+**Source**: `src/fold/CommentStateManager.ts`
 
 Manages comment state during fold/unfold operations.
 
@@ -148,7 +148,7 @@ const spec = specGenerator.generate(moduleAnalysis);
 
 ### Implemented By
 
-- Code Generation → src/generator/CommentExporter.ts:1
+- Code Generation → src/fold/CommentExporter.ts:1
 - XMLContextGenerator → src/generator/XMLContextGenerator.ts:23
 - JsonBuilder → src/output/JsonBuilder.ts:36
 - XmlBuilder → src/output/XmlBuilder.ts:81

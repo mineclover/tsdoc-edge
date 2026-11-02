@@ -155,10 +155,10 @@ for (const [symbolId, symbol] of this.graph.symbols.entries()) {
 
 ### Referenced By
 
-- [[AnalyzeTypesCommand]] → managed/commands/AnalyzeTypesCommand.md:29
+- [[AnalyzeTypesCommand]] → managed/commands/AnalyzeTypesCommand.md:35
 - [[DetectCircularTypesCommand]] → managed/commands/DetectCircularTypesCommand.md:81
 - [[FindRootTypesCommand]] → managed/commands/FindRootTypesCommand.md:72
-- [[Phase Commands]] → managed/commands/PhaseCommands.md:35
+- [[Phase Commands]] → managed/commands/PhaseCommands.md:37
 - [[Analyzer Status]] → managed/features/analyzer-status.md:102
 - [[SymbolGraphFeatures]] → managed/features/symbol-graph.md:237
 - [[Relationship Analysis Guide]] → managed/guides/relationship-analysis-guide.md:428

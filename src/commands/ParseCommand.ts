@@ -78,7 +78,7 @@ export class ParseCommand extends BaseCommand {
    * @public
    */
   protected getUsage(): string {
-    return `tsdoc-edge parse <source-path>
+    return `tsdoc-edge symbol parse <source-path>
 
   source-path can be a file or directory`;
   }
@@ -102,11 +102,11 @@ export class ParseCommand extends BaseCommand {
         this.printError('Source path required');
         console.log();
         console.log('Usage:');
-        this.printInfo('  tsdoc-edge parse <file|directory>');
+        this.printInfo('  tsdoc-edge symbol parse <file|directory>');
         console.log();
         console.log('Examples:');
-        console.log('  tsdoc-edge parse src/analyzer/CodeHealthChecker.ts');
-        console.log('  tsdoc-edge parse src');
+        console.log('  tsdoc-edge symbol parse src/analyzer/CodeHealthChecker.ts');
+        console.log('  tsdoc-edge symbol parse src');
         console.log();
         return this.failure('Source path required');
       }

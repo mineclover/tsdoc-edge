@@ -387,6 +387,7 @@ describe('DocumentSymbolRegistry', () => {
 
 - [[TSDoc Edge Documentation]] → managed/README.md:293
 - [[IndexDocsCommand]] → managed/commands/IndexDocsCommand.md:78
+- [[DocumentSymbolSystem]] → managed/concepts/document-symbol-system.md:51
 - [[DocumentSymbolParser]] → managed/features/DocumentSymbolParser.md:186
 - [[ValidationFeatures]] → managed/features/validation-features.md:243
 - [[CLI Command Development Guide]] → managed/guides/command-development-guide.md:725

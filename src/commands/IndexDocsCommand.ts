@@ -77,7 +77,7 @@ export class IndexDocsCommand extends BaseCommand {
    * @public
    */
   protected getUsage(): string {
-    return `tsdoc-edge index-docs [docs-directory] [options]
+    return `tsdoc-edge docs index [docs-directory] [options]
 
   Default directory: docs
 

@@ -134,5 +134,80 @@ source: src/implementation.ts
         cwdSpy.mockRestore();
       }
     });
+
+    it('fails closed with broken_source_path when --verify-sources finds a missing source file', async () => {
+      const docsDir = path.join(tempDir, 'managed');
+      fs.mkdirSync(docsDir, { recursive: true });
+      fs.writeFileSync(
+        path.join(docsDir, 'missing-source.md'),
+        `---
+source: src/deleted/MissingFile.ts
+---
+# [[MissingFile]]
+`,
+        'utf8'
+      );
+
+      const registry = new DocumentSymbolRegistry();
+      const cwdSpy = jest.spyOn(process, 'cwd').mockReturnValue(tempDir);
+      try {
+        command = new ValidateDocsCommand(undefined, registry);
+        const result = await command.execute([docsDir, '--verify-sources']);
+
+        expect(result.exitCode).not.toBe(0);
+        expect(registry.getCodeConnections('MissingFile')).toEqual([]);
+        const loggedOutput = consoleSpy.mock.calls.map((c: unknown[]) => String(c[0])).join('\n');
+        expect(loggedOutput).toContain('broken_source_path');
+        expect(loggedOutput).toContain(
+          'Declared source file does not exist: src/deleted/MissingFile.ts'
+        );
+      } finally {
+        cwdSpy.mockRestore();
+      }
+    });
+
+    it('passes --verify-sources when declared source files exist on disk (including :line suffixes and globs)', async () => {
+      const docsDir = path.join(tempDir, 'managed');
+      const srcDir = path.join(tempDir, 'src');
+      fs.mkdirSync(docsDir, { recursive: true });
+      fs.mkdirSync(srcDir, { recursive: true });
+      fs.writeFileSync(path.join(srcDir, 'Existing.ts'), 'export class Existing {}\n', 'utf8');
+
+      fs.writeFileSync(
+        path.join(docsDir, 'existing.md'),
+        `---
+source: src/Existing.ts:1
+---
+# [[Existing]]
+`,
+        'utf8'
+      );
+      fs.writeFileSync(
+        path.join(docsDir, 'glob-source.md'),
+        `# [[GlobSource]]
+
+**Source**: \`src/**/*.ts\`
+`,
+        'utf8'
+      );
+
+      const registry = new DocumentSymbolRegistry();
+      const cwdSpy = jest.spyOn(process, 'cwd').mockReturnValue(tempDir);
+      try {
+        command = new ValidateDocsCommand(undefined, registry);
+        const result = await command.execute(['--verify-sources', docsDir]);
+
+        expect(result.exitCode).toBe(0);
+        expect(registry.getCodeConnections('Existing')).toHaveLength(1);
+      } finally {
+        cwdSpy.mockRestore();
+      }
+    });
+
+    it('rejects unknown flags fail-closed', async () => {
+      command = new ValidateDocsCommand();
+      const result = await command.execute([tempDir, '--unknown-flag']);
+      expect(result.exitCode).not.toBe(0);
+    });
   });
 });

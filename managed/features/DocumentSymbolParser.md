@@ -297,6 +297,7 @@ describe('DocumentSymbolParser', () => {
 - [[SymbolFixCommand]] → managed/commands/SymbolFixCommand.md:325
 - [[SymbolQueryCommand]] → managed/commands/SymbolQueryCommand.md:186
 - [[WorkContextCommand]] → managed/commands/WorkContextCommand.md:62
+- [[DocumentSymbolSystem]] → managed/concepts/document-symbol-system.md:50
 - [[DocumentSymbolRegistry]] → managed/features/DocumentSymbolRegistry.md:296
 - [[CoreWorkflow]] → managed/features/core-workflow.md:96
 - [[ValidationFeatures]] → managed/features/validation-features.md:242

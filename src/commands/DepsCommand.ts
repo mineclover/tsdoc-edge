@@ -39,7 +39,7 @@ export class DepsCommand extends BaseCommand {
     return 'Show what a symbol depends on (A → B)';
   }
   protected getUsage(): string {
-    return 'tsdoc-edge deps <symbol-id> [--all] [--type <kind>] [--json|--xml] [--include-external]';
+    return 'tsdoc-edge symbol deps <symbol-id> [--all] [--type <kind>] [--json|--xml] [--include-external]';
   }
   /**
    * @param args - Command arguments

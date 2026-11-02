@@ -13,13 +13,15 @@
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
+import * as ts from 'typescript';
 import { ConfigManager } from '../config/ConfigManager';
+import { isTestArtifactSymbol } from '../graph/SymbolSearchEngine';
 import {
   type CanonicalDocumentationCoverageProjection,
   projectDocumentationCoverageToCanonicalNodes,
 } from '../metrics/CanonicalCoverageProjection';
 import { createCoverageSourceIdentity } from '../metrics/CoverageMetricContract';
-import { TSDocParser } from '../parser/TSDocParser';
+import { getDirectJsDocs, readTsdocComment, TSDocParser } from '../parser/TSDocParser';
 import {
   CoverageMetricReportRepository,
   type CoverageMetricReportRevision,
@@ -40,10 +42,29 @@ interface CategoryCoverage {
 }
 
 /**
+ * File-level `@doc` coverage statistics across analyzed source files
+ */
+interface ModuleCoverage {
+  totalFiles: number;
+  documentedFiles: number;
+  coverage: number;
+}
+
+/**
+ * Per-file cached `@doc` inspection result
+ */
+interface CachedFileDocInfo {
+  moduleHasDoc: boolean;
+  symbolNamesWithDoc: Set<string>;
+}
+
+/**
  * Complete coverage report
  */
 interface CoverageReport {
   overall: CategoryCoverage;
+  effectiveOverall: CategoryCoverage;
+  moduleCoverage: ModuleCoverage;
   byCategory: {
     commands: CategoryCoverage;
     analyzers: CategoryCoverage;
@@ -89,6 +110,7 @@ export class CoverageReportCommand extends BaseCommand {
   private db?: DatabaseManager;
   private ownsDatabase = false;
   private parser: TSDocParser;
+  private fileDocCache = new Map<string, CachedFileDocInfo>();
 
   constructor(db?: DatabaseManager) {
     super();
@@ -125,6 +147,7 @@ export class CoverageReportCommand extends BaseCommand {
   Options:
   --json               Output as JSON
   --filter=public      Show only public symbols
+  --include-tests      Include test suites, test cases, and test files
   --hierarchical       Group by file hierarchy
   --canonical-graph-db <file>  Project documentation evidence to active ttsc graph revision
   --workspace <id>     Workspace identity for persisted report inspection
@@ -147,6 +170,7 @@ export class CoverageReportCommand extends BaseCommand {
 
       const jsonOutput = args.includes('--json');
       const filterPublic = args.includes('--filter=public');
+      const includeTests = args.includes('--include-tests');
       const hierarchical = args.includes('--hierarchical');
       const canonicalGraphDatabase = this.getOption(args, '--canonical-graph-db');
       const positionalArguments = this.getPositionalArgs(args);
@@ -165,6 +189,7 @@ export class CoverageReportCommand extends BaseCommand {
         this.printHeader('SSOT Coverage Report');
       }
 
+      this.fileDocCache.clear();
       try {
         // 1. Get all symbols from DB
         const allSymbols = await this.getAllSymbols();
@@ -175,8 +200,13 @@ export class CoverageReportCommand extends BaseCommand {
           return this.failure('No symbols in database');
         }
 
-        // 2. Filter if requested
-        const symbols = filterPublic ? allSymbols.filter((s) => this.isPublicAPI(s)) : allSymbols;
+        // 2. Exclude test artifacts by default unless --include-tests is passed, then filter if requested
+        const candidateSymbols = includeTests
+          ? allSymbols
+          : allSymbols.filter((s) => !isTestArtifactSymbol(s));
+        const symbols = filterPublic
+          ? candidateSymbols.filter((s) => this.isPublicAPI(s))
+          : candidateSymbols;
 
         // 3. Check coverage
         const report = hierarchical
@@ -198,6 +228,7 @@ export class CoverageReportCommand extends BaseCommand {
 
         return this.success();
       } finally {
+        this.fileDocCache.clear();
         this.closeOwnedDatabase();
       }
     });
@@ -370,6 +401,10 @@ export class CoverageReportCommand extends BaseCommand {
    * Check if symbol is public API (high priority)
    */
   private isPublicAPI(symbol: Symbol): boolean {
+    if (typeof symbol.isExported === 'boolean') {
+      return Boolean(symbol.isExported && symbol.isPublic);
+    }
+
     const { filePath, type } = symbol;
 
     // Commands are always public
@@ -415,41 +450,145 @@ export class CoverageReportCommand extends BaseCommand {
   }
 
   /**
-   * Check if symbol has `@doc` tag
+   * Parse and cache module-level `@packageDocumentation` `@doc` and symbol-level `@doc` tags for a file
    */
-  private hasDocTag(symbol: Symbol): boolean {
-    try {
-      const fullPath = path.resolve(symbol.filePath);
+  private getFileDocInfo(filePath: string): CachedFileDocInfo {
+    const fullPath = path.resolve(filePath);
+    const cached = this.fileDocCache.get(fullPath);
+    if (cached) {
+      return cached;
+    }
 
+    const info: CachedFileDocInfo = {
+      moduleHasDoc: false,
+      symbolNamesWithDoc: new Set<string>(),
+    };
+
+    try {
       if (!fs.existsSync(fullPath)) {
-        return false;
+        this.fileDocCache.set(fullPath, info);
+        return info;
       }
 
       const source = fs.readFileSync(fullPath, 'utf-8');
+      const sourceFile = ts.createSourceFile(fullPath, source, ts.ScriptTarget.Latest, true);
+      const visitedJsDocStarts = new Set<number>();
 
-      // Parse TSDoc comments
-      const parsed = this.parser.parseFile(fullPath, source);
+      const inspectJsDoc = (jsDoc: ts.JSDoc, declarationNames: readonly string[]): void => {
+        const startPos = jsDoc.getStart(sourceFile);
+        if (visitedJsDocStarts.has(startPos)) {
+          return;
+        }
+        visitedJsDocStarts.add(startPos);
 
-      // Check if any comment for this symbol has @doc tag
-      for (const comment of parsed.comments) {
-        if (comment.symbolName === symbol.name) {
-          // Check for @doc tag in the comment
-          const docComment = comment.docComment;
-          const customBlocks = docComment.customBlocks;
+        const jsDocText = jsDoc.getText(sourceFile);
+        const structured = readTsdocComment(this.parser.parseString(jsDocText).docComment);
+        const hasDoc =
+          structured.docReferences.length > 0 ||
+          structured.getTagValues('@doc').some((value) => value.trim().length > 0);
+        if (!hasDoc) {
+          return;
+        }
 
-          for (const block of customBlocks) {
-            if (block.blockTag.tagName === '@doc') {
-              return true;
-            }
+        const isPackageDoc =
+          structured.hasModifier('@packagedocumentation') ||
+          (jsDoc.tags ?? []).some(
+            (tag) => tag.tagName.text.toLowerCase() === 'packagedocumentation'
+          );
+
+        if (isPackageDoc || declarationNames.length === 0) {
+          info.moduleHasDoc = true;
+        } else {
+          for (const name of declarationNames) {
+            info.symbolNamesWithDoc.add(name);
           }
         }
+      };
+
+      const visit = (node: ts.Node, parentName?: string): void => {
+        const declarationNames = getDeclarationSymbolNames(node, parentName);
+        const jsDocs = getDirectJsDocs(node);
+        for (const jsDoc of jsDocs) {
+          inspectJsDoc(jsDoc, declarationNames);
+        }
+
+        const nextParent =
+          (ts.isClassDeclaration(node) || ts.isInterfaceDeclaration(node)) && node.name
+            ? node.name.text
+            : parentName;
+        ts.forEachChild(node, (child) => visit(child, nextParent));
+      };
+
+      visit(sourceFile);
+
+      for (const eofJsDoc of getDirectJsDocs(sourceFile.endOfFileToken)) {
+        inspectJsDoc(eofJsDoc, []);
       }
 
-      return false;
+      const leadingRanges = ts.getLeadingCommentRanges(source, 0) ?? [];
+      for (const range of leadingRanges) {
+        if (visitedJsDocStarts.has(range.pos)) {
+          continue;
+        }
+        const commentText = source.slice(range.pos, range.end);
+        if (!commentText.startsWith('/**') || commentText.startsWith('/***')) {
+          continue;
+        }
+        const structured = readTsdocComment(this.parser.parseString(commentText).docComment);
+        const isPackageDoc =
+          structured.hasModifier('@packagedocumentation') ||
+          commentText.includes('@packageDocumentation');
+        const hasDoc =
+          structured.docReferences.length > 0 ||
+          structured.getTagValues('@doc').some((value) => value.trim().length > 0);
+        if (isPackageDoc && hasDoc) {
+          info.moduleHasDoc = true;
+        }
+      }
     } catch (_error) {
-      // If parsing fails, assume no doc tag
-      return false;
+      // If parsing fails, fall back to empty doc info for this file
     }
+
+    this.fileDocCache.set(fullPath, info);
+    return info;
+  }
+
+  /**
+   * Check if symbol has a direct `@doc` tag
+   */
+  private hasDocTag(symbol: Symbol): boolean {
+    const info = this.getFileDocInfo(symbol.filePath);
+    return info.symbolNamesWithDoc.has(symbol.name);
+  }
+
+  /**
+   * Check if symbol is covered by a direct `@doc` tag or module-level `@packageDocumentation` `@doc`
+   */
+  private hasEffectiveDocTag(symbol: Symbol): boolean {
+    const info = this.getFileDocInfo(symbol.filePath);
+    return info.moduleHasDoc || info.symbolNamesWithDoc.has(symbol.name);
+  }
+
+  /**
+   * Compute file-level `@doc` coverage across unique files represented in `symbols`
+   */
+  private computeModuleCoverage(symbols: Symbol[]): ModuleCoverage {
+    const uniqueFiles = new Set<string>(symbols.map((symbol) => path.resolve(symbol.filePath)));
+    let documentedFiles = 0;
+
+    for (const fullPath of uniqueFiles) {
+      const info = this.getFileDocInfo(fullPath);
+      if (info.moduleHasDoc || info.symbolNamesWithDoc.size > 0) {
+        documentedFiles++;
+      }
+    }
+
+    const totalFiles = uniqueFiles.size;
+    return {
+      totalFiles,
+      documentedFiles,
+      coverage: totalFiles > 0 ? (documentedFiles / totalFiles) * 100 : 0,
+    };
   }
 
   /**
@@ -466,12 +605,18 @@ export class CoverageReportCommand extends BaseCommand {
     const undocumentedSymbols: CoverageReport['undocumentedSymbols'] = [];
 
     let totalDocumented = 0;
+    let totalEffectiveDocumented = 0;
 
     for (const symbol of symbols) {
       const hasDoc = this.hasDocTag(symbol);
+      const hasEffectiveDoc = hasDoc || this.hasEffectiveDocTag(symbol);
       const category = this.categorizeSymbol(symbol);
 
       byCategory[category].total++;
+
+      if (hasEffectiveDoc) {
+        totalEffectiveDocumented++;
+      }
 
       if (hasDoc) {
         byCategory[category].documented++;
@@ -504,6 +649,12 @@ export class CoverageReportCommand extends BaseCommand {
         documented: totalDocumented,
         coverage: symbols.length > 0 ? (totalDocumented / symbols.length) * 100 : 0,
       },
+      effectiveOverall: {
+        total: symbols.length,
+        documented: totalEffectiveDocumented,
+        coverage: symbols.length > 0 ? (totalEffectiveDocumented / symbols.length) * 100 : 0,
+      },
+      moduleCoverage: this.computeModuleCoverage(symbols),
       byCategory,
       undocumentedSymbols,
     };
@@ -525,15 +676,19 @@ export class CoverageReportCommand extends BaseCommand {
 
     const undocumentedSymbols: CoverageReport['undocumentedSymbols'] = [];
     let totalDocumented = 0;
+    const uniqueFiles = new Set<string>();
+    const connectedUniqueFiles = new Set<string>();
 
     for (const symbol of symbols) {
       const category = this.categorizeSymbol(symbol);
       byCategory[category].total++;
+      uniqueFiles.add(symbol.filePath);
 
       // Check if symbol's file is in connected files
       const isConnected = connectedFiles.some((f) => symbol.filePath.includes(f));
 
       if (isConnected) {
+        connectedUniqueFiles.add(symbol.filePath);
         byCategory[category].documented++;
         totalDocumented++;
       } else {
@@ -558,11 +713,19 @@ export class CoverageReportCommand extends BaseCommand {
       return priorityOrder[a.priority] - priorityOrder[b.priority];
     });
 
+    const overall: CategoryCoverage = {
+      total: symbols.length,
+      documented: totalDocumented,
+      coverage: symbols.length > 0 ? (totalDocumented / symbols.length) * 100 : 0,
+    };
+
     return {
-      overall: {
-        total: symbols.length,
-        documented: totalDocumented,
-        coverage: symbols.length > 0 ? (totalDocumented / symbols.length) * 100 : 0,
+      overall,
+      effectiveOverall: { ...overall },
+      moduleCoverage: {
+        totalFiles: uniqueFiles.size,
+        documentedFiles: connectedUniqueFiles.size,
+        coverage: uniqueFiles.size > 0 ? (connectedUniqueFiles.size / uniqueFiles.size) * 100 : 0,
       },
       byCategory,
       undocumentedSymbols,
@@ -622,18 +785,42 @@ export class CoverageReportCommand extends BaseCommand {
    * Display coverage report
    */
   private displayReport(report: CoverageReport, hierarchical = false): void {
-    const { overall, byCategory, undocumentedSymbols } = report;
+    const { overall, effectiveOverall, moduleCoverage, byCategory, undocumentedSymbols } = report;
 
     // Overall coverage
     this.printSection(hierarchical ? 'Overall Coverage (Hierarchical)' : 'Overall Coverage');
     console.log(`  Total symbols: ${overall.total}`);
-    console.log(
-      `  Documented (${hierarchical ? 'file-level' : '@doc tag'}): ${overall.documented}`
-    );
+    if (hierarchical) {
+      console.log(`  Documented (file-level): ${overall.documented}`);
+      const coverageColor =
+        overall.coverage >= 50 ? colors.green : overall.coverage >= 30 ? colors.yellow : colors.red;
+      console.log(`  Coverage: ${coverageColor}${overall.coverage.toFixed(1)}%${colors.reset}`);
+    } else {
+      const directColor =
+        overall.coverage >= 50 ? colors.green : overall.coverage >= 30 ? colors.yellow : colors.red;
+      const effectiveColor =
+        effectiveOverall.coverage >= 80
+          ? colors.green
+          : effectiveOverall.coverage >= 50
+            ? colors.yellow
+            : colors.red;
+      const moduleColor =
+        moduleCoverage.coverage >= 80
+          ? colors.green
+          : moduleCoverage.coverage >= 50
+            ? colors.yellow
+            : colors.red;
 
-    const coverageColor =
-      overall.coverage >= 50 ? colors.green : overall.coverage >= 30 ? colors.yellow : colors.red;
-    console.log(`  Coverage: ${coverageColor}${overall.coverage.toFixed(1)}%${colors.reset}`);
+      console.log(
+        `  Direct Symbol @doc Coverage     : ${overall.documented} / ${overall.total} (${directColor}${overall.coverage.toFixed(1)}%${colors.reset})`
+      );
+      console.log(
+        `  Module-Linked Effective Coverage: ${effectiveOverall.documented} / ${effectiveOverall.total} (${effectiveColor}${effectiveOverall.coverage.toFixed(1)}%${colors.reset})`
+      );
+      console.log(
+        `  Source File @doc Coverage       : ${moduleCoverage.documentedFiles} / ${moduleCoverage.totalFiles} (${moduleColor}${moduleCoverage.coverage.toFixed(1)}%${colors.reset})`
+      );
+    }
     console.log();
 
     // By category
@@ -714,6 +901,54 @@ export class CoverageReportCommand extends BaseCommand {
   }
 }
 
+function getDeclarationSymbolNames(node: ts.Node, parentName?: string): string[] {
+  if (
+    (ts.isClassDeclaration(node) ||
+      ts.isFunctionDeclaration(node) ||
+      ts.isInterfaceDeclaration(node) ||
+      ts.isTypeAliasDeclaration(node) ||
+      ts.isEnumDeclaration(node)) &&
+    node.name
+  ) {
+    return [node.name.text];
+  }
+
+  if (
+    ts.isMethodDeclaration(node) ||
+    ts.isMethodSignature(node) ||
+    ts.isPropertyDeclaration(node) ||
+    ts.isPropertySignature(node) ||
+    ts.isGetAccessorDeclaration(node) ||
+    ts.isSetAccessorDeclaration(node)
+  ) {
+    if (
+      ts.isIdentifier(node.name) ||
+      ts.isStringLiteral(node.name) ||
+      ts.isNumericLiteral(node.name)
+    ) {
+      const memberName = node.name.text;
+      return parentName ? [memberName, `${parentName}.${memberName}`] : [memberName];
+    }
+    return [];
+  }
+
+  if (ts.isVariableStatement(node)) {
+    const names: string[] = [];
+    for (const declaration of node.declarationList.declarations) {
+      if (ts.isIdentifier(declaration.name)) {
+        names.push(declaration.name.text);
+      }
+    }
+    return names;
+  }
+
+  if (ts.isVariableDeclaration(node) && ts.isIdentifier(node.name)) {
+    return [node.name.text];
+  }
+
+  return [];
+}
+
 function relativeDatabasePath(databasePath: string): string {
   return path.relative(process.cwd(), databasePath).split(path.sep).join('/') || '.';
 }
@@ -724,7 +959,7 @@ const VALUE_OPTIONS = new Set([
   '--report-db',
   '--report-id',
 ]);
-const BOOLEAN_OPTIONS = new Set(['--json', '--hierarchical', '--help', '-h']);
+const BOOLEAN_OPTIONS = new Set(['--json', '--hierarchical', '--include-tests', '--help', '-h']);
 
 function validateArguments(
   args: readonly string[],

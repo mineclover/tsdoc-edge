@@ -123,6 +123,6 @@ tsdoc-edge validate spec <file> [options]
 
 - SpecCommands → src/commands/SpecBumpCommand.ts:1
 - SpecCommand → src/commands/SpecCommand.ts:54
-- SpecExtractCommand → src/commands/SpecExtractCommand.ts:26
+- SpecExtractCommand → src/commands/SpecExtractCommand.ts:27
 - SpecGraphCommand → src/commands/SpecGraphCommand.ts:26
 

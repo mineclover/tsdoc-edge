@@ -8,11 +8,9 @@ canonical: false
 
 # [[TestRelationshipAnalyzer]]
 
-**Source**: `src/analyzer/TestRelationshipAnalyzer.ts`
+**Source**: `src/analyzer/TestRelationshipExtractor.ts`
 
-> **Historical document**: 현재 checkout에는 위 source 파일이 없다. 현재 테스트-심볼 관계
-> 추출의 구현 소유자는 `src/analyzer/TestCoverageAnalyzer.ts`이며 metric ID는
-> [[Coverage Metrics Contract]] / `test.symbol`이다.
+> **Historical alias**: 테스트-심볼 관계 추출 구현은 `src/analyzer/TestRelationshipExtractor.ts`와 `src/analyzer/TestCoverageAnalyzer.ts`에 통합되어 있으며, metric ID는 [[Coverage Metrics Contract]] / `test.symbol`이다.
 
 ## Purpose
 
@@ -46,5 +44,5 @@ interface TestCoverage {
 
 ### Implemented By
 
-- TestRelationshipAnalyzer → src/analyzer/TestRelationshipAnalyzer.ts:1
+- TestRelationshipAnalyzer → src/analyzer/TestRelationshipExtractor.ts:1
 

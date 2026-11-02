@@ -12,25 +12,15 @@ canonical: true
 
 ## Context Commands
 
-### context
+### work-context
 
-Show current context information.
-
-```bash
-tsdoc-edge context
-```
-
-**Source**: `src/commands/ContextCommand.ts`
-
-### context-to-llm
-
-Generate LLM-friendly context for a file.
+Provide comprehensive pre-edit context (`--human` or `--llm`) for a target source file, replacing legacy `context` and `context-to-llm` commands.
 
 ```bash
-tsdoc-edge context-to-llm <file> [options]
+tsdoc-edge work-context <file> [--human | --llm]
 ```
 
-**Source**: `src/commands/ContextToLLMCommand.ts`
+**Source**: `src/commands/WorkContextCommand.ts`
 
 ### [[DesignContextCommand]]
 
@@ -54,15 +44,15 @@ tsdoc-edge sync [--force] [--dry-run] [--check] [--json]
 
 ## Document Commands
 
-### find-doc
+### symbol query
 
-Find document definitions.
+Unified code symbol (`@ttsc/graph`) and `[[Symbol]]` document checkpoint lookup, replacing legacy `find-doc`.
 
 ```bash
-tsdoc-edge find-doc <query>
+tsdoc-edge symbol query <name>
 ```
 
-**Source**: `src/commands/FindDocCommand.ts`
+**Source**: `src/commands/SymbolQueryCommand.ts`
 
 ### docs find-unused
 
@@ -158,25 +148,15 @@ tsdoc-edge spec duplicates [path]
 
 **Source**: `src/commands/CheckDuplicatesCommand.ts`
 
-### without-contract
+### validate
 
-Find symbols missing contracts.
-
-```bash
-tsdoc-edge without-contract [path]
-```
-
-**Source**: `src/commands/WithoutContractCommand.ts`
-
-### without-responsibility
-
-Find symbols missing @responsibility.
+Validates TSDoc conventions, `@contract` / `@responsibility` completeness, and connectivity rules across TypeScript sources (consolidating legacy `without-contract` and `without-responsibility` checks).
 
 ```bash
-tsdoc-edge without-responsibility [path]
+tsdoc-edge validate [path]
 ```
 
-**Source**: `src/commands/WithoutResponsibilityCommand.ts`
+**Source**: `src/commands/ValidateCommand.ts`
 
 ### [[LintCommand]]
 
@@ -254,15 +234,15 @@ tsdoc-edge system-status
 
 **Source**: `src/commands/SystemStatusCommand.ts`
 
-### scan
+### docs
 
-Scan directory for TypeScript files.
+Unified managed documentation lifecycle command group (`index`, `backlinks`, `check-links`, `symbols`, `find-unused`, `generate`, `fix`, `move`, `plans`, `todos`).
 
 ```bash
-tsdoc-edge scan <path>
+tsdoc-edge docs <subcommand> [options]
 ```
 
-**Source**: `src/commands/ScanCommand.ts`
+**Source**: `src/commands/DocsCommand.ts`
 
 ### coverage-baseline
 
@@ -324,5 +304,5 @@ tsdoc-edge docs move <from> <to>
 
 ### Implemented By
 
-- UtilityCommands → src/commands/ContextCommand.ts:1
+- UtilityCommands → src/commands/WorkContextCommand.ts:1
 

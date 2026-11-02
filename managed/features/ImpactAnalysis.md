@@ -302,8 +302,8 @@ Break large impacts into smaller steps:
 
 ### Referenced By
 
-- [[Dead Code Detection]] → managed/features/DeadCodeDetection.md:178
 - [[Dependency Analysis]] → managed/features/DependencyAnalysis.md:222
+- [[Features Index]] → managed/features/index.md:114
 
 ### Implemented By
 

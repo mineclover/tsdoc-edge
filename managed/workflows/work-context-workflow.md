@@ -784,6 +784,7 @@ done
 
 - [[Commands Index]] → managed/COMMANDS.md:188
 - [[TSDoc Edge Documentation]] → managed/README.md:158
+- [[Complete Workflow Architecture]] → managed/architecture/diagrams/mermaid-workflow-complete.md:189
 - [[Semantic Graph Analysis and Relationship Model]] → managed/architecture/semantic-graph-analysis-and-relationship-model.md:1462
 - [[CoverageReportCommand]] → managed/commands/CoverageReportCommand.md:271
 - [[Feature Showcase]] → managed/examples/feature-showcase.md:268
@@ -795,7 +796,7 @@ done
 - [[Quick Start Guide]] → managed/quick-start.md:129
 - [[Relationship Types]] → managed/relationships/index.md:232
 - [[TSDoc Edge User Guide]] → managed/user-guide.md:71
-- [[Workflows Index]] → managed/workflows/index.md:236
+- [[Workflows Index]] → managed/workflows/index.md:234
 - [[Mermaid Entrypoint Workflow]] → managed/workflows/mermaid-entrypoint-workflow.md:611
 - [[Relationship System Roadmap]] → managed/workflows/relationship-system-roadmap.md:533
 - [[Semantic Graph Spec Governance Roadmap]] → managed/workflows/semantic-graph-spec-governance-roadmap.md:279

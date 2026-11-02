@@ -102,7 +102,7 @@ export class SpecStatusCommand extends BaseCommand {
    * @public
    */
   protected getUsage(): string {
-    return `tsdoc-edge spec-status <subcommand> <file> [status]
+    return `tsdoc-edge spec status <subcommand> <file> [status]
 
   Subcommands:
     show <file>            Show current status
@@ -128,15 +128,15 @@ export class SpecStatusCommand extends BaseCommand {
       if (!subcommand) {
         this.printError('Usage:');
         this.printInfo(
-          '  tsdoc-edge spec-status show <file>           - Show current status and allowed transitions'
+          '  tsdoc-edge spec status show <file>           - Show current status and allowed transitions'
         );
         this.printInfo(
-          '  tsdoc-edge spec-status promote <file> <status> - Promote document to new status'
+          '  tsdoc-edge spec status promote <file> <status> - Promote document to new status'
         );
         this.printInfo(
-          '  tsdoc-edge spec-status list-ready [dir]      - List documents ready for promotion'
+          '  tsdoc-edge spec status list-ready [dir]      - List documents ready for promotion'
         );
-        this.printInfo('  tsdoc-edge spec-status stats [dir]           - Show status distribution');
+        this.printInfo('  tsdoc-edge spec status stats [dir]           - Show status distribution');
         console.log();
         return this.failure('Subcommand required');
       }
@@ -146,7 +146,7 @@ export class SpecStatusCommand extends BaseCommand {
       // show: Show current status
       if (subcommand === 'show') {
         if (!target) {
-          this.printError('Usage: tsdoc-edge spec-status show <file>');
+          this.printError('Usage: tsdoc-edge spec status show <file>');
           console.log();
           return this.failure('File path required');
         }
@@ -200,7 +200,7 @@ export class SpecStatusCommand extends BaseCommand {
         const newStatus = args[2];
 
         if (!target || !newStatus) {
-          this.printError('Usage: tsdoc-edge spec-status promote <file> <status>');
+          this.printError('Usage: tsdoc-edge spec status promote <file> <status>');
           this.printInfo('Valid statuses: draft, review, approved, active, deprecated, archived');
           console.log();
           return this.failure('File and status required');

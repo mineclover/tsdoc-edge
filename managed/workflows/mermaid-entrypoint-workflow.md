@@ -609,6 +609,8 @@ tsdoc-edge parse-mermaid <path> --generate-docs
 ## Related Workflows
 
 - [[Work Context Workflow]]: 파일 작업 전 컨텍스트 확인
+- [[Mermaid Diagram Rules]]: GitHub 및 mermaid-cli 호환 Mermaid 다이어그램 문법 규칙
+- [[Complete Workflow Architecture]]: `.mmd` → explore → promote → validate 전체 워크플로우 아키텍처 다이어그램
 - Symbol Validation: 심볼 중복 및 일관성 검증
 - Documentation Quality: 문서 품질 가이드
 
@@ -636,9 +638,10 @@ tsdoc-edge parse-mermaid <path> --generate-docs
 ### Referenced By
 
 - [[TSDoc Edge Documentation]] → managed/README.md:161
+- [[Complete Workflow Architecture]] → managed/architecture/diagrams/mermaid-workflow-complete.md:186
 - [[Guides & Tutorials]] → managed/guides/index.md:371
 - [[Quick Start Guide]] → managed/quick-start.md:180
 - [[TSDoc Edge User Guide]] → managed/user-guide.md:217
 - [[Example - Mermaid Workflow]] → managed/workflows/EXAMPLE-MERMAID-WORKFLOW.md:368
-- [[Workflows Index]] → managed/workflows/index.md:237
+- [[Workflows Index]] → managed/workflows/index.md:235
 

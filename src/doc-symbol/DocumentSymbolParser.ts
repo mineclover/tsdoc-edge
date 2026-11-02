@@ -33,12 +33,14 @@ export class DocumentSymbolParser {
   }
 
   /**
-   * Parse document for [[]] symbols
+   * Parse document for `[[]]` symbols
    *
    * @param filePath - Markdown file path
+   * @param options - Optional parsing options (`forceManaged` bypasses managedDir filtering while keeping `excludeDirs`)
    * @returns Parsed symbols (null if not managed document)
+   * @public
    */
-  parse(filePath: string): ParsedDocSymbols | null {
+  parse(filePath: string, options?: { forceManaged?: boolean }): ParsedDocSymbols | null {
     if (!fs.existsSync(filePath)) {
       throw new Error(`File not found: ${filePath}`);
     }
@@ -53,18 +55,28 @@ export class DocumentSymbolParser {
       .length;
 
     // Check if document is managed
-    if (!this.isManagedDocument(filePath, metadata)) {
+    if (!this.isManagedDocument(filePath, metadata, options?.forceManaged)) {
       return null;
     }
 
-    // Extract source file path BEFORE removing code blocks (to preserve backticks)
+    // Extract source file path from frontmatter first; fall back to body **Source**:
+    // outside fenced code blocks and before ## Backlinks so fenced markdown examples
+    // can never hijack or overwrite sourceFilePath.
     let sourceFilePath =
       typeof metadata.source === 'string' && metadata.source.trim().length > 0
         ? metadata.source.trim()
         : undefined;
-    const sourceMatch = body.match(/\*\*Source\*\*:\s*`([^`]+)`/);
-    if (sourceMatch) {
-      sourceFilePath = sourceMatch[1];
+    const bodyWithoutFencedCode = this.removeFencedCodeBlocks(body);
+    if (!sourceFilePath) {
+      const backlinksMatch = /^\s*##?\s+Backlinks\b/im.exec(bodyWithoutFencedCode);
+      const bodyBeforeBacklinks =
+        backlinksMatch !== null
+          ? bodyWithoutFencedCode.slice(0, backlinksMatch.index)
+          : bodyWithoutFencedCode;
+      const sourceMatch = bodyBeforeBacklinks.match(/^\s*\*\*Source\*\*:\s*`([^`\n]+)`/m);
+      if (sourceMatch) {
+        sourceFilePath = sourceMatch[1].trim();
+      }
     }
 
     // Remove code blocks if configured
@@ -270,7 +282,11 @@ export class DocumentSymbolParser {
    * 3. If requireFrontmatter is true, check metadata.tsdoc === 'managed'
    * 4. If in managedDirs, managed
    */
-  private isManagedDocument(filePath: string, metadata: Record<string, unknown>): boolean {
+  private isManagedDocument(
+    filePath: string,
+    metadata: Record<string, unknown>,
+    forceManaged = false
+  ): boolean {
     const config = this.configManager.get();
     const docMgmt = config.documentManagement;
 
@@ -294,6 +310,10 @@ export class DocumentSymbolParser {
       }
     }
 
+    if (forceManaged) {
+      return true;
+    }
+
     // Require frontmatter check
     if (docMgmt.requireFrontmatter) {
       return metadata?.tsdoc === 'managed';
@@ -314,29 +334,41 @@ export class DocumentSymbolParser {
   }
 
   /**
+   * Remove fenced code blocks from markdown content while preserving line count
+   *
+   * @param content - Markdown content
+   * @returns Content with fenced code blocks replaced by matching newlines
+   * @public
+   */
+  removeFencedCodeBlocks(content: string): string {
+    return content.replace(
+      /(?:^|\n)[ \t]*(`{3,}|~{3,})[^\n]*\n[\s\S]*?\n[ \t]*\1[ \t]*(?=\n|$)/g,
+      (match) => {
+        const newlineCount = (match.match(/\n/g) || []).length;
+        return '\n'.repeat(newlineCount);
+      }
+    );
+  }
+
+  /**
+   * Remove inline code spans from markdown content
+   */
+  private removeInlineCode(content: string): string {
+    return content.replace(/`[^`\n]+`/g, '');
+  }
+
+  /**
    * Remove code blocks from markdown content
    *
    * @param content - Markdown content
    * @returns Content with code blocks removed
    *
    * @remarks
-   * Removes both fenced code blocks (\`\`\`) and indented code blocks
+   * Removes both fenced code blocks (\`\`\`) and inline code spans
    * This prevents example code from being treated as actual references
    */
   private removeCodeBlocks(content: string): string {
-    // Replace fenced code blocks (``` ... ```) with matching newlines to preserve line numbering
-    let result = content.replace(
-      /(?:^|\n)[ \t]*`{3,}[^\n]*\n[\s\S]*?\n[ \t]*`{3,}(?=\n|$)/g,
-      (match) => {
-        const newlineCount = (match.match(/\n/g) || []).length;
-        return '\n'.repeat(newlineCount);
-      }
-    );
-
-    // Remove inline code (`...`), which does not cross newlines
-    result = result.replace(/`[^`\n]+`/g, '');
-
-    return result;
+    return this.removeInlineCode(this.removeFencedCodeBlocks(content));
   }
 
   /**

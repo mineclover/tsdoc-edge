@@ -42,7 +42,7 @@ export class RelationshipHelpCommand extends BaseCommand {
    * @public
    */
   protected getUsage(): string {
-    return `tsdoc-edge relationship-help [topic]
+    return `tsdoc-edge relationship help [topic]
 
 Provides guided help and workflow recommendations for the relationship system.
 
@@ -54,9 +54,9 @@ Topics:
   quick-start  - Getting started guide
 
 Examples:
-  tsdoc-edge relationship-help
-  tsdoc-edge relationship-help workflows
-  tsdoc-edge relationship-help metrics`;
+  tsdoc-edge relationship help
+  tsdoc-edge relationship help workflows
+  tsdoc-edge relationship help metrics`;
   }
 
   /**
@@ -101,21 +101,21 @@ Examples:
 
     this.printSection('What can you do?');
     console.log(`  ${this.colors.cyan}❓ "What will break if I change this?"${this.colors.reset}`);
-    console.log(`     → tsdoc-edge relationship-impact <symbol-id>`);
+    console.log(`     → tsdoc-edge relationship impact <symbol-id>`);
     console.log();
     console.log(
       `  ${this.colors.cyan}❓ "What are the architectural modules?"${this.colors.reset}`
     );
-    console.log(`     → tsdoc-edge relationship-clusters`);
+    console.log(`     → tsdoc-edge relationship clusters`);
     console.log();
     console.log(`  ${this.colors.cyan}❓ "Which symbols are most critical?"${this.colors.reset}`);
-    console.log(`     → tsdoc-edge relationship-metrics`);
+    console.log(`     → tsdoc-edge relationship metrics`);
     console.log();
     console.log(`  ${this.colors.cyan}❓ "How are two symbols connected?"${this.colors.reset}`);
-    console.log(`     → tsdoc-edge relationship-path <symbol-a> <symbol-b>`);
+    console.log(`     → tsdoc-edge relationship path <symbol-a> <symbol-b>`);
     console.log();
     console.log(`  ${this.colors.cyan}❓ "What does this symbol connect to?"${this.colors.reset}`);
-    console.log(`     → tsdoc-edge relationship-query <symbol-id>`);
+    console.log(`     → tsdoc-edge relationship query <symbol-id>`);
     console.log();
 
     console.log();
@@ -138,16 +138,16 @@ Examples:
     console.log();
 
     console.log(
-      `  ${this.colors.dim}Usage: tsdoc-edge relationship-help <topic>${this.colors.reset}`
+      `  ${this.colors.dim}Usage: tsdoc-edge relationship help <topic>${this.colors.reset}`
     );
     console.log();
 
     this.printSection('Documentation');
     console.log(
-      `  Full guide: ${this.colors.cyan}docs/relationship-system-guide.md${this.colors.reset}`
+      `  Full guide: ${this.colors.cyan}managed/relationships/index.md${this.colors.reset}`
     );
     console.log(
-      `  Current status: ${this.colors.cyan}tsdoc-edge relationship-stats${this.colors.reset}`
+      `  Current status: ${this.colors.cyan}tsdoc-edge relationship stats${this.colors.reset}`
     );
     console.log();
 
@@ -159,7 +159,7 @@ Examples:
 
     console.log();
     this.printSection('Step 1: Discover Patterns (30 seconds)');
-    console.log(`  ${this.colors.cyan}tsdoc-edge relationship-clusters${this.colors.reset}`);
+    console.log(`  ${this.colors.cyan}tsdoc-edge relationship clusters${this.colors.reset}`);
     console.log(
       `  ${this.colors.dim}→ See natural architectural modules in your codebase${this.colors.reset}`
     );
@@ -167,7 +167,7 @@ Examples:
 
     this.printSection('Step 2: Find Critical Symbols (30 seconds)');
     console.log(
-      `  ${this.colors.cyan}tsdoc-edge relationship-metrics --top 10${this.colors.reset}`
+      `  ${this.colors.cyan}tsdoc-edge relationship metrics --top 10${this.colors.reset}`
     );
     console.log(
       `  ${this.colors.dim}→ Identify bottlenecks and critical dependencies${this.colors.reset}`
@@ -176,7 +176,7 @@ Examples:
 
     this.printSection('Step 3: Before Making Changes (1 minute)');
     console.log(
-      `  ${this.colors.cyan}tsdoc-edge relationship-impact <your-symbol>${this.colors.reset}`
+      `  ${this.colors.cyan}tsdoc-edge relationship impact <your-symbol>${this.colors.reset}`
     );
     console.log(
       `  ${this.colors.dim}→ See who will be affected and assess risk${this.colors.reset}`
@@ -185,13 +185,13 @@ Examples:
 
     this.printSection('Next Steps');
     console.log(
-      `  • Export for visualization: ${this.colors.cyan}tsdoc-edge relationship-help formats${this.colors.reset}`
+      `  • Export for visualization: ${this.colors.cyan}tsdoc-edge relationship help formats${this.colors.reset}`
     );
     console.log(
-      `  • Learn workflows: ${this.colors.cyan}tsdoc-edge relationship-help workflows${this.colors.reset}`
+      `  • Learn workflows: ${this.colors.cyan}tsdoc-edge relationship help workflows${this.colors.reset}`
     );
     console.log(
-      `  • Understand metrics: ${this.colors.cyan}tsdoc-edge relationship-help metrics${this.colors.reset}`
+      `  • Understand metrics: ${this.colors.cyan}tsdoc-edge relationship help metrics${this.colors.reset}`
     );
     console.log();
 
@@ -206,13 +206,13 @@ Examples:
     console.log(`  ${this.colors.bold}Goal:${this.colors.reset} Assess risk and plan testing`);
     console.log();
     console.log(`  ${this.colors.cyan}# Check if critical${this.colors.reset}`);
-    console.log(`  tsdoc-edge relationship-metrics --top 20`);
+    console.log(`  tsdoc-edge relationship metrics --top 20`);
     console.log();
     console.log(`  ${this.colors.cyan}# Analyze impact${this.colors.reset}`);
-    console.log(`  tsdoc-edge relationship-impact <symbol-id>`);
+    console.log(`  tsdoc-edge relationship impact <symbol-id>`);
     console.log();
     console.log(`  ${this.colors.cyan}# Understand connections${this.colors.reset}`);
-    console.log(`  tsdoc-edge relationship-query <symbol-id>`);
+    console.log(`  tsdoc-edge relationship query <symbol-id>`);
     console.log();
     console.log(
       `  ${this.colors.dim}Risk levels: LOW (<5 affected), MEDIUM (5-19), HIGH (20+)${this.colors.reset}`
@@ -223,36 +223,36 @@ Examples:
     console.log(`  ${this.colors.bold}Goal:${this.colors.reset} Understand system structure`);
     console.log();
     console.log(`  ${this.colors.cyan}# Find modules${this.colors.reset}`);
-    console.log(`  tsdoc-edge relationship-clusters`);
+    console.log(`  tsdoc-edge relationship clusters`);
     console.log();
     console.log(`  ${this.colors.cyan}# Find bottlenecks${this.colors.reset}`);
-    console.log(`  tsdoc-edge relationship-metrics --metric betweenness`);
+    console.log(`  tsdoc-edge relationship metrics --metric betweenness`);
     console.log();
     console.log(`  ${this.colors.cyan}# Export for team discussion${this.colors.reset}`);
-    console.log(`  tsdoc-edge relationship-export --format graphml -o review.graphml`);
+    console.log(`  tsdoc-edge relationship export --format graphml -o review.graphml`);
     console.log();
 
     this.printSection('3. Refactoring Planning');
     console.log(`  ${this.colors.bold}Goal:${this.colors.reset} Safely restructure code`);
     console.log();
     console.log(`  ${this.colors.cyan}# What moves together?${this.colors.reset}`);
-    console.log(`  tsdoc-edge relationship-clusters --min-size 5`);
+    console.log(`  tsdoc-edge relationship clusters --min-size 5`);
     console.log();
     console.log(`  ${this.colors.cyan}# What connects to it?${this.colors.reset}`);
-    console.log(`  tsdoc-edge relationship-query <symbol-id>`);
+    console.log(`  tsdoc-edge relationship query <symbol-id>`);
     console.log();
     console.log(`  ${this.colors.cyan}# Impact of moving${this.colors.reset}`);
-    console.log(`  tsdoc-edge relationship-impact <symbol-id>`);
+    console.log(`  tsdoc-edge relationship impact <symbol-id>`);
     console.log();
 
     this.printSection('4. Understanding Dependencies');
     console.log(`  ${this.colors.bold}Goal:${this.colors.reset} Debug unexpected coupling`);
     console.log();
     console.log(`  ${this.colors.cyan}# How are they connected?${this.colors.reset}`);
-    console.log(`  tsdoc-edge relationship-path <symbol-a> <symbol-b>`);
+    console.log(`  tsdoc-edge relationship path <symbol-a> <symbol-b>`);
     console.log();
     console.log(`  ${this.colors.cyan}# Show shortest path only${this.colors.reset}`);
-    console.log(`  tsdoc-edge relationship-path <symbol-a> <symbol-b> --shortest-only`);
+    console.log(`  tsdoc-edge relationship path <symbol-a> <symbol-b> --shortest-only`);
     console.log();
 
     console.log();
@@ -416,7 +416,7 @@ Examples:
     console.log();
 
     console.log();
-    this.printInfo('Try: tsdoc-edge relationship-metrics --detailed --top 10');
+    this.printInfo('Try: tsdoc-edge relationship metrics --detailed --top 10');
     console.log();
 
     return this.success('Metrics explained');
@@ -432,7 +432,7 @@ Examples:
     );
     console.log(`  ${this.colors.bold}Size:${this.colors.reset} Large (14 MB for full export)`);
     console.log(
-      `  ${this.colors.cyan}tsdoc-edge relationship-export --format json --output data.json${this.colors.reset}`
+      `  ${this.colors.cyan}tsdoc-edge relationship export --format json --output data.json${this.colors.reset}`
     );
     console.log();
     console.log(
@@ -446,7 +446,7 @@ Examples:
     );
     console.log(`  ${this.colors.bold}Tools:${this.colors.reset} Gephi, yEd, Cytoscape`);
     console.log(
-      `  ${this.colors.cyan}tsdoc-edge relationship-export --format graphml --output graph.graphml${this.colors.reset}`
+      `  ${this.colors.cyan}tsdoc-edge relationship export --format graphml --output graph.graphml${this.colors.reset}`
     );
     console.log();
     console.log(`  ${this.colors.dim}Gephi workflow:${this.colors.reset}`);
@@ -462,7 +462,7 @@ Examples:
     );
     console.log(`  ${this.colors.bold}Tool:${this.colors.reset} Graphviz`);
     console.log(
-      `  ${this.colors.cyan}tsdoc-edge relationship-export --format dot --output graph.dot${this.colors.reset}`
+      `  ${this.colors.cyan}tsdoc-edge relationship export --format dot --output graph.dot${this.colors.reset}`
     );
     console.log(`  ${this.colors.cyan}dot -Tpng graph.dot -o diagram.png${this.colors.reset}`);
     console.log();
@@ -475,7 +475,7 @@ Examples:
       `  ${this.colors.bold}Tools:${this.colors.reset} Excel, Google Sheets, Python/Pandas`
     );
     console.log(
-      `  ${this.colors.cyan}tsdoc-edge relationship-export --format csv --output data.csv${this.colors.reset}`
+      `  ${this.colors.cyan}tsdoc-edge relationship export --format csv --output data.csv${this.colors.reset}`
     );
     console.log();
 
@@ -485,7 +485,7 @@ Examples:
     );
     console.log(`  ${this.colors.bold}Tool:${this.colors.reset} Neo4j`);
     console.log(
-      `  ${this.colors.cyan}tsdoc-edge relationship-export --format cypher --output import.cypher${this.colors.reset}`
+      `  ${this.colors.cyan}tsdoc-edge relationship export --format cypher --output import.cypher${this.colors.reset}`
     );
     console.log();
     console.log(`  ${this.colors.dim}Neo4j example queries:${this.colors.reset}`);

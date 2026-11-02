@@ -37,7 +37,7 @@ canonical: true
 - [[DocumentationAnalyzer]] → managed/analyzers/DocumentationAnalyzer.md:148
 - [[Analyzers & Extractors]] → managed/analyzers/index.md:81
 - [[InitCommand]] → managed/commands/InitCommand.md:345
-- [[Phase Commands]] → managed/commands/PhaseCommands.md:102
+- [[Phase Commands]] → managed/commands/PhaseCommands.md:104
 - [[StatsCommand]] → managed/commands/StatsCommand.md:224
 - [[SuggestCommand]] → managed/commands/SuggestCommand.md:483
 - [[SystemStatusCommand]] → managed/commands/SystemStatusCommand.md:31

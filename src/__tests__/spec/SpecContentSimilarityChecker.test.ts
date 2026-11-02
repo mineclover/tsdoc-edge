@@ -198,6 +198,99 @@ status: draft
       expect(result.reason).toBeDefined();
       expect(result.reason.length).toBeGreaterThan(0);
     });
+
+    it('should ignore auto-generated Backlinks sections and subsections', () => {
+      const file1 = path.join(tempDir, 'with-backlinks-1.md');
+      const file2 = path.join(tempDir, 'with-backlinks-2.md');
+
+      const sharedBacklinks = `## Backlinks
+
+### Referenced By
+
+- Core platform architecture specification index overview and governance rules
+- Validation workflow documentation and canonical graph synchronization pipeline
+
+### Implemented By
+
+- Primary command handler execution and repository persistence storage layer`;
+
+      fs.writeFileSync(
+        file1,
+        `---
+version: 1.0.0
+status: active
+---
+
+# Spec One
+
+## Purpose
+
+Database connection pooling lifecycle and query transaction isolation guarantees.
+
+${sharedBacklinks}
+`,
+        'utf-8'
+      );
+
+      fs.writeFileSync(
+        file2,
+        `---
+version: 1.0.0
+status: active
+---
+
+# Spec Two
+
+## Overview
+
+Interactive terminal color formatting and progress spinner rendering layout.
+
+${sharedBacklinks}
+`,
+        'utf-8'
+      );
+
+      const result = checker.checkPair(file1, file2);
+
+      expect(result.overlappingSections).toEqual([]);
+      expect(result.similarity).toBe(0);
+      expect(result.suggestion).toBe('keep-separate');
+    });
+
+    it('should not score 8-section specs 100% when only 1 boilerplate section overlaps', () => {
+      const sharedBoilerplate =
+        'Canonical specification governance architecture traceability verification contract';
+
+      const file1 = createTestDoc('eight-sec-1', [
+        { name: 'Purpose', content: 'Lexical tokenization of source comments and block tags' },
+        { name: 'Input', content: 'Raw UTF-8 source buffer and compiler script target options' },
+        { name: 'Output', content: 'Structured syntax tree nodes with byte range offsets' },
+        { name: 'Context', content: 'Upstream Microsoft parser configuration registry' },
+        { name: 'Logic', content: 'Recursive descent scanner over leading trivia ranges' },
+        { name: 'Effect', content: 'Pure in-memory transformation without disk mutation' },
+        { name: 'Scope', content: 'Exported parser facade and immutable comment reader' },
+        { name: 'Related Concepts', content: sharedBoilerplate },
+      ]);
+
+      const file2 = createTestDoc('eight-sec-2', [
+        { name: 'Purpose', content: 'SQLite persistence checkpoint and journal management' },
+        { name: 'Input', content: 'Serialized relational rows and migration schema version' },
+        { name: 'Output', content: 'Atomic transaction commit receipt and row counts' },
+        { name: 'Context', content: 'Embedded better-sqlite3 driver connection handle' },
+        { name: 'Logic', content: 'Prepared statement batching inside write transaction' },
+        { name: 'Effect', content: 'Writes database pages and wal segments onto disk' },
+        { name: 'Scope', content: 'Repository storage adapter and read-only query pins' },
+        { name: 'Related Concepts', content: sharedBoilerplate },
+      ]);
+
+      const result = checker.checkPair(file1, file2);
+
+      expect(result.overlappingSections).toHaveLength(1);
+      expect(result.overlappingSections[0]?.section).toBe('Related Concepts');
+      expect(result.similarity).toBeCloseTo(0.13, 2);
+      expect(result.similarity).toBeLessThan(0.3);
+      expect(result.suggestion).toBe('keep-separate');
+    });
   });
 
   describe('checkMultiple', () => {

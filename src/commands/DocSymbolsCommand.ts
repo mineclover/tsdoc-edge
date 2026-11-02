@@ -30,16 +30,16 @@ import { BaseCommand, type CommandResult, colors } from './BaseCommand';
  * @example
  * ```bash
  * # List all document symbols
- * tsdoc-edge doc-symbols
+ * tsdoc-edge docs symbols
  *
  * # Filter by category
- * tsdoc-edge doc-symbols --category features
+ * tsdoc-edge docs symbols --category features
  *
  * # Search by keyword
- * tsdoc-edge doc-symbols --search database
+ * tsdoc-edge docs symbols --search database
  *
  * # Generate project glossary for LLM
- * tsdoc-edge doc-symbols --llm > project-glossary.txt
+ * tsdoc-edge docs symbols --llm > project-glossary.txt
  * ```
  */
 export class DocSymbolsCommand extends BaseCommand {
@@ -82,7 +82,7 @@ export class DocSymbolsCommand extends BaseCommand {
    * @public
    */
   protected getUsage(): string {
-    return `tsdoc-edge doc-symbols [options]
+    return `tsdoc-edge docs symbols [options]
 
 List all explicitly defined document symbols (project concepts) from managed/.
 Shows project's core concepts, not auto-generated code symbols.
@@ -93,10 +93,10 @@ Options:
   --llm              Generate LLM-friendly project glossary format
 
 Examples:
-  tsdoc-edge doc-symbols                    List all symbols
-  tsdoc-edge doc-symbols --category features
-  tsdoc-edge doc-symbols --search database
-  tsdoc-edge doc-symbols --llm > glossary.txt`;
+  tsdoc-edge docs symbols                    List all symbols
+  tsdoc-edge docs symbols --category features
+  tsdoc-edge docs symbols --search database
+  tsdoc-edge docs symbols --llm > glossary.txt`;
   }
 
   /**

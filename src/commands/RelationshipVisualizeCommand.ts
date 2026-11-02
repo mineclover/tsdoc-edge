@@ -60,7 +60,7 @@ export class RelationshipVisualizeCommand extends BaseCommand {
    * @public
    */
   protected getUsage(): string {
-    return `tsdoc-edge relationship-visualize <symbol-id> [options]
+    return `tsdoc-edge relationship visualize <symbol-id> [options]
 
 Options:
   --format <format>     Output format: mermaid, dot (default: mermaid)
@@ -72,10 +72,10 @@ Options:
   --style <style>       Diagram style: graph, flowchart (default: graph)
 
 Examples:
-  tsdoc-edge relationship-visualize class-databasemanager
-  tsdoc-edge relationship-visualize class-buildcommand --depth=3 --category=structural
-  tsdoc-edge relationship-visualize class-configmanager --output=config.mmd
-  tsdoc-edge relationship-visualize class-databasemanager --style=flowchart --type=composition`;
+  tsdoc-edge relationship visualize class-databasemanager
+  tsdoc-edge relationship visualize class-buildcommand --depth=3 --category=structural
+  tsdoc-edge relationship visualize class-configmanager --output=config.mmd
+  tsdoc-edge relationship visualize class-databasemanager --style=flowchart --type=composition`;
   }
 
   /**

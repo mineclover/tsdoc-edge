@@ -73,7 +73,7 @@ export class RelationshipPathCommand extends BaseCommand {
    * @public
    */
   protected getUsage(): string {
-    return `tsdoc-edge relationship-path <from-symbol> <to-symbol> [options]
+    return `tsdoc-edge relationship path <from-symbol> <to-symbol> [options]
 
 Finds paths connecting two symbols through Canonical @ttsc/graph and Enrichment relationships.
 
@@ -86,9 +86,9 @@ Options:
   --json                Output as JSON
 
 Examples:
-  tsdoc-edge relationship-path SyncCommand GraphRepository
-  tsdoc-edge relationship-path BuildCommand DatabaseManager --shortest-only
-  tsdoc-edge relationship-path SyncCommand SpecGraphRepository --max-length 4 --json`;
+  tsdoc-edge relationship path SyncCommand GraphRepository
+  tsdoc-edge relationship path BuildCommand DatabaseManager --shortest-only
+  tsdoc-edge relationship path SyncCommand SpecGraphRepository --max-length 4 --json`;
   }
 
   /**

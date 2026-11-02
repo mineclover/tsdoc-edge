@@ -326,7 +326,7 @@ tsdoc-edge parse src/commands/BuildCommand.ts
 - [[ExtractionResult]] → managed/primary-types/ExtractionResult.md:104
 - [[Quick Start Guide]] → managed/quick-start.md:51
 - [[Symbol]] → managed/types/Symbol.md:92
-- [[FileScanner]] → managed/utilities/FileScanner.md:81
+- [[FileScanner]] → managed/utilities/FileScanner.md:84
 
 ### Implemented By
 

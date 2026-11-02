@@ -55,7 +55,7 @@ export class RelationshipQueryCommand extends BaseCommand {
    * @public
    */
   protected getUsage(): string {
-    return `tsdoc-edge relationship-query <symbol-id> [options]
+    return `tsdoc-edge relationship query <symbol-id> [options]
 
 Options:
   --type <type>         Filter by relationship type or canonical edge kind (e.g. calls, type_ref)
@@ -68,10 +68,10 @@ Options:
   --xml                 XML output
 
 Examples:
-  tsdoc-edge relationship-query readTsdocComment
-  tsdoc-edge relationship-query GraphRepository --category behavioral
-  tsdoc-edge relationship-query BuildCommand --type calls --limit 20
-  tsdoc-edge relationship-query BuildCommand --direction to --json`;
+  tsdoc-edge relationship query readTsdocComment
+  tsdoc-edge relationship query GraphRepository --category behavioral
+  tsdoc-edge relationship query BuildCommand --type calls --limit 20
+  tsdoc-edge relationship query BuildCommand --direction to --json`;
   }
 
   /**

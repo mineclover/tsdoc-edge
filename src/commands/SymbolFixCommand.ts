@@ -86,7 +86,7 @@ export class SymbolFixCommand extends BaseCommand {
    * @public
    */
   protected getUsage(): string {
-    return `tsdoc-edge symbol-fix [docs-directory] [options]
+    return `tsdoc-edge symbol fix [docs-directory] [options]
 
   Default directory: managed
 

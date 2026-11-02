@@ -99,7 +99,7 @@ export class OntologyListCommand extends BaseCommand {
    * @public
    */
   protected getUsage(): string {
-    return `tsdoc-edge ontology-list [options]
+    return `tsdoc-edge ontology list [options]
 
 Options:
   --nodes <type>        List all nodes of specific type (e.g., class, function, method)
@@ -113,11 +113,11 @@ Options:
   --include-external    Include external/stdlib nodes from canonical graph
 
 Examples:
-  tsdoc-edge ontology-list --nodes class
-  tsdoc-edge ontology-list --rels calls --limit 10
-  tsdoc-edge ontology-list --rels test-coverage
-  tsdoc-edge ontology-list --category structural
-  tsdoc-edge ontology-list --rels type_ref --format csv`;
+  tsdoc-edge ontology list --nodes class
+  tsdoc-edge ontology list --rels calls --limit 10
+  tsdoc-edge ontology list --rels test-coverage
+  tsdoc-edge ontology list --category structural
+  tsdoc-edge ontology list --rels type_ref --format csv`;
   }
 
   /**
@@ -149,10 +149,10 @@ Examples:
         this.printError('Please specify what to list: --nodes, --rels, --category, or --strength');
         console.log();
         console.log('Examples:');
-        console.log('  tsdoc-edge ontology-list --nodes class');
-        console.log('  tsdoc-edge ontology-list --rels calls');
-        console.log('  tsdoc-edge ontology-list --rels test-coverage');
-        console.log('  tsdoc-edge ontology-list --category structural');
+        console.log('  tsdoc-edge ontology list --nodes class');
+        console.log('  tsdoc-edge ontology list --rels calls');
+        console.log('  tsdoc-edge ontology list --rels test-coverage');
+        console.log('  tsdoc-edge ontology list --category structural');
         return this.failure('Missing required option');
       }
 

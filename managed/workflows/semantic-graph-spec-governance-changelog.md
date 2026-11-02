@@ -358,8 +358,3 @@ proof와 남은 gate는 [[Semantic Graph Spec Governance Completed Work]]에서 
 
 - [[Semantic Graph Spec Governance Roadmap]] → managed/workflows/semantic-graph-spec-governance-roadmap.md:13
 
-### Implemented By
-
-- Semantic Graph Spec Governance Changelog → 와 동일한 code connection 입력으로 처리하고, parser 회귀 테스트를 추가했다.
-  재인덱싱 후 단일 owner가 명확한 :1
-

@@ -60,7 +60,7 @@ export class TypeChainCommand extends BaseCommand {
    * @public
    */
   protected getUsage(): string {
-    return `tsdoc-edge type-chain <source-type> [target-type] [options]
+    return `tsdoc-edge relationship type-chain <source-type> [target-type] [options]
 
   Options:
     --max-depth=N         Maximum depth to traverse (default: 10)
@@ -408,7 +408,7 @@ export class FindRootTypesCommand extends BaseCommand {
    * @public
    */
   protected getUsage(): string {
-    return `tsdoc-edge find-roots [options]
+    return `tsdoc-edge relationship roots [options]
 
   Options:
     --include-external    Include external types from node_modules`;
@@ -589,7 +589,7 @@ export class DetectCircularTypesCommand extends BaseCommand {
    * @public
    */
   protected getUsage(): string {
-    return `tsdoc-edge detect-cycles [options]
+    return `tsdoc-edge relationship cycles [options]
 
   Options:
     --include-external    Include external types from node_modules`;

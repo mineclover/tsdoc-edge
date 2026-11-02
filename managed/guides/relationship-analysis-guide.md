@@ -511,8 +511,8 @@ tsdoc-edge validate docs managed
 ### Referenced By
 
 - [[TSDoc Edge Documentation]] → managed/README.md:147
-- [[AnalyzerCommands]] → managed/commands/AnalyzerCommands.md:255
-- [[RelationshipCommands]] → managed/commands/RelationshipCommands.md:168
+- [[AnalyzerCommands]] → managed/commands/AnalyzerCommands.md:257
+- [[RelationshipCommands]] → managed/commands/RelationshipCommands.md:170
 - [[Analyzer Development Guide]] → managed/guides/analyzer-development-guide.md:1002
 - [[Guides & Tutorials]] → managed/guides/index.md:27
 - [[Usage Scenarios]] → managed/guides/usage-scenarios.md:122

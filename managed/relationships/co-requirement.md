@@ -311,6 +311,6 @@ interface CoRequirementMetrics {
 ### Referenced By
 
 - [[Commands Index]] → managed/COMMANDS.md:100
-- [[AnalyzerCommands]] → managed/commands/AnalyzerCommands.md:164
+- [[AnalyzerCommands]] → managed/commands/AnalyzerCommands.md:166
 - [[Mutual Exclusion]] → managed/relationships/mutual-exclusion.md:214
 

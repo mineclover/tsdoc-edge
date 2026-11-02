@@ -52,7 +52,7 @@ export class ValidateSpecCommand extends BaseCommand {
    * @public
    */
   protected getUsage(): string {
-    return 'tsdoc-edge validate-spec [docs-directory]\n\n  Default: managed';
+    return 'tsdoc-edge validate spec [docs-directory]\n\n  Default: managed';
   }
 
   /**

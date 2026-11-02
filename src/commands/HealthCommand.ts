@@ -271,7 +271,7 @@ export class HealthCommand extends BaseCommand {
     console.log();
 
     console.log(
-      `${colors.cyan}💡 Tip: Run 'tsdoc-edge suggest' for detailed improvement suggestions${colors.reset}`
+      `${colors.cyan}💡 Tip: Run 'tsdoc-edge docs suggest' for detailed improvement suggestions${colors.reset}`
     );
     console.log();
   }

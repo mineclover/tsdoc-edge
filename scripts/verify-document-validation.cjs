@@ -14,11 +14,15 @@ if (!fs.existsSync(cliPath)) {
   fail('Built CLI is missing; run npm run build before document validation');
 }
 
-const result = spawnSync(process.execPath, [cliPath, 'validate', 'docs', 'managed'], {
-  cwd: projectRoot,
-  env: process.env,
-  encoding: 'utf8',
-});
+const result = spawnSync(
+  process.execPath,
+  [cliPath, 'validate', 'docs', 'managed', '--verify-sources'],
+  {
+    cwd: projectRoot,
+    env: process.env,
+    encoding: 'utf8',
+  }
+);
 
 const output = `${result.stdout ?? ''}${result.stderr ?? ''}`;
 process.stdout.write(output);

@@ -55,7 +55,7 @@ export class RelationshipImpactCommand extends BaseCommand {
    * @public
    */
   protected getUsage(): string {
-    return `tsdoc-edge relationship-impact <symbol-id> [options]
+    return `tsdoc-edge relationship impact <symbol-id> [options]
 
 Analyzes what symbols would be affected if you change the given symbol.
 
@@ -70,16 +70,16 @@ Options:
 
 Examples:
   # See what depends on BuildCommand
-  tsdoc-edge relationship-impact class-buildcommand
+  tsdoc-edge relationship impact class-buildcommand
 
   # See what BuildCommand depends on
-  tsdoc-edge relationship-impact class-buildcommand --direction upstream
+  tsdoc-edge relationship impact class-buildcommand --direction upstream
 
   # Deep impact analysis
-  tsdoc-edge relationship-impact class-buildcommand --depth 5
+  tsdoc-edge relationship impact class-buildcommand --depth 5
 
   # Only structural dependencies
-  tsdoc-edge relationship-impact class-buildcommand --category structural`;
+  tsdoc-edge relationship impact class-buildcommand --category structural`;
   }
 
   /**

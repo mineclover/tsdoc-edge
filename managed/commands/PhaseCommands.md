@@ -8,7 +8,9 @@ canonical: true
 
 # [[Phase Commands]]
 
-Phase commands are organized by development phases, grouping related functionality for incremental feature development.
+**Source**: `src/commands/registerCliCommands.ts`
+
+Historical phase command modules (`Phase4Commands`..`Phase10Commands`) were consolidated into the 20 canonical top-level CLI commands registered in `src/commands/registerCliCommands.ts`.
 
 ## Overview
 
@@ -23,7 +25,7 @@ Phase commands are organized by development phases, grouping related functionali
 
 ## Phase 4: Type Analysis
 
-**Source**: `src/commands/Phase4Commands.ts`
+**Source**: `src/commands/registerCliCommands.ts`
 
 Analyzes type dependencies and interface relationships.
 
@@ -36,20 +38,20 @@ Analyzes type dependencies and interface relationships.
 
 ## Phase 5: Test Coverage
 
-**Source**: `src/commands/Phase5Commands.ts`
+**Source**: `src/commands/registerCliCommands.ts`
 
 Tracks test relationships and integration coverage.
 
 **Commands**:
 - `relationship analyze --type=tests` - Test-to-code mapping
-- `sync-coverage` - Coverage data synchronization
 - `coverage-report` - Coverage reporting
+- `coverage-baseline` - Immutable baseline comparison
 
 **Related**: [[Test Coverage]], [[Integration Test Traceability]]
 
 ## Phase 6: Code Health
 
-**Source**: `src/commands/Phase6Commands.ts`
+**Source**: `src/commands/registerCliCommands.ts`
 
 Analyzes code quality and maintainability.
 
@@ -61,7 +63,7 @@ Analyzes code quality and maintainability.
 
 ## Phase 7: Data Flow
 
-**Source**: `src/commands/Phase7Commands.ts`
+**Source**: `src/commands/registerCliCommands.ts`
 
 Tracks data flow and execution paths.
 
@@ -73,7 +75,7 @@ Tracks data flow and execution paths.
 
 ## Phase 8: SSOT Validation
 
-**Source**: `src/commands/Phase8Commands.ts`
+**Source**: `src/commands/registerCliCommands.ts`
 
 Validates documentation completeness and SSOT compliance.
 
@@ -85,7 +87,7 @@ Validates documentation completeness and SSOT compliance.
 
 ## Phase 10: System Management
 
-**Source**: `src/commands/Phase10Commands.ts`
+**Source**: `src/commands/registerCliCommands.ts`
 
 System-level management and validation.
 
@@ -113,5 +115,5 @@ System-level management and validation.
 
 ### Implemented By
 
-- Phase Commands → src/commands/Phase4Commands.ts:1
+- Phase Commands → src/commands/registerCliCommands.ts:1
 

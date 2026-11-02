@@ -64,7 +64,7 @@ export class SpecMetricsCommand extends BaseCommand {
    * @public
    */
   protected getUsage(): string {
-    return `tsdoc-edge spec-metrics [options]
+    return `tsdoc-edge spec metrics [options]
   tsdoc-edge spec metrics [options]
 
 Options:

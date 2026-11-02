@@ -1,4 +1,13 @@
-# Mermaid Diagram Syntax Rules
+---
+title: Mermaid Diagram Rules
+type: architecture-diagram
+category: architecture
+status: active
+canonical: true
+codeImplementation: not-applicable
+---
+
+# [[Mermaid Diagram Rules]]
 
 **목적**: GitHub와 mermaid-cli에서 안정적으로 렌더링되는 다이어그램 작성 규칙
 
@@ -326,3 +335,12 @@ sed -n 'X-2,X+2p' .tsdoc/diagrams/file.mmd
 
 **마지막 업데이트**: 2025-11-07
 **검증 상태**: 24/24 diagrams passing ✅
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[Mermaid Entrypoint Workflow]] → managed/workflows/mermaid-entrypoint-workflow.md:612
+

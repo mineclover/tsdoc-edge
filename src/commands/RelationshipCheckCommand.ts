@@ -55,7 +55,7 @@ export class RelationshipCheckCommand extends BaseCommand {
    * @public
    */
   protected getUsage(): string {
-    return `tsdoc-edge relationship-check <symbol-id> [options]
+    return `tsdoc-edge relationship check <symbol-id> [options]
 
 Quick safety check combining multiple analyses:
   1. Impact analysis (how many affected)
@@ -71,13 +71,13 @@ Options:
 
 Examples:
   # Before modifying BuildCommand
-  tsdoc-edge relationship-check class-buildcommand
+  tsdoc-edge relationship check class-buildcommand
 
   # Quick check with JSON output
-  tsdoc-edge relationship-check class-buildcommand --json
+  tsdoc-edge relationship check class-buildcommand --json
 
   # Deep analysis
-  tsdoc-edge relationship-check class-buildcommand --depth 5
+  tsdoc-edge relationship check class-buildcommand --depth 5
 
 Output includes:
   ✓ Risk Level (LOW/MEDIUM/HIGH)

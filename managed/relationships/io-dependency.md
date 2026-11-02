@@ -79,8 +79,8 @@ tsdoc-edge analyze-pipeline
 - [[TSDoc Edge Documentation]] → managed/README.md:53
 - [[IODependencyAnalyzer]] → managed/analyzers/IODependencyAnalyzer.md:26
 - [[Analyzers & Extractors]] → managed/analyzers/index.md:401
-- [[AnalyzeIOCommand]] → managed/commands/AnalyzeIOCommand.md:30
-- [[AnalyzerCommands]] → managed/commands/AnalyzerCommands.md:50
+- [[AnalyzeIOCommand]] → managed/commands/AnalyzeIOCommand.md:36
+- [[AnalyzerCommands]] → managed/commands/AnalyzerCommands.md:52
 - [[BuildCommand]] → managed/commands/BuildCommand.md:48
 - [[Unified Relationship Taxonomy]] → managed/concepts/unified-relationship-taxonomy.md:501
 - [[Build Pipeline Guide]] → managed/guides/build-pipeline-guide.md:279

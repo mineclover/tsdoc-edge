@@ -290,8 +290,9 @@ canonical graph 입력을 기준선에 포함하려면 `--graph-revision`과
 - [[TSDoc Edge Documentation]] → managed/README.md:18
 - [[CodeHealthChecker]] → managed/analyzers/CodeHealthChecker.md:16
 - [[TestCoverageAnalyzer]] → managed/analyzers/TestCoverageAnalyzer.md:17
-- [[TestRelationshipAnalyzer]] → managed/analyzers/TestRelationshipAnalyzer.md:15
+- [[TestRelationshipAnalyzer]] → managed/analyzers/TestRelationshipAnalyzer.md:13
 - [[Analyzers & Extractors]] → managed/analyzers/index.md:95
+- [[Complete Workflow Architecture]] → managed/architecture/diagrams/mermaid-workflow-complete.md:16
 - [[CoverageReportCommand]] → managed/commands/CoverageReportCommand.md:17
 - [[Analyzer System]] → managed/core/analyzer-system.md:214
 - [[AnalysisFeatures]] → managed/features/analysis-features.md:104
@@ -311,7 +312,7 @@ canonical graph 입력을 기준선에 포함하려면 `--graph-revision`과
 
 - Coverage Metrics Contract → src/convention/CoverageMetricPolicy.ts:1
 - CoverageBaselineCommand → src/commands/CoverageBaselineCommand.ts:31
-- CoverageReportCommand → src/commands/CoverageReportCommand.ts:88
+- CoverageReportCommand → src/commands/CoverageReportCommand.ts:109
 - COVERAGE_METRIC_REPORT_REPOSITORY_SCHEMA_VERSION → src/storage/CoverageMetricReportRepository.ts:32
 - CoverageMetricReportPin → src/storage/CoverageMetricReportRepository.ts:42
 - CoverageMetricReportRevision → src/storage/CoverageMetricReportRepository.ts:55

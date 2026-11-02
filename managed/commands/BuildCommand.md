@@ -100,7 +100,7 @@ active revision을 항상 보존하면서 오래된 revision을 정리하며, �
 - [[TSDoc Edge Documentation]] → managed/README.md:52
 - [[CoverageReportCommand]] → managed/commands/CoverageReportCommand.md:267
 - [[InitCommand]] → managed/commands/InitCommand.md:343
-- [[Phase Commands]] → managed/commands/PhaseCommands.md:101
+- [[Phase Commands]] → managed/commands/PhaseCommands.md:103
 - [[SyncCommand]] → managed/commands/SyncCommand.md:25
 - [[Module Specification Framework]] → managed/concepts/module-specification-framework.md:399
 - [[DatabaseManager]] → managed/core-components/DatabaseManager.md:288
@@ -114,7 +114,7 @@ active revision을 항상 보존하면서 오래된 revision을 정리하며, �
 - [[Document Symbol Parser]] → managed/parser/DocumentSymbolParser.md:87
 - [[ExtractionResult]] → managed/primary-types/ExtractionResult.md:106
 - [[TsdocEdgeConfig]] → managed/primary-types/TsdocEdgeConfig.md:121
-- [[FileScanner]] → managed/utilities/FileScanner.md:82
+- [[FileScanner]] → managed/utilities/FileScanner.md:85
 
 ### Implemented By
 

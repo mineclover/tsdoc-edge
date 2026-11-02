@@ -35,11 +35,12 @@ Check validity of all [[Symbol]] links.
 ### Referenced By
 
 - [[CLI Commands]] → managed/CLI-COMMANDS.md:44
+- [[DocumentSymbolSystem]] → managed/concepts/document-symbol-system.md:179
 - [[ValidationFeatures]] → managed/features/validation-features.md:254
 - [[LinkingTypes]] → managed/types/LinkingTypes.md:155
 - [[LinkValidator]] → managed/utilities/LinkValidator.md:77
 
 ### Implemented By
 
-- CheckLinksCommand → src/commands/CheckLinksCommand.ts:45
+- CheckLinksCommand → src/commands/CheckLinksCommand.ts:55
 

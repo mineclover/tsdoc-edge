@@ -57,7 +57,7 @@ tsdoc-edge work-context <file-path>    # 파일 작업 전 컨텍스트 확인
 ---
 
 ### [[Document Symbol System]]
-**Path**: `../concepts/document-symbol-system.md`
+**Path**: `../concepts/document-symbol-system.md` | **Link**: [[DocumentSymbolSystem]]
 
 Wiki 스타일 `[[Symbol]]` 문법으로 문서와 코드를 양방향 연결.
 
@@ -96,7 +96,7 @@ graph policy 메트릭의 정의와 현재 구현 상태를 관리하는 기준 
 ---
 
 ### Dependency Analysis
-**Path**: `DependencyAnalysis.md` (source-backed)
+**Path**: `DependencyAnalysis.md` (source-backed) | **Link**: [[Dependency Analysis]]
 
 심볼 의존성 분석 및 관계 탐색.
 
@@ -106,12 +106,12 @@ graph policy 메트릭의 정의와 현재 구현 상태를 관리하는 기준 
 - 전이적 의존성 체인 (Transitive chains)
 - 순환 의존성 탐지
 
-**Commands**: `deps`, `used-by`, `who-uses`, `type-chain`, `detect-cycles`
+**Commands**: `symbol deps`, `symbol who-uses`, `relationship type-chain`, `relationship cycles`
 
 ---
 
 ### Impact Analysis
-**Path**: `ImpactAnalysis.md` (source-backed)
+**Path**: `ImpactAnalysis.md` (source-backed) | **Link**: [[Impact Analysis]]
 
 코드 변경의 영향 범위 평가.
 
@@ -121,22 +121,22 @@ graph policy 메트릭의 정의와 현재 구현 상태를 관리하는 기준 
 - 테스트 영향 예측
 - Breaking change 탐지
 
-**Commands**: `used-by`, `analyze-impact`, `test-impact`, `breaking-changes`
+**Commands**: `symbol who-uses`, `relationship impact`
 
 ---
 
-### Dead Code Detection
-**Path**: `DeadCodeDetection.md` (source-backed)
+### Orphan & Unused Symbol Analysis
+**Command**: [[OrphansCommand]] (`tsdoc-edge symbol orphans`)
 
-미사용 코드 탐지 및 제거 전략.
+미사용(Orphan) 심볼 탐지 및 제거 전략.
 
 **주요 기능**:
 - Orphan 심볼 탐지 (no dependencies/usages)
 - 진입점 기반 도달 불가능 코드 탐지
-- 테스트 커버리지 상관 분석
+- 테스트 커버리지 상관 분석 ([[UntestedCommand]])
 - 안전한 제거 가이드
 
-**Commands**: `orphans`, `untested`, `stats`
+**Commands**: `symbol orphans`, `symbol untested`, `stats`
 
 ---
 
@@ -215,7 +215,7 @@ Biome severity tiers, legacy warning budget, and strict canonical-kernel quality
 ## Integration Features (통합 기능)
 
 ### CI/CD Integration
-**Path**: `CICDIntegration.md` (workflow-backed)
+**Path**: `CICDIntegration.md` (workflow-backed) | **Link**: [[CI/CD Integration]]
 
 CI/CD 파이프라인 통합 및 품질 게이트.
 
@@ -289,16 +289,16 @@ Model Context Protocol 도구 테스트 전략 (`basic-test.js` 9/9, `detailed-t
 | Feature | Status | Commands | Priority |
 |---------|--------|----------|----------|
 | [[CoreWorkflow]] | ✅ Active | build, parse | Critical |
-| DocumentSymbolSystem | ✅ Active | index-docs | Critical |
-| [[AnalysisFeatures]] | ✅ Active | analyze, health | High |
-| DependencyAnalysis | ✅ Active | deps, used-by | High |
-| ImpactAnalysis | ✅ Active | analyze-impact | High |
-| [[SymbolGraphFeatures]] | ✅ Active | scan, deps | High |
-| [[QueryCommands]] | ✅ Active | deps, orphans | Medium |
+| [[Document Symbol System]] | ✅ Active | docs index | Critical |
+| [[AnalysisFeatures]] | ✅ Active | health, stats | High |
+| [[Dependency Analysis]] | ✅ Active | symbol deps, symbol who-uses | High |
+| [[Impact Analysis]] | ✅ Active | relationship impact | High |
+| [[SymbolGraphFeatures]] | ✅ Active | symbol deps, symbol tree | High |
+| [[QueryCommands]] | ✅ Active | symbol deps, symbol orphans | Medium |
 | [[ValidationFeatures]] | ✅ Active | validate | Medium |
-| DeadCodeDetection | ✅ Active | orphans | Medium |
-| CICDIntegration | ✅ Active | (CI/CD) | Medium |
-| [[AutoIndexing]] | ✅ Active | watch | Low |
+| [[OrphansCommand]] | ✅ Active | symbol orphans | Medium |
+| [[CI/CD Integration]] | ✅ Active | (CI/CD) | Medium |
+| [[AutoIndexing]] | ✅ Active | docs index --watch | Low |
 
 ---
 
@@ -366,5 +366,5 @@ tsdoc-edge test-impact database-manager
 - [[Types Index]] → managed/types/index.md:379
 - [[TSDoc Edge User Guide]] → managed/user-guide.md:284
 - [[Utilities Index]] → managed/utilities/index.md:464
-- [[Workflows Index]] → managed/workflows/index.md:284
+- [[Workflows Index]] → managed/workflows/index.md:282
 

@@ -378,7 +378,7 @@ tsdoc-edge tree
 - [[CoreWorkflow]] - 메인 문서화 파이프라인
 ## 가이드
 
-실전 시나리오 및 워크플로우: [DEPENDENCY_ANALYSIS_GUIDE.md](../DEPENDENCY_ANALYSIS_GUIDE.md)
+실전 시나리오 및 워크플로우: [DependencyAnalysis.md](./DependencyAnalysis.md) · [relationship-analysis-guide.md](../guides/relationship-analysis-guide.md)
 
 ---
 
@@ -395,7 +395,7 @@ tsdoc-edge tree
 ### Referenced By
 
 - [[TSDoc Edge Documentation]] → managed/README.md:289
-- [[RelationshipCommands]] → managed/commands/RelationshipCommands.md:169
+- [[RelationshipCommands]] → managed/commands/RelationshipCommands.md:171
 - [[AnalysisFeatures]] → managed/features/analysis-features.md:433
 - [[CoreFeatures]] → managed/features/core-features-catalog.md:102
 - [[CoreWorkflow]] → managed/features/core-workflow.md:154
@@ -408,5 +408,7 @@ tsdoc-edge tree
 
 - DepthTraverser (Traversal) → src/graph/DepthTraverser.ts:64
 - SymbolGraphBuilder (Builder) → src/graph/SymbolGraphBuilder.ts:36
-- SymbolSearchEngine (Search) → src/graph/SymbolSearchEngine.ts:39
+- isTestArtifactSymbol (Search) → src/graph/SymbolSearchEngine.ts:19
+- isUnexportedTopLevelSymbol (Search) → src/graph/SymbolSearchEngine.ts:36
+- SymbolSearchEngine (Search) → src/graph/SymbolSearchEngine.ts:70
 

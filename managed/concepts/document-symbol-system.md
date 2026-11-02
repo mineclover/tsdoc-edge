@@ -4,7 +4,10 @@ type: concept
 category: concepts
 status: active
 canonical: false
+codeImplementation: not-applicable
 ---
+
+# [[DocumentSymbolSystem]]
 
 ## [[Document Symbol System]]
 
@@ -280,3 +283,13 @@ tsdoc-edge symbol query managed stats
 - SSOT validation and enforcement
 - Automatic backlink generation
 - Symbol promotion workflow
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[Concepts Index]] → managed/concepts/index.md:70
+- [[Features Index]] → managed/features/index.md:60
+

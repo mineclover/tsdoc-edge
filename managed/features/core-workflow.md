@@ -29,13 +29,13 @@ TSDoc Edge의 메인 워크플로우는 TypeScript 소스 코드를 스캔하여
 
 ## 핵심 산출물
 ### 1. 진입점
-- [TSDocEdge](../../../src/index.ts#TSDocEdge) - 메인 클래스, 전체 파이프라인 통합
+- [TSDocEdge](../../src/index.ts) - 메인 클래스, 전체 파이프라인 통합
 **주요 메서드:**
 - `processFile(filePath, sourceCode)` - 파일 하나 처리
 - `getParser()`, `getValidator()`, `getGenerator()` - 내부 컴포넌트 접근
 
 ### 2. 파일 스캔
-- [FileScanner](../../../src/scanner/FileScanner.ts#FileScanner) - 프로젝트 디렉토리 스캔
+- [ProjectIndexer](../../src/indexer/ProjectIndexer.ts#ProjectIndexer) - 프로젝트 디렉토리 스캔 및 정본 그래프 인덱싱
 
 **기능:**
 - Glob 패턴 기반 파일 탐색
@@ -43,15 +43,15 @@ TSDoc Edge의 메인 워크플로우는 TypeScript 소스 코드를 스캔하여
 - 재귀적 디렉토리 스캔
 
 ### 3. TSDoc 파싱
-- [TSDocParser](../../../src/parser/TSDocParser.ts#TSDocParser) - TSDoc 주석 파싱
+- [TSDocParser](../../src/parser/TSDocParser.ts#TSDocParser) - TSDoc 주석 파싱
 
 **기능:**
-- TSDoc 표준 태그 지원 (35개)
+- TSDoc 표준 태그 지원 (29개)
 - 커스텀 태그 지원 (`@responsibility`, `@contract`, `@testScenario` 등)
 - TypeScript Compiler API 기반 정확한 파싱
 
 ### 4. 컨벤션 검증
-- [ConventionValidator](../../../src/validator/ConventionValidator.ts#ConventionValidator) - 프로젝트 규칙 검증
+- [ConventionValidator](../../src/validator/ConventionValidator.ts#ConventionValidator) - 프로젝트 규칙 검증
 
 **검증 항목:**
 - 필수 태그 확인
@@ -59,8 +59,8 @@ TSDoc Edge의 메인 워크플로우는 TypeScript 소스 코드를 스캔하여
 - Public API 문서화 강제
 
 ### 5. 문서 생성
-- [MarkdownGenerator](../../../src/generator/MarkdownGenerator.ts#MarkdownGenerator) - 기본 마크다운 생성
-- [EnhancedMarkdownGenerator](../../../src/generator/EnhancedMarkdownGenerator.ts#EnhancedMarkdownGenerator) - 확장 메타데이터 포함
+- [MarkdownGenerator](../../src/generator/MarkdownGenerator.ts#MarkdownGenerator) - 기본 마크다운 생성
+- [EnhancedMarkdownGenerator](../../src/generator/EnhancedMarkdownGenerator.ts#EnhancedMarkdownGenerator) - 확장 메타데이터 포함
 **출력 형식:**
 - 구조화된 마크다운
 - 계약, 책임, 테스트 시나리오 포함
@@ -73,7 +73,7 @@ TSDoc Edge의 메인 워크플로우는 TypeScript 소스 코드를 스캔하여
 - 프로젝트 초기화
 - `.tsdoc.config.json` 생성
 - **Implementation Chain**:
-  - Command: `src/commands/Phase4Commands.ts:153`
+  - Command: `src/commands/InitCommand.ts`
   - Manager: ConfigManager (`src/config/ConfigManager.ts`)
   - Creates: `.tsdoc.config.json` with default settings
 
@@ -195,5 +195,5 @@ TSDoc Edge의 메인 워크플로우는 TypeScript 소스 코드를 스캔하여
 
 ### Implemented By
 
-- TSDocEdge → src/index.ts:160
+- TSDocEdge → src/index.ts:162
 

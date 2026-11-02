@@ -296,7 +296,7 @@ chmod +x .git/hooks/pre-commit
 - [[CoreWorkflow]] - 메인 문서화 파이프라인
 ## 가이드
 
-**상세 사용법:** [AUTO_INDEXING_GUIDE.md](../AUTO_INDEXING_GUIDE.md)
+**상세 사용법:** [build-pipeline-guide.md](../guides/build-pipeline-guide.md)
 - 각 방법별 상세 설정
 - 예시 파일 전체
 - 성능 최적화 팁

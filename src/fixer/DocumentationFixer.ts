@@ -3,7 +3,6 @@
  *
  * @packageDocumentation
  * @doc [[FixCommand]]
- * @doc [[Dead Code Detection]]
  * @responsibility Automatically add or improve TSDoc comments based on analysis
  * @context AST-guided TSDoc remediation engine driven by `DocQualityScore` findings from `DocumentationAnalyzer`
  * @functionality Synthesizes missing TSDoc blocks or appends missing `@param`, `@returns`, `@example`, `@responsibility`, and `@contract` tags
@@ -28,7 +27,6 @@ interface DocFix {
  * Options for fixing documentation
  *
  * @doc [[FixCommand]]
- * @doc [[Dead Code Detection]]
  * @public
  */
 export interface FixOptions {
@@ -52,7 +50,6 @@ export interface FixOptions {
  * Result of fixing a file
  *
  * @doc [[FixCommand]]
- * @doc [[Dead Code Detection]]
  * @public
  */
 export interface FixResult {
@@ -70,7 +67,6 @@ export interface FixResult {
  * Fixes documentation issues automatically
  *
  * @doc [[FixCommand]]
- * @doc [[Dead Code Detection]]
  * @public
  * @responsibility Generate and insert missing TSDoc comments
  * @context Consumes `DocQualityScore` assessments and patches under-documented TypeScript declarations

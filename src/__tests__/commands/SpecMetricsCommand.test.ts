@@ -23,7 +23,7 @@ describe('SpecMetricsCommand', () => {
     const result = await command.execute(['--help']);
 
     expect(result.exitCode).toBe(0);
-    expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('tsdoc-edge spec-metrics'));
+    expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('tsdoc-edge spec metrics'));
     consoleSpy.mockRestore();
   });
 

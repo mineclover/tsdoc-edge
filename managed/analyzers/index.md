@@ -422,8 +422,8 @@ Storage (SQLite + JSONL)
 
 - [[TSDoc Edge Documentation]] → managed/README.md:176
 - [[Code Generation]] → managed/code-generation/index.md:136
-- [[AnalyzerCommands]] → managed/commands/AnalyzerCommands.md:253
-- [[Phase Commands]] → managed/commands/PhaseCommands.md:84
+- [[AnalyzerCommands]] → managed/commands/AnalyzerCommands.md:255
+- [[Phase Commands]] → managed/commands/PhaseCommands.md:86
 - [[Core Systems]] → managed/core/index.md:50
 - [[Analyzer Status]] → managed/features/analyzer-status.md:306
 - [[ValidationFeatures]] → managed/features/validation-features.md:258

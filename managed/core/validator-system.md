@@ -373,7 +373,7 @@ issues.forEach(issue => {
 ### Implemented By
 
 - Validator System → src/validator/ConnectivityValidator.ts:1
-- ConnectivityValidator → src/validator/ConnectivityValidator.ts:44
+- ConnectivityValidator → src/validator/ConnectivityValidator.ts:48
 - ConventionValidator → src/validator/ConventionValidator.ts:36
 - DocValidationResult → src/validator/GeneratedDocsValidator.ts:20
 - GeneratedDocsValidator → src/validator/GeneratedDocsValidator.ts:71

@@ -38,7 +38,7 @@ export class WhoUsesCommand extends BaseCommand {
     return 'Show what depends on a symbol (B ← A)';
   }
   protected getUsage(): string {
-    return 'tsdoc-edge who-uses <symbol-name> [--json|--xml] [--include-external]';
+    return 'tsdoc-edge symbol who-uses <symbol-name> [--json|--xml] [--include-external]';
   }
 
   /**

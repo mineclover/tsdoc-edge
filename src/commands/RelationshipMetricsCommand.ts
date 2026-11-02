@@ -60,7 +60,7 @@ export class RelationshipMetricsCommand extends BaseCommand {
    * @public
    */
   protected getUsage(): string {
-    return `tsdoc-edge relationship-metrics [options]
+    return `tsdoc-edge relationship metrics [options]
 
 Calculates centrality and importance metrics for symbols in the relationship graph.
 Helps identify architectural hubs, bottlenecks, and critical integration points.
@@ -87,16 +87,16 @@ Interpretation:
 
 Examples:
   # Find most important symbols
-  tsdoc-edge relationship-metrics
+  tsdoc-edge relationship metrics
 
   # Find structural hubs
-  tsdoc-edge relationship-metrics --category structural --metric betweenness
+  tsdoc-edge relationship metrics --category structural --metric betweenness
 
   # Find top orchestrators
-  tsdoc-edge relationship-metrics --metric degree --top 10
+  tsdoc-edge relationship metrics --metric degree --top 10
 
   # Detailed analysis
-  tsdoc-edge relationship-metrics --detailed --top 15`;
+  tsdoc-edge relationship metrics --detailed --top 15`;
   }
 
   /**

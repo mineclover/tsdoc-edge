@@ -326,7 +326,7 @@ tsdoc-edge health src --include-private
 - [[DocumentationAnalyzer]] → managed/analyzers/DocumentationAnalyzer.md:147
 - [[Analyzers & Extractors]] → managed/analyzers/index.md:93
 - [[HealthCommand]] → managed/commands/HealthCommand.md:26
-- [[Phase Commands]] → managed/commands/PhaseCommands.md:60
+- [[Phase Commands]] → managed/commands/PhaseCommands.md:62
 - [[AnalysisFeatures]] → managed/features/analysis-features.md:242
 - [[CoreWorkflow]] → managed/features/core-workflow.md:125
 - [[Analyzer Development Guide]] → managed/guides/analyzer-development-guide.md:28

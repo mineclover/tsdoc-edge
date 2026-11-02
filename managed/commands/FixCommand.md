@@ -26,10 +26,10 @@ Automatically repairs common TSDoc formatting, missing modifier, and document li
 - TagResult → src/fixer/DeadCodeTagger.ts:43
 - TaggedDeadCodeSymbol → src/fixer/DeadCodeTagger.ts:60
 - DeadCodeTagger → src/fixer/DeadCodeTagger.ts:94
-- FixOptions → src/fixer/DocumentationFixer.ts:34
-- FixResult → src/fixer/DocumentationFixer.ts:58
-- DocumentationFixer → src/fixer/DocumentationFixer.ts:80
-- RecursiveImproveOptions → src/fixer/RecursiveImprover.ts:27
-- RecursiveImproveResult → src/fixer/RecursiveImprover.ts:49
-- RecursiveImprover → src/fixer/RecursiveImprover.ts:81
+- FixOptions → src/fixer/DocumentationFixer.ts:32
+- FixResult → src/fixer/DocumentationFixer.ts:55
+- DocumentationFixer → src/fixer/DocumentationFixer.ts:76
+- RecursiveImproveOptions → src/fixer/RecursiveImprover.ts:25
+- RecursiveImproveResult → src/fixer/RecursiveImprover.ts:46
+- RecursiveImprover → src/fixer/RecursiveImprover.ts:77
 

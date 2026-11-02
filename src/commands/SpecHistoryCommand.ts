@@ -73,7 +73,7 @@ export class SpecHistoryCommand extends BaseCommand {
    * @public
    */
   protected getUsage(): string {
-    return 'tsdoc-edge spec-history <file-path>';
+    return 'tsdoc-edge spec history <file-path>';
   }
 
   /**
@@ -92,7 +92,7 @@ export class SpecHistoryCommand extends BaseCommand {
       const target = args[0];
 
       if (!target) {
-        this.printError('Usage: tsdoc-edge spec-history <file>');
+        this.printError('Usage: tsdoc-edge spec history <file>');
         console.log();
         return this.failure('File path required');
       }

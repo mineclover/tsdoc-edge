@@ -224,8 +224,8 @@ Dependency data powers [[Impact Analysis]]:
 - Who needs to update imports?
 - Test cascade requirements
 
-### Dead Code Detection
-Dependency data identifies [[Dead Code Detection]]:
+### Orphan & Unused Symbol Analysis
+Dependency data powers [[OrphansCommand]] (`tsdoc-edge symbol orphans`):
 - Symbols with zero usages
 - Unreachable code
 - Orphaned modules
@@ -258,6 +258,7 @@ tsdoc-edge validate-architecture \
 ### Referenced By
 
 - [[Impact Analysis]] → managed/features/ImpactAnalysis.md:288
+- [[Features Index]] → managed/features/index.md:99
 
 ### Implemented By
 

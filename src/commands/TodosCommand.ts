@@ -73,7 +73,7 @@ export class TodosCommand extends BaseCommand {
    * @public
    */
   protected getUsage(): string {
-    return 'tsdoc-edge todos';
+    return 'tsdoc-edge docs todos';
   }
 
   /**

@@ -8,7 +8,7 @@ canonical: true
 
 # [[ValidateSpecCommand]]
 
-**Source**: `src/commands/Phase4Commands.ts:349`
+**Source**: `src/commands/ValidateSpecCommand.ts`
 
 ## Purpose
 
@@ -409,6 +409,5 @@ tsdoc-edge validate spec managed | grep "⚠️" -A 1
 
 ### Implemented By
 
-- ValidateSpecCommand → src/commands/Phase4Commands.ts:349:1
 - ValidateSpecCommand → src/commands/ValidateSpecCommand.ts:26
 

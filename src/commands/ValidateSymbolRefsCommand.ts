@@ -1,22 +1,23 @@
 /**
- * Validate Symbol References Command - `[[Symbol]]` 참조 일관성 검증
+ * Validate Symbol References Command - `[[Symbol]]` reference consistency validation
  *
  * @packageDocumentation
  * @doc [[ValidateSymbolRefsCommand]]
- * @responsibility Validate all `[[Symbol]]` references across documentation
+ * @responsibility Validate all `[[Symbol]]` references across Markdown documentation
  *
- * @problem Multiple docs may define the same symbol, references may be broken
- * @solves Build symbol registry, detect duplicates, validate all references
+ * @problem Multiple docs may define the same symbol, or references may point to missing checkpoints
+ * @solves Parse Markdown checkpoints via `DocumentSymbolParser`, detect duplicate H1s and broken references, and report authored reference cycles
  * @context Enforce SSOT (Single Source of Truth) for documentation symbols
- * @functionality Scans Markdown prose and Mermaid diagrams to detect duplicate H1 definitions, broken `[[Symbol]]` references, and circular reference chains
+ * @functionality Scans Markdown documents via `DocumentSymbolParser` to detect duplicate H1 definitions, broken `[[Symbol]]` and `[[Symbol#Section]]` references, and authored circular reference chains
  * @sideEffect console: Writes `[[Symbol]]` reference consistency diagnostics or `--json` payloads to stdout
- * @sideEffect filesystem: Recursively scans and reads managed Markdown files on disk (read)
+ * @sideEffect filesystem: Recursively scans and reads managed Markdown files on disk, and optionally writes skeleton docs when `--fix` is passed
  */
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { MermaidSymbolExtractor } from '../doc-symbol/MermaidSymbolExtractor';
-import { BaseCommand, type CommandResult } from './BaseCommand';
+import { ConfigManager } from '../config/ConfigManager';
+import { DocumentSymbolParser } from '../doc-symbol/DocumentSymbolParser';
+import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 
 /**
  * Symbol definition in a document
@@ -24,7 +25,7 @@ import { BaseCommand, type CommandResult } from './BaseCommand';
 interface SymbolDefinition {
   symbolName: string;
   filePath: string;
-  isH1: boolean; // Is this the H1 title (primary definition)?
+  isH1: boolean;
   lineNumber: number;
 }
 
@@ -33,9 +34,9 @@ interface SymbolDefinition {
  */
 interface SymbolReference {
   symbolName: string;
+  section?: string;
   filePath: string;
   lineNumber: number;
-  context: string; // Surrounding text
 }
 
 /**
@@ -54,14 +55,14 @@ interface ValidationIssue {
   lineNumber?: number;
   message: string;
   suggestion?: string;
-  cycle?: string[]; // For circular dependencies
+  cycle?: string[];
 }
 
 /**
  * Symbol registry result
  */
 interface SymbolRegistry {
-  definitions: Map<string, SymbolDefinition[]>; // symbolName -> definitions
+  definitions: Map<string, SymbolDefinition[]>;
   references: SymbolReference[];
   issues: ValidationIssue[];
   statistics: {
@@ -82,6 +83,10 @@ interface SymbolRegistry {
  * @public
  */
 export class ValidateSymbolRefsCommand extends BaseCommand {
+  constructor(private parser?: DocumentSymbolParser) {
+    super();
+  }
+
   /**
    * getName method
    * @returns Returns string
@@ -106,57 +111,118 @@ export class ValidateSymbolRefsCommand extends BaseCommand {
    * @public
    */
   protected getUsage(): string {
-    return 'tsdoc-edge validate-symbol-refs [docs-directory]\n\n  Default: managed\n  Options: --fix   Fix detected issues automatically';
+    return (
+      'tsdoc-edge validate refs [docs-directory] [--fix] [--json]\n\n' +
+      '  Default: managed\n' +
+      '  Options:\n' +
+      '    --fix    Fix detected issues automatically\n' +
+      '    --json   Output structured JSON report'
+    );
   }
 
   /**
    * execute method
    * @param args - args parameter
-   * @returns Returns Promise<CommandResult>
+   * @returns Returns `Promise<CommandResult>`
    * @public
    */
   execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(() => {
-      // Check for help flag
       if (this.hasHelpFlag(args)) {
         return this.displayHelp();
       }
 
-      const docsDir = args[0] || 'managed';
-      const fixMode = args.includes('--fix');
-
-      this.printHeader('Validate Symbol References');
-      console.log(`📁 Scanning: ${docsDir}`);
-      console.log();
-
-      // Build symbol registry
-      this.printInfo('Building symbol registry...');
-      const registry = this.buildSymbolRegistry(docsDir);
-
-      // Display statistics
-      this.displayStatistics(registry);
-
-      // Display issues
-      if (registry.issues.length > 0) {
-        console.log();
-        this.displayIssues(registry, fixMode);
+      const flagError = this.validateAllowedFlags(args, ['--fix', '--json']);
+      if (flagError) {
+        return flagError;
       }
 
-      // Fix mode
+      const fixMode = this.hasFlag(args, '--fix');
+      const jsonMode = this.hasFlag(args, '--json');
+      const positionalArgs = this.getPositionalArgs(args);
+      const docsDir = positionalArgs[0] || 'managed';
+      const docsPath = path.resolve(process.cwd(), docsDir);
+
+      if (!fs.existsSync(docsPath)) {
+        const message = `Directory not found: ${docsPath}`;
+        if (jsonMode) {
+          console.log(
+            JSON.stringify(
+              {
+                valid: false,
+                docsDir,
+                error: message,
+              },
+              null,
+              2
+            )
+          );
+        } else {
+          this.printError(message);
+        }
+        return this.failure(message);
+      }
+
+      if (!jsonMode) {
+        this.printHeader('Validate Symbol References');
+        console.log(`📁 Scanning: ${docsDir}`);
+        console.log();
+        this.printInfo('Building symbol registry...');
+      }
+
+      const parser = this.parser || new DocumentSymbolParser();
+      const registry = this.buildSymbolRegistry(docsPath, parser);
+
+      let fixedCount = 0;
       if (fixMode && registry.issues.length > 0) {
+        if (!jsonMode) {
+          this.displayStatistics(registry);
+          console.log();
+          this.displayIssues(registry, fixMode);
+          console.log();
+          this.printSection('Fixing Issues');
+        }
+        fixedCount = this.fixIssues(registry, !jsonMode);
+        if (!jsonMode) {
+          this.printSuccess(`Fixed ${fixedCount} issues`);
+          console.log();
+        }
+      } else if (!jsonMode) {
+        this.displayStatistics(registry);
+        if (registry.issues.length > 0) {
+          console.log();
+          this.displayIssues(registry, fixMode);
+        }
         console.log();
-        this.printSection('Fixing Issues');
-        const fixed = this.fixIssues(registry);
-        this.printSuccess(`Fixed ${fixed} issues`);
       }
 
-      console.log();
+      const errorCount = registry.issues.filter((i) => i.severity === 'error').length;
+      const warningCount = registry.issues.filter((i) => i.severity === 'warning').length;
+      const infoCount = registry.issues.filter((i) => i.severity === 'info').length;
 
-      const hasErrors = registry.issues.some((i) => i.severity === 'error');
-      if (hasErrors) {
-        return this.failure(
-          `Found ${registry.issues.filter((i) => i.severity === 'error').length} errors`
+      if (jsonMode) {
+        console.log(
+          JSON.stringify(
+            {
+              valid: errorCount === 0,
+              docsDir,
+              statistics: registry.statistics,
+              counts: {
+                errors: errorCount,
+                warnings: warningCount,
+                info: infoCount,
+              },
+              issues: registry.issues,
+              ...(fixMode ? { fixedCount } : {}),
+            },
+            null,
+            2
+          )
         );
+      }
+
+      if (errorCount > 0) {
+        return this.failure(`Found ${errorCount} errors`);
       }
 
       return this.success('All symbol references are valid');
@@ -164,9 +230,9 @@ export class ValidateSymbolRefsCommand extends BaseCommand {
   }
 
   /**
-   * Build symbol registry from all documentation files
+   * Build symbol registry from all Markdown documentation files in target directory
    */
-  private buildSymbolRegistry(rootDir: string): SymbolRegistry {
+  private buildSymbolRegistry(docsPath: string, parser: DocumentSymbolParser): SymbolRegistry {
     const registry: SymbolRegistry = {
       definitions: new Map(),
       references: [],
@@ -181,22 +247,34 @@ export class ValidateSymbolRefsCommand extends BaseCommand {
       },
     };
 
-    // Find all markdown and mermaid files
-    const files = this.findDocFiles(rootDir);
+    const files = this.findMarkdownFiles(docsPath);
 
-    // Extract definitions and references from each file
     for (const filePath of files) {
-      const content = fs.readFileSync(filePath, 'utf-8');
-      const lines = content.split('\n');
+      const parsed = parser.parse(filePath, { forceManaged: true });
+      if (!parsed) {
+        continue;
+      }
 
-      if (filePath.endsWith('.mmd')) {
-        this.extractFromMermaid(filePath, content, registry);
-      } else {
-        this.extractFromMarkdown(filePath, lines, registry);
+      if (parsed.primary) {
+        this.addDefinition(registry, parsed.primary.name, filePath, parsed.primary.line, true);
+      }
+
+      for (const aux of parsed.auxiliaries) {
+        this.addDefinition(registry, aux.name, filePath, aux.line, false);
+      }
+
+      for (const ref of parsed.references) {
+        registry.references.push({
+          symbolName: ref.name,
+          section: ref.section,
+          filePath,
+          lineNumber: ref.line,
+        });
       }
     }
 
-    // Calculate statistics
+    const externalResolvable = this.collectCanonicalSymbols(docsPath, parser);
+
     registry.statistics.uniqueSymbols = registry.definitions.size;
     registry.statistics.totalDefinitions = Array.from(registry.definitions.values()).reduce(
       (sum, defs) => sum + defs.length,
@@ -204,96 +282,158 @@ export class ValidateSymbolRefsCommand extends BaseCommand {
     );
     registry.statistics.totalReferences = registry.references.length;
 
-    // Detect duplicates
+    // Detect duplicate H1 primary definitions and ambiguous orphaned auxiliary headings
     for (const [symbolName, definitions] of registry.definitions.entries()) {
-      if (definitions.length > 1) {
+      const h1Defs = definitions.filter((d) => d.isH1);
+      const auxDefs = definitions.filter((d) => !d.isH1);
+
+      if (h1Defs.length > 1) {
         registry.statistics.duplicates++;
-
-        // Check if one is H1 (primary) and others are not
-        const h1Defs = definitions.filter((d) => d.isH1);
-
-        if (h1Defs.length > 1) {
-          // Multiple H1 definitions - ERROR
-          registry.issues.push({
-            type: 'duplicate-definition',
-            severity: 'error',
-            symbolName,
-            filePath: definitions.map((d) => d.filePath).join(', '),
-            message: `Symbol [[${symbolName}]] is defined as H1 in ${h1Defs.length} files`,
-            suggestion: `Keep only one H1 definition, move others to references`,
-          });
-        } else if (h1Defs.length === 0) {
-          // No H1 definition, only inline references - WARNING
-          registry.issues.push({
-            type: 'ambiguous-reference',
-            severity: 'warning',
-            symbolName,
-            filePath: definitions.map((d) => d.filePath).join(', '),
-            message: `Symbol [[${symbolName}]] is used but never defined as H1`,
-            suggestion: `Create managed/relationships/${this.normalizeSymbolName(symbolName)}.md`,
-          });
-        }
+        registry.issues.push({
+          type: 'duplicate-definition',
+          severity: 'error',
+          symbolName,
+          filePath: h1Defs.map((d) => d.filePath).join(', '),
+          lineNumber: h1Defs[0].lineNumber,
+          message: `Symbol [[${symbolName}]] is defined as H1 in ${h1Defs.length} files`,
+          suggestion: 'Keep only one H1 definition, move others to references',
+        });
+      } else if (h1Defs.length === 0 && auxDefs.length > 1 && !externalResolvable.has(symbolName)) {
+        registry.statistics.duplicates++;
+        registry.issues.push({
+          type: 'ambiguous-reference',
+          severity: 'warning',
+          symbolName,
+          filePath: auxDefs.map((d) => d.filePath).join(', '),
+          lineNumber: auxDefs[0].lineNumber,
+          message: `Symbol [[${symbolName}]] has ${auxDefs.length} auxiliary definitions without a canonical H1 definition`,
+          suggestion: `Create managed/relationships/${this.normalizeSymbolName(symbolName)}.md`,
+        });
       }
     }
 
-    // Validate references
+    // Validate references against H1 primaries, unique H2/H3 auxiliary hubs, and canonical managed definitions
     for (const ref of registry.references) {
-      const definitions = registry.definitions.get(ref.symbolName);
+      const definitions = registry.definitions.get(ref.symbolName) ?? [];
+      const h1Count = definitions.filter((d) => d.isH1).length;
+      const auxCount = definitions.filter((d) => !d.isH1).length;
+      const isResolved =
+        h1Count >= 1 || (h1Count === 0 && auxCount === 1) || externalResolvable.has(ref.symbolName);
 
-      if (!definitions || definitions.length === 0) {
+      if (!isResolved) {
         registry.statistics.brokenReferences++;
+        const displayRef = ref.section ? `${ref.symbolName}#${ref.section}` : ref.symbolName;
         registry.issues.push({
           type: 'broken-reference',
           severity: 'error',
           symbolName: ref.symbolName,
           filePath: ref.filePath,
           lineNumber: ref.lineNumber,
-          message: `Reference to [[${ref.symbolName}]] but symbol is not defined`,
-          suggestion: this.findSimilarSymbol(ref.symbolName, registry.definitions),
+          message: `Reference to [[${displayRef}]] but symbol [[${ref.symbolName}]] is not defined`,
+          suggestion: this.findSimilarSymbol(
+            ref.symbolName,
+            registry.definitions,
+            externalResolvable
+          ),
         });
       }
     }
 
-    // Detect circular dependencies
+    // Detect document-level circular dependencies from authored body references only
     this.detectCircularDependencies(registry);
 
     return registry;
   }
 
   /**
-   * Detect circular dependencies between documents
+   * Preload canonical resolvable symbol names from `managed/` when validating another directory
    */
-  private detectCircularDependencies(registry: SymbolRegistry): void {
-    // Build document dependency graph
-    // Map: filePath -> Set<filePath> (files this file references)
-    const docDependencies = new Map<string, Set<string>>();
+  private collectCanonicalSymbols(docsPath: string, parser: DocumentSymbolParser): Set<string> {
+    const resolvedDocsPath = path.resolve(docsPath);
+    const managedPath = path.resolve(process.cwd(), 'managed');
+    const resolvable = new Set<string>();
 
-    // Build graph from references
-    for (const ref of registry.references) {
-      const defs = registry.definitions.get(ref.symbolName);
-      if (!defs || defs.length === 0) continue;
+    if (resolvedDocsPath === managedPath || !fs.existsSync(managedPath)) {
+      return resolvable;
+    }
 
-      // Get all files that define this symbol
-      const defFiles = new Set(defs.map((d) => d.filePath));
+    const externalPrimaries = new Set<string>();
+    const externalAuxCounts = new Map<string, number>();
 
-      // Add dependencies: ref.filePath depends on defFiles
-      if (!docDependencies.has(ref.filePath)) {
-        docDependencies.set(ref.filePath, new Set());
+    for (const filePath of this.findMarkdownFiles(managedPath)) {
+      const resolvedFile = path.resolve(filePath);
+      if (
+        resolvedFile === resolvedDocsPath ||
+        resolvedFile.startsWith(`${resolvedDocsPath}${path.sep}`)
+      ) {
+        continue;
       }
 
-      for (const defFile of defFiles) {
-        if (defFile !== ref.filePath) {
-          docDependencies.get(ref.filePath)?.add(defFile);
+      try {
+        const parsed = parser.parse(filePath);
+        if (!parsed) {
+          continue;
+        }
+        if (parsed.primary) {
+          externalPrimaries.add(parsed.primary.name);
+        }
+        for (const aux of parsed.auxiliaries) {
+          externalAuxCounts.set(aux.name, (externalAuxCounts.get(aux.name) ?? 0) + 1);
+        }
+      } catch (_error) {
+        // Keep target validation scoped to the requested directory.
+      }
+    }
+
+    for (const primary of externalPrimaries) {
+      resolvable.add(primary);
+    }
+    for (const [auxName, count] of externalAuxCounts.entries()) {
+      if (count === 1) {
+        resolvable.add(auxName);
+      }
+    }
+
+    return resolvable;
+  }
+
+  /**
+   * Detect circular dependencies between documents using authored body references
+   */
+  private detectCircularDependencies(registry: SymbolRegistry): void {
+    const docDependencies = new Map<string, Set<string>>();
+
+    for (const ref of registry.references) {
+      const defs = registry.definitions.get(ref.symbolName);
+      if (!defs || defs.length === 0) {
+        continue;
+      }
+
+      const h1Defs = defs.filter((d) => d.isH1);
+      const auxDefs = defs.filter((d) => !d.isH1);
+      const resolvedDefs = h1Defs.length > 0 ? h1Defs : auxDefs.length === 1 ? auxDefs : [];
+      if (resolvedDefs.length === 0) {
+        continue;
+      }
+
+      let targetSet = docDependencies.get(ref.filePath);
+      if (!targetSet) {
+        targetSet = new Set<string>();
+        docDependencies.set(ref.filePath, targetSet);
+      }
+
+      for (const def of resolvedDefs) {
+        if (def.filePath !== ref.filePath) {
+          targetSet.add(def.filePath);
         }
       }
     }
 
-    // Detect cycles using DFS
     const visited = new Set<string>();
     const recursionStack = new Set<string>();
-    const detectedCycles = new Set<string>(); // To avoid duplicate reporting
+    const detectedCycles = new Set<string>();
 
-    const dfs = (file: string, path: string[]): void => {
+    const dfs = (file: string, currentPath: string[]): void => {
       visited.add(file);
       recursionStack.add(file);
 
@@ -301,25 +441,20 @@ export class ValidateSymbolRefsCommand extends BaseCommand {
       if (dependencies) {
         for (const depFile of dependencies) {
           if (!visited.has(depFile)) {
-            dfs(depFile, [...path, file]);
+            dfs(depFile, [...currentPath, file]);
           } else if (recursionStack.has(depFile)) {
-            // Found a cycle
-            const cycleStart = path.indexOf(depFile);
-            const cycle = [...path.slice(cycleStart), file, depFile];
-
-            // Create a unique key for this cycle (sorted to avoid duplicates)
+            const cycleStart = currentPath.indexOf(depFile);
+            const cycle = [...currentPath.slice(cycleStart), file, depFile];
             const cycleKey = [...new Set(cycle)].sort().join('->');
 
             if (!detectedCycles.has(cycleKey)) {
               detectedCycles.add(cycleKey);
 
-              // Find symbols involved
               const symbolsInvolved = new Set<string>();
               for (let i = 0; i < cycle.length - 1; i++) {
                 const fromFile = cycle[i];
                 const toFile = cycle[i + 1];
 
-                // Find references from fromFile to symbols in toFile
                 for (const ref of registry.references) {
                   if (ref.filePath === fromFile) {
                     const defs = registry.definitions.get(ref.symbolName);
@@ -332,12 +467,11 @@ export class ValidateSymbolRefsCommand extends BaseCommand {
 
               registry.issues.push({
                 type: 'circular-dependency',
-                severity: 'warning',
+                severity: 'info',
                 symbolName: Array.from(symbolsInvolved).join(', '),
                 filePath: cycle.join(' -> '),
                 message: `Circular dependency detected: ${cycle.length - 1} files form a cycle`,
-                suggestion:
-                  'Consider breaking the cycle by introducing an intermediary concept or removing unnecessary references',
+                suggestion: 'Consider breaking the cycle only if strict DAG navigation is required',
                 cycle,
               });
 
@@ -350,364 +484,11 @@ export class ValidateSymbolRefsCommand extends BaseCommand {
       recursionStack.delete(file);
     };
 
-    // Run DFS from each unvisited file
     for (const file of docDependencies.keys()) {
       if (!visited.has(file)) {
         dfs(file, []);
       }
     }
-  }
-
-  /**
-   * Extract symbols from Markdown file
-   */
-  private extractFromMarkdown(filePath: string, lines: string[], registry: SymbolRegistry): void {
-    let inCodeBlock = false;
-    const _inInlineCode = false;
-
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i];
-      const lineNumber = i + 1;
-
-      // Track code block boundaries (``` or ~~~)
-      if (line.trim().match(/^```|^~~~/)) {
-        inCodeBlock = !inCodeBlock;
-        continue;
-      }
-
-      // Skip lines inside code blocks
-      if (inCodeBlock) {
-        continue;
-      }
-
-      // Skip inline code (simplified check - just skip lines with backticks)
-      const lineWithoutInlineCode = line.replace(/`[^`]+`/g, '');
-
-      // Check for H1 definition: # [[SymbolName]]
-      const h1Match = lineWithoutInlineCode.match(/^#\s+\[\[([^\]]+)\]\]/);
-      if (h1Match) {
-        const symbolName = h1Match[1];
-        this.addDefinition(registry, symbolName, filePath, lineNumber, true);
-        continue;
-      }
-
-      // Extract all [[Symbol]] references in the line (excluding inline code)
-      const refRegex = /\[\[([^\]]+)\]\]/g;
-      for (const match of lineWithoutInlineCode.matchAll(refRegex)) {
-        const symbolName = match[1];
-
-        // Apply same filters as Mermaid extraction
-        // Skip workflow steps and abstract concepts
-        if (
-          /Issue$|Bonus$|Workflow$|Taxonomy$|Roadmap$|Validation$|Analyzer$|Fixer$|Generator$/.test(
-            symbolName
-          )
-        ) {
-          continue;
-        }
-        // Skip action verbs and abstract concepts
-        if (/^(Fix|Add|Rebuild|Visualize|Explore|Auto|Missing)\s+/.test(symbolName)) {
-          continue;
-        }
-        // Skip abstract system concepts
-        if (/^(Documentation|Architecture|Evidence|Type Safety)$/.test(symbolName)) {
-          continue;
-        }
-        // Skip interface notation
-        if (/\s+interface$/i.test(symbolName)) {
-          continue;
-        }
-        // Skip system concept patterns
-        if (/^(Dependency|Type)\s+(Graph|System)$/.test(symbolName)) {
-          continue;
-        }
-        // Skip all-caps hyphenated names
-        if (/^[A-Z][A-Z-]+[A-Z]$/.test(symbolName)) {
-          continue;
-        }
-        // Skip workflow actions and system components
-        if (/^(Backlinks|Archive|Delete|Validate)\s*$/.test(symbolName)) {
-          continue;
-        }
-        // Skip quality/health/detector/resolver patterns
-        if (/\s+Quality$|\s+Health$|Detector$|Resolver$/.test(symbolName)) {
-          continue;
-        }
-        // Skip Base/Enhanced prefixes
-        if (/^(Base|Enhanced)\s+/.test(symbolName)) {
-          continue;
-        }
-        // Skip command/symbol system components
-        if (/^(Command|Symbol)\s+(Registry|Graph|Validation)$/.test(symbolName)) {
-          continue;
-        }
-        // Skip TypeScript/Mermaid prefixes
-        if (/^(TypeScript|Mermaid)\s+/.test(symbolName)) {
-          continue;
-        }
-        // Skip generic terms and plural categories
-        if (/^(Analyzers?|Visualize|Type)\s*$/.test(symbolName)) {
-          continue;
-        }
-        // Skip Chain/Framework suffixes
-        if (/Chain$|\s+Framework$/.test(symbolName)) {
-          continue;
-        }
-        // Skip EnhancedXXXSystem patterns
-        if (/^Enhanced[A-Z][a-z]+System$/.test(symbolName)) {
-          continue;
-        }
-        // Skip Symbol/Work Context subsystems
-        if (/^Symbol\s+(Link|Reference|Validation)|^Work\s+Context\s+/.test(symbolName)) {
-          continue;
-        }
-        // Skip Implementation/Relationship planning prefixes
-        if (/^(Implementation|Relationship)\s+/.test(symbolName)) {
-          continue;
-        }
-        // Skip Dependency/Test subsystems
-        if (/^Dependency\s+(Chain|Graph)\s|^Test\s+Coverage\s/.test(symbolName)) {
-          continue;
-        }
-        // Skip Documentation subsystems
-        if (/^Documentation\s+(Reference|Quality)/.test(symbolName)) {
-          continue;
-        }
-        // Skip AST/Validation/Code Health
-        if (/^AST\s+|^Validate\s+Symbol\s+Refs$|^Code\s+Health$/.test(symbolName)) {
-          continue;
-        }
-        // Skip standalone abstract terms
-        if (/^Symbol\s+(Graph|Validation)\s*$|^Backlinks\s*$/.test(symbolName)) {
-          continue;
-        }
-        // Skip planned commands
-        if (
-          /^(Id|Improve|SpecStatus|SpecHistory|Plans|Todos|CoreApi|WithoutResponsibility|WithoutContract|Scan|FindDoc|FindMethod|FindUnusedDocs)Command$/.test(
-            symbolName
-          )
-        ) {
-          continue;
-        }
-
-        // Skip relationship type names used as mermaid node labels (not actual doc symbols)
-        // Handle both hyphenated (layer-dependency) and spaced (Layer Dependency) versions
-        if (
-          /^(enhancement|layer[- ]dependency|module[- ]boundary|callback|event[- ]flow|composition|doc[- ]reference|test[- ]coverage|generic[- ]constraint|contains|calls|verification|covers[- ]scenario|co[- ]requirement|mutual[- ]exclusion|fallback|temporal[- ]order|collaboration|naming[- ]pattern|feature[- ]grouping|test[- ]as[- ]example)$/i.test(
-            symbolName
-          )
-        ) {
-          continue;
-        }
-
-        // Skip relationship category names used in diagrams
-        if (
-          /^(structural|data[- ]flow|behavioral|semantic|testing|verification|alternative|constraint)$/i.test(
-            symbolName
-          )
-        ) {
-          continue;
-        }
-
-        // Skip diagram-specific labels
-        if (/^(Impact\d+|Phase\s+\d+|Layer\s+\d+|L\d+[A-Z])$/i.test(symbolName)) {
-          continue;
-        }
-
-        // Check if this is a definition (in heading) or reference
-        if (lineWithoutInlineCode.trim().startsWith('#')) {
-          // Heading but not H1 - still a definition but not primary
-          this.addDefinition(registry, symbolName, filePath, lineNumber, false);
-        } else {
-          // Regular reference
-          registry.references.push({
-            symbolName,
-            filePath,
-            lineNumber,
-            context: lineWithoutInlineCode.trim(),
-          });
-        }
-      }
-    }
-  }
-
-  /**
-   * Extract symbols from Mermaid diagram
-   */
-  private extractFromMermaid(filePath: string, content: string, registry: SymbolRegistry): void {
-    const extractor = new MermaidSymbolExtractor();
-    const result = extractor.extract(content, filePath);
-
-    // Mermaid symbols are references, not definitions
-    // (unless explicitly documented in frontmatter)
-    // Skip node IDs (like "S1", "E1") and other non-symbol patterns
-    for (const symbol of result.symbols) {
-      const symbolName = symbol.symbolName;
-
-      // Skip if it's just a node ID (1-3 uppercase letters + digits)
-      if (/^[A-Z]{1,3}\d+$/.test(symbolName)) {
-        continue;
-      }
-
-      // Skip if it's a percentage pattern
-      if (/^[-+]?\d+%$/.test(symbolName)) {
-        continue;
-      }
-
-      // Skip short uppercase codes (A, CD, TEST) and labels (L1A, L2B)
-      // These are typically node IDs or diagram labels, not symbol references
-      if (/^([A-Z]$|[A-Z]{2,4}$|L\d+[A-Z]$)/.test(symbolName)) {
-        continue;
-      }
-
-      // Skip workflow steps and abstract concepts
-      if (
-        /Issue$|Bonus$|Workflow$|Taxonomy$|Roadmap$|Validation$|Analyzer$|Fixer$|Generator$/.test(
-          symbolName
-        )
-      ) {
-        continue;
-      }
-
-      // Skip action verbs and abstract concepts
-      if (/^(Fix|Add|Rebuild|Visualize|Explore|Auto|Missing)\s+/.test(symbolName)) {
-        continue;
-      }
-
-      // Skip abstract system concepts
-      if (/^(Documentation|Architecture|Evidence|Type Safety)$/.test(symbolName)) {
-        continue;
-      }
-
-      // Skip interface notation
-      if (/\s+interface$/i.test(symbolName)) {
-        continue;
-      }
-
-      // Skip system concept patterns
-      if (/^(Dependency|Type)\s+(Graph|System)$/.test(symbolName)) {
-        continue;
-      }
-
-      // Skip all-caps hyphenated names
-      if (/^[A-Z][A-Z-]+[A-Z]$/.test(symbolName)) {
-        continue;
-      }
-
-      // Skip workflow actions and system components
-      if (/^(Backlinks|Archive|Delete|Validate)\s*$/.test(symbolName)) {
-        continue;
-      }
-
-      // Skip quality/health/detector/resolver patterns
-      if (/\s+Quality$|\s+Health$|Detector$|Resolver$/.test(symbolName)) {
-        continue;
-      }
-
-      // Skip Base/Enhanced prefixes
-      if (/^(Base|Enhanced)\s+/.test(symbolName)) {
-        continue;
-      }
-
-      // Skip command/symbol system components
-      if (/^(Command|Symbol)\s+(Registry|Graph|Validation)$/.test(symbolName)) {
-        continue;
-      }
-
-      // Skip TypeScript/Mermaid prefixes
-      if (/^(TypeScript|Mermaid)\s+/.test(symbolName)) {
-        continue;
-      }
-
-      // Skip generic terms and plural categories
-      if (/^(Analyzers?|Visualize|Type)\s*$/.test(symbolName)) {
-        continue;
-      }
-
-      // Skip Chain/Framework suffixes
-      if (/Chain$|\s+Framework$/.test(symbolName)) {
-        continue;
-      }
-
-      // Skip EnhancedXXXSystem patterns
-      if (/^Enhanced[A-Z][a-z]+System$/.test(symbolName)) {
-        continue;
-      }
-
-      // Skip Symbol/Work Context subsystems
-      if (/^Symbol\s+(Link|Reference|Validation)|^Work\s+Context\s+/.test(symbolName)) {
-        continue;
-      }
-
-      // Skip Implementation/Relationship planning prefixes
-      if (/^(Implementation|Relationship)\s+/.test(symbolName)) {
-        continue;
-      }
-
-      // Skip Dependency/Test subsystems
-      if (/^Dependency\s+(Chain|Graph)\s|^Test\s+Coverage\s/.test(symbolName)) {
-        continue;
-      }
-
-      // Skip Documentation subsystems
-      if (/^Documentation\s+(Reference|Quality)/.test(symbolName)) {
-        continue;
-      }
-
-      // Skip AST/Validation/Code Health
-      if (/^AST\s+|^Validate\s+Symbol\s+Refs$|^Code\s+Health$/.test(symbolName)) {
-        continue;
-      }
-
-      // Skip standalone abstract terms
-      if (/^Symbol\s+(Graph|Validation)\s*$|^Backlinks\s*$/.test(symbolName)) {
-        continue;
-      }
-
-      // Skip planned commands
-      if (
-        /^(Id|Improve|SpecStatus|SpecHistory|Plans|Todos|CoreApi|WithoutResponsibility|WithoutContract|Scan|FindDoc|FindMethod|FindUnusedDocs)Command$/.test(
-          symbolName
-        )
-      ) {
-        continue;
-      }
-
-      // Skip relationship type names used as mermaid node labels (not actual doc symbols)
-      // Handle both hyphenated (layer-dependency) and spaced (Layer Dependency) versions
-      if (
-        /^(enhancement|layer[- ]dependency|module[- ]boundary|callback|event[- ]flow|composition|doc[- ]reference|test[- ]coverage|generic[- ]constraint|contains|calls|verification|covers[- ]scenario|co[- ]requirement|mutual[- ]exclusion|fallback|temporal[- ]order|collaboration|naming[- ]pattern|feature[- ]grouping|test[- ]as[- ]example)$/i.test(
-          symbolName
-        )
-      ) {
-        continue;
-      }
-
-      // Skip relationship category names used in diagrams
-      if (
-        /^(structural|data[- ]flow|behavioral|semantic|testing|verification|alternative|constraint)$/i.test(
-          symbolName
-        )
-      ) {
-        continue;
-      }
-
-      // Skip diagram-specific labels (Impact1, Phase 1, etc.)
-      if (/^(Impact\d+|Phase\s+\d+|Layer\s+\d+|L\d+[A-Z])$/i.test(symbolName)) {
-        continue;
-      }
-
-      registry.references.push({
-        symbolName,
-        filePath,
-        lineNumber: 0, // Line number not available from parser
-        context: `Mermaid node: ${symbol.label}`,
-      });
-    }
-
-    // Also check frontmatter for [[Symbol]] references
-    const lines = content.split('\n');
-    this.extractFromMarkdown(filePath, lines, registry);
   }
 
   /**
@@ -720,35 +501,47 @@ export class ValidateSymbolRefsCommand extends BaseCommand {
     lineNumber: number,
     isH1: boolean
   ): void {
-    if (!registry.definitions.has(symbolName)) {
-      registry.definitions.set(symbolName, []);
+    const existing = registry.definitions.get(symbolName);
+    if (existing) {
+      existing.push({
+        symbolName,
+        filePath,
+        lineNumber,
+        isH1,
+      });
+    } else {
+      registry.definitions.set(symbolName, [
+        {
+          symbolName,
+          filePath,
+          lineNumber,
+          isH1,
+        },
+      ]);
     }
-
-    registry.definitions.get(symbolName)?.push({
-      symbolName,
-      filePath,
-      lineNumber,
-      isH1,
-    });
   }
 
   /**
-   * Find similar symbol names (for suggestions)
+   * Find similar symbol names for typo suggestions
    */
   private findSimilarSymbol(
     targetName: string,
-    definitions: Map<string, SymbolDefinition[]>
-  ): string | undefined {
+    definitions: Map<string, SymbolDefinition[]>,
+    externalResolvable: ReadonlySet<string>
+  ): string {
     const normalized = this.normalizeSymbolName(targetName);
+    const candidateNames = new Set<string>([...definitions.keys(), ...externalResolvable]);
 
-    for (const [symbolName] of definitions) {
+    for (const symbolName of candidateNames) {
       const symNormalized = this.normalizeSymbolName(symbolName);
+      if (!symNormalized || !normalized) {
+        continue;
+      }
 
       if (symNormalized.includes(normalized) || normalized.includes(symNormalized)) {
         return `Did you mean [[${symbolName}]]?`;
       }
 
-      // Check Levenshtein distance
       if (this.levenshteinDistance(normalized, symNormalized) <= 3) {
         return `Did you mean [[${symbolName}]]?`;
       }
@@ -799,22 +592,33 @@ export class ValidateSymbolRefsCommand extends BaseCommand {
   }
 
   /**
-   * Find all documentation files recursively
+   * Find all Markdown documentation files recursively (excluding raw `.mmd` files and excluded directories)
    */
-  private findDocFiles(dir: string): string[] {
+  private findMarkdownFiles(dir: string, excludeDirs?: string[]): string[] {
+    if (fs.statSync(dir).isFile()) {
+      return dir.endsWith('.md') || dir.endsWith('.mdx') ? [dir] : [];
+    }
+
     const files: string[] = [];
+    const resolvedExcludeDirs =
+      excludeDirs ?? ConfigManager.getInstance().get().validation?.excludeDirs ?? [];
     const entries = fs.readdirSync(dir, { withFileTypes: true });
 
     for (const entry of entries) {
       const fullPath = path.join(dir, entry.name);
 
       if (entry.isDirectory()) {
-        if (entry.name === 'node_modules' || entry.name === '.git') continue;
-        files.push(...this.findDocFiles(fullPath));
-      } else if (entry.isFile()) {
-        if (fullPath.endsWith('.md') || fullPath.endsWith('.mmd')) {
-          files.push(fullPath);
+        if (
+          entry.name === 'node_modules' ||
+          entry.name === '.git' ||
+          entry.name === 'dist' ||
+          resolvedExcludeDirs.includes(entry.name)
+        ) {
+          continue;
         }
+        files.push(...this.findMarkdownFiles(fullPath, resolvedExcludeDirs));
+      } else if (entry.isFile() && (entry.name.endsWith('.md') || entry.name.endsWith('.mdx'))) {
+        files.push(fullPath);
       }
     }
 
@@ -828,37 +632,35 @@ export class ValidateSymbolRefsCommand extends BaseCommand {
     this.printSection('Symbol Registry Statistics');
 
     console.log(
-      `  Unique symbols: ${this.colors.cyan}${registry.statistics.uniqueSymbols}${this.colors.reset}`
+      `  Unique symbols: ${colors.cyan}${registry.statistics.uniqueSymbols}${colors.reset}`
     );
     console.log(
-      `  Total definitions: ${this.colors.cyan}${registry.statistics.totalDefinitions}${this.colors.reset}`
+      `  Total definitions: ${colors.cyan}${registry.statistics.totalDefinitions}${colors.reset}`
     );
     console.log(
-      `  Total references: ${this.colors.cyan}${registry.statistics.totalReferences}${this.colors.reset}`
+      `  Total references: ${colors.cyan}${registry.statistics.totalReferences}${colors.reset}`
     );
 
     if (registry.statistics.duplicates > 0) {
-      console.log(
-        `  Duplicates: ${this.colors.yellow}${registry.statistics.duplicates}${this.colors.reset}`
-      );
+      console.log(`  Duplicates: ${colors.yellow}${registry.statistics.duplicates}${colors.reset}`);
     } else {
-      console.log(`  Duplicates: ${this.colors.green}0${this.colors.reset}`);
+      console.log(`  Duplicates: ${colors.green}0${colors.reset}`);
     }
 
     if (registry.statistics.brokenReferences > 0) {
       console.log(
-        `  Broken references: ${this.colors.red}${registry.statistics.brokenReferences}${this.colors.reset}`
+        `  Broken references: ${colors.red}${registry.statistics.brokenReferences}${colors.reset}`
       );
     } else {
-      console.log(`  Broken references: ${this.colors.green}0${this.colors.reset}`);
+      console.log(`  Broken references: ${colors.green}0${colors.reset}`);
     }
 
     if (registry.statistics.circularDependencies > 0) {
       console.log(
-        `  Circular dependencies: ${this.colors.yellow}${registry.statistics.circularDependencies}${this.colors.reset}`
+        `  Circular dependencies (info): ${colors.cyan}${registry.statistics.circularDependencies}${colors.reset}`
       );
     } else {
-      console.log(`  Circular dependencies: ${this.colors.green}0${this.colors.reset}`);
+      console.log(`  Circular dependencies: ${colors.green}0${colors.reset}`);
     }
   }
 
@@ -866,99 +668,94 @@ export class ValidateSymbolRefsCommand extends BaseCommand {
    * Display validation issues
    */
   private displayIssues(registry: SymbolRegistry, showFix: boolean): void {
-    this.printSection('Validation Issues');
-
     const errors = registry.issues.filter((i) => i.severity === 'error');
     const warnings = registry.issues.filter((i) => i.severity === 'warning');
+    const infos = registry.issues.filter((i) => i.severity === 'info');
+
+    if (errors.length === 0 && warnings.length === 0 && infos.length === 0) {
+      return;
+    }
+
+    this.printSection('Validation Issues');
 
     if (errors.length > 0) {
-      console.log(`  ${this.colors.red}❌ Errors (${errors.length}):${this.colors.reset}`);
+      console.log(`  ${colors.red}❌ Errors (${errors.length}):${colors.reset}`);
       console.log();
       errors.forEach((issue, idx) => {
-        console.log(`  ${idx + 1}. ${this.colors.bold}${issue.message}${this.colors.reset}`);
+        console.log(`  ${idx + 1}. ${colors.bold}${issue.message}${colors.reset}`);
         console.log(`     Symbol: [[${issue.symbolName}]]`);
         console.log(
           `     File: ${issue.filePath}${issue.lineNumber ? `:${issue.lineNumber}` : ''}`
         );
         if (issue.suggestion) {
-          console.log(`     ${this.colors.cyan}💡 ${issue.suggestion}${this.colors.reset}`);
+          console.log(`     ${colors.cyan}💡 ${issue.suggestion}${colors.reset}`);
         }
         console.log();
       });
     }
 
     if (warnings.length > 0) {
-      console.log(`  ${this.colors.yellow}⚠️  Warnings (${warnings.length}):${this.colors.reset}`);
+      console.log(`  ${colors.yellow}⚠️  Warnings (${warnings.length}):${colors.reset}`);
       console.log();
       warnings.forEach((issue, idx) => {
         console.log(`  ${idx + 1}. ${issue.message}`);
         console.log(`     Symbol: [[${issue.symbolName}]]`);
-        if (issue.type === 'circular-dependency' && issue.cycle) {
-          console.log(`     ${this.colors.yellow}Cycle:${this.colors.reset}`);
-          for (let i = 0; i < issue.cycle.length - 1; i++) {
-            const _isLast = i === issue.cycle.length - 2;
-            console.log(`       ${i + 1}. ${issue.cycle[i]}`);
-            console.log(`          ${this.colors.dim}↓${this.colors.reset}`);
-          }
-          console.log(
-            `       ${this.colors.yellow}(returns to ${issue.cycle[0]})${this.colors.reset}`
-          );
-        } else {
-          console.log(`     File: ${issue.filePath}`);
-        }
+        console.log(`     File: ${issue.filePath}`);
         if (issue.suggestion) {
-          console.log(`     ${this.colors.cyan}💡 ${issue.suggestion}${this.colors.reset}`);
+          console.log(`     ${colors.cyan}💡 ${issue.suggestion}${colors.reset}`);
         }
         console.log();
       });
     }
 
-    if (!showFix && (errors.length > 0 || warnings.length > 0)) {
+    if (infos.length > 0) {
       console.log(
-        `  ${this.colors.dim}Run with --fix to automatically fix some issues${this.colors.reset}`
+        `  ${colors.cyan}ℹ Info: ${infos.length} authored circular cross-reference chain(s) detected (use --json for full cycle details)${colors.reset}`
       );
+      console.log();
+    }
+
+    if (!showFix && (errors.length > 0 || warnings.length > 0)) {
+      console.log(`  ${colors.dim}Run with --fix to automatically fix some issues${colors.reset}`);
     }
   }
 
   /**
    * Fix issues automatically (where possible)
    */
-  private fixIssues(registry: SymbolRegistry): number {
+  private fixIssues(registry: SymbolRegistry, logOutput = true): number {
     let fixed = 0;
 
     for (const issue of registry.issues) {
       if (issue.type === 'ambiguous-reference' && issue.severity === 'warning') {
-        // Create skeleton document for undefined symbols
         const normalizedName = this.normalizeSymbolName(issue.symbolName);
         const targetPath = path.join('managed', 'relationships', `${normalizedName}.md`);
 
-        // Ensure directory exists
         const targetDir = path.dirname(targetPath);
         if (!fs.existsSync(targetDir)) {
           fs.mkdirSync(targetDir, { recursive: true });
         }
 
-        // Only create if file doesn't exist
         if (!fs.existsSync(targetPath)) {
           const skeletonContent = this.generateSkeletonDocument(issue.symbolName);
           fs.writeFileSync(targetPath, skeletonContent);
-          console.log(`  ${this.colors.green}✓${this.colors.reset} Created: ${targetPath}`);
+          if (logOutput) {
+            console.log(`  ${colors.green}✓${colors.reset} Created: ${targetPath}`);
+          }
           fixed++;
-        } else {
-          console.log(
-            `  ${this.colors.yellow}⚠${this.colors.reset} Skipped (exists): ${targetPath}`
-          );
+        } else if (logOutput) {
+          console.log(`  ${colors.yellow}⚠${colors.reset} Skipped (exists): ${targetPath}`);
         }
       } else if (
+        logOutput &&
         issue.type === 'broken-reference' &&
         issue.severity === 'error' &&
         issue.suggestion?.startsWith('Did you mean')
       ) {
-        // Log suggestion but don't auto-fix broken references (needs manual review)
         console.log(
-          `  ${this.colors.yellow}⚠${this.colors.reset} Manual fix needed: ${issue.filePath}:${issue.lineNumber}`
+          `  ${colors.yellow}⚠${colors.reset} Manual fix needed: ${issue.filePath}:${issue.lineNumber}`
         );
-        console.log(`     ${this.colors.cyan}${issue.suggestion}${this.colors.reset}`);
+        console.log(`     ${colors.cyan}${issue.suggestion}${colors.reset}`);
       }
     }
 
@@ -969,7 +766,6 @@ export class ValidateSymbolRefsCommand extends BaseCommand {
    * Generate skeleton document for a new symbol definition
    */
   private generateSkeletonDocument(symbolName: string): string {
-    const _normalizedName = this.normalizeSymbolName(symbolName);
     const timestamp = new Date().toISOString().split('T')[0];
 
     return `# [[${symbolName}]]
@@ -991,18 +787,5 @@ export class ValidateSymbolRefsCommand extends BaseCommand {
 ---
 *Generated: ${timestamp}*
 `;
-  }
-
-  private get colors() {
-    return {
-      reset: '\x1b[0m',
-      bold: '\x1b[1m',
-      dim: '\x1b[2m',
-      green: '\x1b[32m',
-      yellow: '\x1b[33m',
-      blue: '\x1b[34m',
-      cyan: '\x1b[36m',
-      red: '\x1b[31m',
-    };
   }
 }

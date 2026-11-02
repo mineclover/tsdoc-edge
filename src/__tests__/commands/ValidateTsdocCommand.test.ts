@@ -25,7 +25,7 @@ describe('ValidateTsdocCommand', () => {
     const result = await command.execute(['--help']);
 
     expect(result.exitCode).toBe(0);
-    expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('tsdoc-edge validate-tsdoc'));
+    expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('tsdoc-edge validate tsdoc'));
     consoleSpy.mockRestore();
   });
 

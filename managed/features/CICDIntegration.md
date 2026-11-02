@@ -299,5 +299,5 @@ Cache TSDoc database between runs:
 
 ### Referenced By
 
-- [[Dead Code Detection]] → managed/features/DeadCodeDetection.md:179
+- [[Features Index]] → managed/features/index.md:218
 

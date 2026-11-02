@@ -70,13 +70,11 @@ tsdoc-edge explore-entrypoint <generated-doc.md> --detect-orphans
 
 ---
 
-### Safe Dead Code Deletion
-**Path**: `dead-code-deletion-workflow.md`
+### Orphan & Unused Symbol Cleanup
+**Command**: [[OrphansCommand]] (`tsdoc-edge symbol orphans`)
 **Priority**: ⭐⭐ High
 
-**Note**: ⚠️ This file needs H1 symbol update
-
-안전하게 미사용 코드를 식별하고 제거하는 워크플로우.
+안전하게 미사용(Orphan) 심볼을 식별하고 제거하는 워크플로우.
 
 **Use Case**:
 - 레거시 코드 정리
@@ -85,14 +83,14 @@ tsdoc-edge explore-entrypoint <generated-doc.md> --detect-orphans
 
 **Key Commands**:
 ```bash
-# 1. Detect dead code
-tsdoc-edge detect-dead-code --high
+# 1. Identify orphaned symbols
+tsdoc-edge symbol orphans
 
-# 2. Verify with orphans
-tsdoc-edge orphans
+# 2. Verify reverse usages
+tsdoc-edge symbol who-uses <symbol-name>
 
-# 3. Check tests
-tsdoc-edge analyze-tests
+# 3. Check test coverage relationships
+tsdoc-edge symbol untested
 ```
 
 **Workflow Steps**:

@@ -3,7 +3,7 @@
  *
  * @packageDocumentation
  * @doc [[FixCommand]]
- * @doc [[Dead Code Detection]]
+ * @doc [[OrphansCommand]]
  * @context Source-rewriting utility that annotates unused TypeScript declarations with `@deprecated` and `@deadcode` TSDoc tags or removes stale tags
  * @functionality AST declaration lookup, `@deprecated` / `@deadcode` tag insertion and removal, and workspace scanning for existing dead-code annotations
  * @sideEffect filesystem: Reads and rewrites TypeScript source files when tagging, untagging, or scanning dead code (read/write)
@@ -17,7 +17,7 @@ import * as ts from 'typescript';
  * Options for dead code tagging
  *
  * @doc [[FixCommand]]
- * @doc [[Dead Code Detection]]
+ * @doc [[OrphansCommand]]
  * @public
  */
 export interface DeadCodeTagOptions {
@@ -37,7 +37,7 @@ export interface DeadCodeTagOptions {
  * Result of tagging or untagging an individual symbol
  *
  * @doc [[FixCommand]]
- * @doc [[Dead Code Detection]]
+ * @doc [[OrphansCommand]]
  * @public
  */
 export interface TagResult {
@@ -54,7 +54,7 @@ export interface TagResult {
  * Information on an existing tagged dead code symbol
  *
  * @doc [[FixCommand]]
- * @doc [[Dead Code Detection]]
+ * @doc [[OrphansCommand]]
  * @public
  */
 export interface TaggedDeadCodeSymbol {
@@ -84,7 +84,7 @@ interface TargetNodeInfo {
  * Dead Code Tagger implementation
  *
  * @doc [[FixCommand]]
- * @doc [[Dead Code Detection]]
+ * @doc [[OrphansCommand]]
  * @public
  * @responsibility Annotate detected dead code with TSDoc tags and explore existing tagged symbols
  * @context Automates `@deprecated` and `@deadcode` governance annotations across TypeScript declarations

@@ -25,7 +25,7 @@ Multi-step data pipelines (A → B → C → D, 3+ steps).
 - [[Commands Index]] → managed/COMMANDS.md:100
 - [[TSDoc Edge Documentation]] → managed/README.md:56
 - [[CallGraphAnalyzer]] → managed/analyzers/CallGraphAnalyzer.md:417
-- [[AnalyzerCommands]] → managed/commands/AnalyzerCommands.md:72
+- [[AnalyzerCommands]] → managed/commands/AnalyzerCommands.md:74
 - [[BuildCommand]] → managed/commands/BuildCommand.md:49
 - [[Build Pipeline Guide]] → managed/guides/build-pipeline-guide.md:299
 - [[Guides & Tutorials]] → managed/guides/index.md:84

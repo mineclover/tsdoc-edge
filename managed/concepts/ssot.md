@@ -75,7 +75,7 @@ tsdoc-edge validate refs managed --check-duplicates
 
 ### Referenced By
 
-- [[Phase Commands]] → managed/commands/PhaseCommands.md:84
+- [[Phase Commands]] → managed/commands/PhaseCommands.md:86
 - [[WorkContextCommand]] → managed/commands/WorkContextCommand.md:67
 - [[Feature Showcase]] → managed/examples/feature-showcase.md:31
 - [[TsdocEdgePlatformSpecification]] → managed/specs/domains/tsdoc-edge-platform-spec.md:158

@@ -47,7 +47,7 @@ export class MoveCommand extends BaseCommand {
    * @public
    */
   protected getUsage(): string {
-    return `tsdoc-edge move <source> <destination> [options]
+    return `tsdoc-edge docs move <source> <destination> [options]
 
 Move a documentation file and automatically update all references to it.
 
@@ -56,9 +56,9 @@ Options:
   --yes        Skip confirmation prompt
 
 Examples:
-  tsdoc-edge move features/old.md features/new.md
-  tsdoc-edge move features/file.md archive/
-  tsdoc-edge move concepts/api.md features/ --dry-run`;
+  tsdoc-edge docs move features/old.md features/new.md
+  tsdoc-edge docs move features/file.md archive/
+  tsdoc-edge docs move concepts/api.md features/ --dry-run`;
   }
 
   /**

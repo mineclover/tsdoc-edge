@@ -74,13 +74,13 @@ export class ValidateGeneratedDocsCommand extends BaseCommand {
    * @public
    */
   protected getUsage(): string {
-    return `tsdoc-edge validate-generated-docs <path>
+    return `tsdoc-edge validate generated <path>
 
   Path can be a single .md file or a directory
 
   Example:
-    tsdoc-edge validate-generated-docs docs/generated
-    tsdoc-edge validate-generated-docs docs/generated/MyClass.md`;
+    tsdoc-edge validate generated docs/generated
+    tsdoc-edge validate generated docs/generated/MyClass.md`;
   }
 
   /**
@@ -102,7 +102,7 @@ export class ValidateGeneratedDocsCommand extends BaseCommand {
         this.printError('Path required');
         console.log();
         console.log('Usage:');
-        this.printInfo('  tsdoc-edge validate-generated-docs <file|directory>');
+        this.printInfo('  tsdoc-edge validate generated <file|directory>');
         console.log();
         return this.failure('Path required');
       }

@@ -90,7 +90,7 @@ export class OntologyStatsCommand extends BaseCommand {
    * @public
    */
   protected getUsage(): string {
-    return `tsdoc-edge ontology-stats [options]
+    return `tsdoc-edge ontology stats [options]
 
 Options:
   --mermaid            Generate Mermaid diagram of ontology model

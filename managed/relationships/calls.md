@@ -66,10 +66,10 @@ tsdoc-edge orphans --type=function
 - [[TSDoc Edge Documentation]] → managed/README.md:59
 - [[CallGraphAnalyzer]] → managed/analyzers/CallGraphAnalyzer.md:413
 - [[Analyzers & Extractors]] → managed/analyzers/index.md:400
-- [[AnalyzeCallsCommand]] → managed/commands/AnalyzeCallsCommand.md:30
-- [[AnalyzerCommands]] → managed/commands/AnalyzerCommands.md:28
+- [[AnalyzeCallsCommand]] → managed/commands/AnalyzeCallsCommand.md:36
+- [[AnalyzerCommands]] → managed/commands/AnalyzerCommands.md:30
 - [[BuildCommand]] → managed/commands/BuildCommand.md:46
-- [[Phase Commands]] → managed/commands/PhaseCommands.md:72
+- [[Phase Commands]] → managed/commands/PhaseCommands.md:74
 - [[Unified Relationship Taxonomy]] → managed/concepts/unified-relationship-taxonomy.md:500
 - [[Build Pipeline Guide]] → managed/guides/build-pipeline-guide.md:254
 - [[Guides & Tutorials]] → managed/guides/index.md:47

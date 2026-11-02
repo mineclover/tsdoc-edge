@@ -87,8 +87,11 @@ export class SpecContentSimilarityChecker {
       }
     }
 
-    // Calculate overall similarity
-    const similarity = sectionCount > 0 ? totalSimilarity / sectionCount : 0;
+    // Calculate overall similarity normalized by comparable authored section count
+    const comparableSectionCount = Math.min(doc1.sections.length, doc2.sections.length);
+    const rawSimilarity =
+      comparableSectionCount > 0 && sectionCount > 0 ? totalSimilarity / comparableSectionCount : 0;
+    const similarity = Math.min(1, Math.max(0, rawSimilarity));
 
     // Determine suggestion
     const { suggestion, reason } = this.determineSuggestion(
@@ -141,7 +144,8 @@ export class SpecContentSimilarityChecker {
       throw new Error(`File not found: ${filePath}`);
     }
 
-    const content = fs.readFileSync(filePath, 'utf-8');
+    const rawContent = fs.readFileSync(filePath, 'utf-8');
+    const content = rawContent.replace(/^---\r?\n[\s\S]*?\r?\n---(?:\r?\n|$)/, '');
     const sections: DocumentSection[] = [];
 
     const lines = content.split('\n');
@@ -149,7 +153,7 @@ export class SpecContentSimilarityChecker {
     let currentContent: string[] = [];
 
     for (const line of lines) {
-      // Match markdown headings (## Section Name or ### Section Name)
+      // Match level-2 markdown headings (## Section Name)
       const match = line.match(/^##\s+(.+)$/);
 
       if (match) {
@@ -159,12 +163,18 @@ export class SpecContentSimilarityChecker {
           sections.push(currentSection);
         }
 
-        // Start new section
-        currentSection = {
-          name: match[1].trim(),
-          content: '',
-        };
-        currentContent = [];
+        const sectionName = match[1].trim();
+        // Skip auto-generated Backlinks section (and its ### subsections until next ## heading)
+        if (/^backlinks$/i.test(sectionName)) {
+          currentSection = null;
+          currentContent = [];
+        } else {
+          currentSection = {
+            name: sectionName,
+            content: '',
+          };
+          currentContent = [];
+        }
       } else if (currentSection) {
         currentContent.push(line);
       }

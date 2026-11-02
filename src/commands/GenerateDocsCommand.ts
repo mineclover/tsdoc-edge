@@ -63,7 +63,7 @@ export class GenerateDocsCommand extends BaseCommand {
    * @public
    */
   protected getUsage(): string {
-    return `tsdoc-edge generate-docs <source-path> [output-dir] [options]
+    return `tsdoc-edge docs generate <source-path> [output-dir] [options]
 
   Default output-dir: ./docs/generated
   Options:
@@ -95,7 +95,7 @@ export class GenerateDocsCommand extends BaseCommand {
         this.printError('Source path required');
         console.log();
         console.log('Usage:');
-        this.printInfo('  tsdoc-edge generate-docs <file|directory> [output-dir]');
+        this.printInfo('  tsdoc-edge docs generate <file|directory> [output-dir]');
         console.log();
         return this.failure('Source path required');
       }

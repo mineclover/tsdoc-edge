@@ -83,12 +83,12 @@ export class TreeCommand extends BaseCommand {
    * @public
    */
   protected getUsage(): string {
-    return `tsdoc-edge tree [path-filter]
+    return `tsdoc-edge symbol tree [path-filter]
 
 Examples:
-  tsdoc-edge tree                      Show all symbols
-  tsdoc-edge tree src/commands         Filter by path
-  tsdoc-edge tree DatabaseManager      Filter by name pattern`;
+  tsdoc-edge symbol tree                      Show all symbols
+  tsdoc-edge symbol tree src/commands         Filter by path
+  tsdoc-edge symbol tree DatabaseManager      Filter by name pattern`;
   }
 
   /**

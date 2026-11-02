@@ -75,7 +75,7 @@ export class UndocumentedCommand extends BaseCommand {
    * @public
    */
   protected getUsage(): string {
-    return `tsdoc-edge undocumented [options]
+    return `tsdoc-edge symbol undocumented [options]
 
   Options:
     --exclude-tests  Exclude symbols from test files (__tests__, .test.ts, .spec.ts)`;

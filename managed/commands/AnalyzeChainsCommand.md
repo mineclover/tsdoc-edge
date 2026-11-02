@@ -8,11 +8,17 @@ canonical: true
 
 # [[AnalyzeChainsCommand]]
 
-**Source**: `src/commands/AnalyzeChainsCommand.ts`
+**Source**: `src/commands/AnalyzeRelationshipsCommand.ts`
 
 ## Purpose
 
-Analyze dependency chains.
+Analyze dependency chains via the unified relationship analyzer.
+
+## Usage
+
+```bash
+tsdoc-edge relationship analyze --type=chains [options]
+```
 
 ## Features
 
@@ -44,5 +50,5 @@ Analyze dependency chains.
 
 ### Implemented By
 
-- AnalyzeChainsCommand → src/commands/AnalyzeChainsCommand.ts:1
+- AnalyzeChainsCommand → src/commands/AnalyzeRelationshipsCommand.ts:1
 

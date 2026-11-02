@@ -365,7 +365,7 @@ interface CollaborationMetrics {
 ### Referenced By
 
 - [[Commands Index]] → managed/COMMANDS.md:100
-- [[AnalyzerCommands]] → managed/commands/AnalyzerCommands.md:85
+- [[AnalyzerCommands]] → managed/commands/AnalyzerCommands.md:87
 - [[Integration Verification]] → managed/relationships/integration-verification.md:372
 - [[Temporal Order]] → managed/relationships/temporal-order.md:358
 

@@ -76,7 +76,7 @@ export class OrphansCommand extends BaseCommand {
    * @public
    */
   protected getUsage(): string {
-    return `tsdoc-edge orphans [options]
+    return `tsdoc-edge symbol orphans [options]
 
   Options:
     --accurate         Use database relationships for accurate detection (recommended)

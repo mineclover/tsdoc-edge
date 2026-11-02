@@ -25,10 +25,10 @@ Track type-level dependencies (parameter/return types, type aliases).
 - [[TSDoc Edge Documentation]] → managed/README.md:68
 - [[TypeChainTracer]] → managed/analyzers/TypeChainTracer.md:37
 - [[TypeDependencyAnalyzer]] → managed/analyzers/TypeDependencyAnalyzer.md:148
-- [[AnalyzeTypesCommand]] → managed/commands/AnalyzeTypesCommand.md:30
-- [[AnalyzerCommands]] → managed/commands/AnalyzerCommands.md:39
+- [[AnalyzeTypesCommand]] → managed/commands/AnalyzeTypesCommand.md:36
+- [[AnalyzerCommands]] → managed/commands/AnalyzerCommands.md:41
 - [[BuildCommand]] → managed/commands/BuildCommand.md:47
-- [[Phase Commands]] → managed/commands/PhaseCommands.md:35
+- [[Phase Commands]] → managed/commands/PhaseCommands.md:37
 - [[TypeChainCommand]] → managed/commands/TypeChainCommand.md:30
 - [[Guides & Tutorials]] → managed/guides/index.md:93
 - [[Code Dependency]] → managed/relationships/code-dependency.md:57

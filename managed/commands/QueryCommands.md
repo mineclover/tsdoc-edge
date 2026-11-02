@@ -8,11 +8,11 @@ canonical: true
 
 # [[QueryCommands]]
 
-**Source**: `src/commands/Phase5Commands.ts`, `src/commands/Phase7Commands.ts`
+**Source**: `src/commands/SymbolUnifiedCommand.ts`, `src/commands/SymbolQueryCommand.ts`
 
 ## Overview
 
-Query commands for exploring dependencies, usage, and project statistics.
+Query commands for exploring dependencies, usage, and project statistics (dispatched via `tsdoc-edge symbol` and `tsdoc-edge stats`).
 
 ## Commands
 
@@ -22,7 +22,7 @@ Show dependencies of a symbol.
 
 **Usage**: `tsdoc-edge symbol deps <symbol-name>`
 
-**Source**: `src/commands/Phase5Commands.ts`
+**Source**: `src/commands/DepsCommand.ts`
 
 **Output**:
 - Direct dependencies
@@ -35,7 +35,7 @@ Show reverse dependencies (who uses this symbol).
 
 **Usage**: `tsdoc-edge symbol who-uses <symbol-name>`
 
-**Source**: `src/commands/Phase5Commands.ts`
+**Source**: `src/commands/WhoUsesCommand.ts`
 
 **Output**:
 - Direct usages
@@ -48,7 +48,7 @@ Find orphaned code (unreachable from entry points).
 
 **Usage**: `tsdoc-edge symbol orphans`
 
-**Source**: `src/commands/Phase5Commands.ts`
+**Source**: `src/commands/OrphansCommand.ts`
 
 **Output**:
 - Orphaned files
@@ -61,7 +61,7 @@ Display project statistics.
 
 **Usage**: `tsdoc-edge stats`
 
-**Source**: `src/commands/Phase7Commands.ts`
+**Source**: `src/commands/StatsCommand.ts`
 
 **Output**:
 - Symbol counts by type
@@ -75,7 +75,7 @@ Find undocumented symbols.
 
 **Usage**: `tsdoc-edge symbol undocumented`
 
-**Source**: `src/commands/Phase7Commands.ts`
+**Source**: `src/commands/UndocumentedCommand.ts`
 
 ### [[UntestedCommand]]
 
@@ -83,7 +83,7 @@ Find untested code.
 
 **Usage**: `tsdoc-edge symbol untested`
 
-**Source**: `src/commands/Phase7Commands.ts`
+**Source**: `src/commands/UntestedCommand.ts`
 
 ### [[DocSymbolsCommand]]
 
@@ -149,5 +149,5 @@ Provides programmatic traversal, pathfinding, filtering, and subgraph querying o
 
 ### Implemented By
 
-- QueryCommands → src/commands/Phase5Commands.ts:1
+- QueryCommands → src/commands/SymbolUnifiedCommand.ts:1
 

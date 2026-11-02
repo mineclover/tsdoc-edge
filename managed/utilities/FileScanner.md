@@ -4,11 +4,14 @@ type: utility
 category: utility
 status: active
 canonical: true
+codeImplementation: not-applicable
 ---
 
 # [[FileScanner]]
 
-**Source**: `src/scanner/FileScanner.ts`
+**Source**: `src/indexer/ProjectIndexer.ts`
+
+> **Implementation Note**: Historical standalone file scanning was consolidated into `ProjectIndexer` (`src/indexer/ProjectIndexer.ts`) and `BuildCommand` (`src/commands/BuildCommand.ts`).
 
 ## Purpose
 
@@ -91,5 +94,5 @@ Returns:
 
 ### Implemented By
 
-- FileScanner → src/scanner/FileScanner.ts:1
+- FileScanner → src/indexer/ProjectIndexer.ts:1
 

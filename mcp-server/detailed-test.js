@@ -117,12 +117,12 @@ async function runDetailedTests() {
       validate: (res) => {
         const content = res.result?.content?.[0]?.text || '';
         const metrics = {
-          nodes: content.match(/Total Nodes.*?(\d+)/)?.[1],
-          rels: content.match(/Total Relationships.*?(\d+)/)?.[1],
+          nodes: content.match(/Total Nodes.*?([\d,]+)/)?.[1],
+          rels: content.match(/Total Relationships.*?([\d,]+)/)?.[1],
           density: content.match(/Graph Density.*?([\d.]+)/)?.[1],
         };
         log('DETAIL', `Nodes: ${metrics.nodes}, Rels: ${metrics.rels}, Density: ${metrics.density}`, colors.blue);
-        return metrics.nodes && metrics.rels && metrics.density;
+        return Boolean(metrics.nodes && metrics.rels && metrics.density);
       },
     },
 
@@ -134,9 +134,9 @@ async function runDetailedTests() {
       }),
       validate: (res) => {
         const content = res.result?.content?.[0]?.text || '';
-        const total = content.match(/Total: (\d+)/)?.[1];
-        log('DETAIL', `Found ${total || 0} test-coverage relationships`, colors.blue);
-        return content.includes('Relationships');
+        const total = Number((content.match(/Total: ([\d,]+)/)?.[1] || '0').replace(/,/g, ''));
+        log('DETAIL', `Found ${total} test-coverage relationships`, colors.blue);
+        return content.includes('Relationships') && total > 0;
       },
     },
 

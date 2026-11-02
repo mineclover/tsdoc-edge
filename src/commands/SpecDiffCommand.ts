@@ -73,9 +73,9 @@ export class SpecDiffCommand extends BaseCommand {
    * @public
    */
   protected getUsage(): string {
-    return `tsdoc-edge spec-diff <file> <from-version> <to-version>
+    return `tsdoc-edge spec diff <file> <from-version> <to-version>
 
-  Example: tsdoc-edge spec-diff managed/features/validation.md 1.0.0 2.0.0`;
+  Example: tsdoc-edge spec diff managed/features/validation.md 1.0.0 2.0.0`;
   }
 
   /**
@@ -96,8 +96,8 @@ export class SpecDiffCommand extends BaseCommand {
       const toVersion = args[2];
 
       if (!target || !fromVersion || !toVersion) {
-        this.printError('Usage: tsdoc-edge spec-diff <file> <from-version> <to-version>');
-        this.printInfo('Example: tsdoc-edge spec-diff managed/features/validation.md 1.0.0 2.0.0');
+        this.printError('Usage: tsdoc-edge spec diff <file> <from-version> <to-version>');
+        this.printInfo('Example: tsdoc-edge spec diff managed/features/validation.md 1.0.0 2.0.0');
         console.log();
         return this.failure('File and version numbers required');
       }

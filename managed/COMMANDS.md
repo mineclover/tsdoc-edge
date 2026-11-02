@@ -195,7 +195,8 @@ See [[Convention Pack Check]] for the full contract and CI exit semantics.
 
 - [[CLI Commands]] → managed/CLI-COMMANDS.md:59
 - [[TSDoc Edge Documentation]] → managed/README.md:177
-- [[UtilityCommands]] → managed/commands/UtilityCommands.md:314
+- [[Complete Workflow Architecture]] → managed/architecture/diagrams/mermaid-workflow-complete.md:188
+- [[UtilityCommands]] → managed/commands/UtilityCommands.md:294
 - [[Guides & Tutorials]] → managed/guides/index.md:350
 - [[Usage Scenarios]] → managed/guides/usage-scenarios.md:511
 - [[Primary Types Index]] → managed/primary-types/index.md:451
@@ -203,6 +204,6 @@ See [[Convention Pack Check]] for the full contract and CI exit semantics.
 - [[CliCommandSurfaceSpecification]] → managed/specs/domains/cli-command-surface-spec.md:401
 - [[TSDoc Edge User Guide]] → managed/user-guide.md:28
 - [[Example - Mermaid Workflow]] → managed/workflows/EXAMPLE-MERMAID-WORKFLOW.md:369
-- [[Workflows Index]] → managed/workflows/index.md:285
-- [[Mermaid Entrypoint Workflow]] → managed/workflows/mermaid-entrypoint-workflow.md:630
+- [[Workflows Index]] → managed/workflows/index.md:283
+- [[Mermaid Entrypoint Workflow]] → managed/workflows/mermaid-entrypoint-workflow.md:632
 

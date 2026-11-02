@@ -76,12 +76,12 @@ export class FindMethodCommand extends BaseCommand {
    * @public
    */
   protected getUsage(): string {
-    return `tsdoc-edge find-method <qualified-name>
+    return `tsdoc-edge symbol find-method <qualified-name>
 
   Examples:
-    tsdoc-edge find-method DataProcessor#loadCSV
-    tsdoc-edge find-method UserService.validateEmail
-    tsdoc-edge find-method processData`;
+    tsdoc-edge symbol find-method DataProcessor#loadCSV
+    tsdoc-edge symbol find-method UserService.validateEmail
+    tsdoc-edge symbol find-method processData`;
   }
 
   /**
@@ -102,12 +102,12 @@ export class FindMethodCommand extends BaseCommand {
       const query = args.find((arg) => !arg.startsWith('-'));
 
       if (!query) {
-        this.printError('Usage: tsdoc-edge find-method <qualified-name>');
+        this.printError('Usage: tsdoc-edge symbol find-method <qualified-name>');
         console.log();
         console.log('Examples:');
-        this.printInfo('  tsdoc-edge find-method DataProcessor#loadCSV');
-        this.printInfo('  tsdoc-edge find-method UserService.validateEmail');
-        this.printInfo('  tsdoc-edge find-method processData');
+        this.printInfo('  tsdoc-edge symbol find-method DataProcessor#loadCSV');
+        this.printInfo('  tsdoc-edge symbol find-method UserService.validateEmail');
+        this.printInfo('  tsdoc-edge symbol find-method processData');
         console.log();
         return this.failure('Query required');
       }

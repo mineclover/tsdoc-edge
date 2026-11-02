@@ -205,7 +205,12 @@ export interface DocSymbolValidation {
  */
 export interface DocSymbolError {
   /** Error type */
-  type: 'duplicate_definition' | 'orphaned_auxiliary' | 'missing_primary' | 'multiple_primaries';
+  type:
+    | 'duplicate_definition'
+    | 'orphaned_auxiliary'
+    | 'missing_primary'
+    | 'multiple_primaries'
+    | 'broken_source_path';
 
   /** Symbol name */
   symbolName: string;

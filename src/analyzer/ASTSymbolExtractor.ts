@@ -217,21 +217,39 @@ export class ASTSymbolExtractor {
     }
 
     // Extract function
-    if (ts.isFunctionDeclaration(node) && node.name) {
-      const symbol = this.extractFunctionSymbol(node, parentSymbol);
-      this.symbols.push(symbol);
+    if (ts.isFunctionDeclaration(node)) {
+      if (node.name) {
+        const symbol = this.extractFunctionSymbol(node, parentSymbol);
+        this.symbols.push(symbol);
+      }
+      return;
     }
 
     // Extract method
-    if (ts.isMethodDeclaration(node) && parentSymbol) {
-      const symbol = this.extractMethodSymbol(node, parentSymbol);
-      this.symbols.push(symbol);
+    if (ts.isMethodDeclaration(node)) {
+      if (parentSymbol) {
+        const symbol = this.extractMethodSymbol(node, parentSymbol);
+        this.symbols.push(symbol);
+      }
+      return;
+    }
+
+    // Do not descend into executable bodies for module symbol extraction
+    if (
+      ts.isConstructorDeclaration(node) ||
+      ts.isGetAccessorDeclaration(node) ||
+      ts.isSetAccessorDeclaration(node) ||
+      ts.isArrowFunction(node) ||
+      ts.isFunctionExpression(node)
+    ) {
+      return;
     }
 
     // Extract property
     if (ts.isPropertyDeclaration(node) && parentSymbol) {
       const symbol = this.extractPropertySymbol(node, parentSymbol);
       this.symbols.push(symbol);
+      return;
     }
 
     // Extract type alias
@@ -624,6 +642,7 @@ export class ASTSymbolExtractor {
   private extractVariableStatement(node: ts.VariableStatement): void {
     const declarationList = node.declarationList;
     const isConst = (declarationList.flags & ts.NodeFlags.Const) !== 0;
+    const isExported = this.hasExportModifier(node);
 
     for (const declaration of declarationList.declarations) {
       if (!ts.isIdentifier(declaration.name)) continue;
@@ -649,8 +668,8 @@ export class ASTSymbolExtractor {
         filePath: this.currentFilePath,
         line: pos.line + 1,
         column: pos.character,
-        isExported: this.hasExportModifier(node),
-        isPublic: true,
+        isExported,
+        isPublic: isExported,
         summary: this.extractJSDocSummary(node),
         declaredType: typeInfo?.declaredType,
         genericParams: typeInfo?.genericParams,

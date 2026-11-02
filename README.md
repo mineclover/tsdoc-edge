@@ -380,12 +380,13 @@ saved-file whole-project refreshes.
 | Metric | Value |
 |--------|-------|
 | CLI Commands | 20 canonical top-level (`tsdoc-edge help --tree`) |
-| Canonical `@ttsc/graph` | 8,354 internal (8,606 total) nodes / 16,980 internal (21,133 total) edges |
+| Canonical `@ttsc/graph` | 8,381 internal (8,634 total) nodes / 17,118 internal (21,335 total) edges |
 | Normative `SpecGraph` | 8 `project-spec` docs · 62 nodes · 54 bindings (`54/54` satisfied) |
-| Enrichment Symbol DB | 10,409 symbols / 22,064 domain+test relationships |
+| Enrichment Symbol DB | 9,088 symbols / 22,765 domain+test relationships |
+| Managed Checkpoints & Links | 308/308 `With [[Symbol]]` (`100%`) · 1,996 checked links (`0` broken) · `0` unused docs |
 | `@ttsc/lint` | 25 error rules (`0` findings) |
 | Health Scores | `90/100 (A)` system-status · `89/100 (A)` spec metrics |
-| Test Suites | 237 suites (3,247 tests) |
+| Test Suites | 237 suites (3,269 tests) |
 
 ---
 

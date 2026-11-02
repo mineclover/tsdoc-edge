@@ -212,6 +212,74 @@ This document intentionally has no single implementation owner.`
 
         expect(result?.primary?.codeImplementation).toBe('not-applicable');
       });
+
+      it('should ignore **Source**: inside fenced markdown code blocks and never overwrite frontmatter source', () => {
+        const withFrontmatter = path.join(tempDir, 'managed', 'fenced-with-frontmatter.md');
+        fs.writeFileSync(
+          withFrontmatter,
+          `---
+source: src/doc-symbol/DocumentSymbolParser.ts
+---
+# [[Document Symbol Parser]]
+
+## Example
+
+\`\`\`markdown
+# [[ExampleDoc]]
+
+**Source**: \`src/example/Fake.ts\`
+\`\`\`
+`
+        );
+
+        const resultWithFrontmatter = parser.parse(withFrontmatter);
+        expect(resultWithFrontmatter?.sourceFilePath).toBe(
+          'src/doc-symbol/DocumentSymbolParser.ts'
+        );
+
+        const withoutSource = path.join(tempDir, 'managed', 'fenced-without-source.md');
+        fs.writeFileSync(
+          withoutSource,
+          `# [[ExampleOnlyDoc]]
+
+\`\`\`markdown
+**Source**: \`src/example/Fake.ts\`
+\`\`\`
+`
+        );
+
+        const resultWithoutSource = parser.parse(withoutSource);
+        expect(resultWithoutSource?.sourceFilePath).toBeUndefined();
+      });
+
+      it('should give frontmatter source precedence over body **Source**: and ignore **Source**: in ## Backlinks', () => {
+        const precedenceFile = path.join(tempDir, 'managed', 'precedence.md');
+        fs.writeFileSync(
+          precedenceFile,
+          `---
+source: src/real/FrontmatterSource.ts
+---
+# [[PrecedenceDoc]]
+
+**Source**: \`src/other/BodySource.ts\`
+`
+        );
+
+        expect(parser.parse(precedenceFile)?.sourceFilePath).toBe('src/real/FrontmatterSource.ts');
+
+        const backlinksSourceFile = path.join(tempDir, 'managed', 'backlinks-source.md');
+        fs.writeFileSync(
+          backlinksSourceFile,
+          `# [[BacklinksOnlySource]]
+
+## Backlinks
+
+**Source**: \`src/example/FakeBacklinkSource.ts\`
+`
+        );
+
+        expect(parser.parse(backlinksSourceFile)?.sourceFilePath).toBeUndefined();
+      });
     });
 
     describe('error handling', () => {

@@ -496,7 +496,7 @@ vscode.commands.registerCommand('tsdoc.showImpactAnalysis', (symbolId, direction
 
 ### Implemented By
 
-- LSP Integration → src/lsp/cache-manager.ts:1
+- LSP Integration → src/lsp/server.ts:1
 - CacheEntry → src/lsp/cache-manager.ts:25
 - CacheManagerOptions → src/lsp/cache-manager.ts:40
 - CacheManager → src/lsp/cache-manager.ts:73

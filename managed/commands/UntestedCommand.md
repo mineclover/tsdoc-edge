@@ -242,8 +242,8 @@ Low Priority:
 - [[UndocumentedCommand]] → managed/commands/UndocumentedCommand.md:177
 - [[Integration Test Traceability]] → managed/concepts/integration-test-traceability.md:545
 - [[CI/CD Integration]] → managed/features/CICDIntegration.md:246
-- [[Dead Code Detection]] → managed/features/DeadCodeDetection.md:108
 - [[AnalysisFeatures]] → managed/features/analysis-features.md:296
+- [[Features Index]] → managed/features/index.md:136
 - [[TestRelationships]] → managed/types/TestRelationships.md:124
 - [[UnifiedRelationships]] → managed/types/UnifiedRelationships.md:205
 

@@ -35,7 +35,7 @@ canonical: true
 - [[TSDoc Edge Documentation]] → managed/README.md:54
 - [[ASTSymbolExtractor]] → managed/analyzers/ASTSymbolExtractor.md:297
 - [[Analyzers & Extractors]] → managed/analyzers/index.md:367
-- [[AnalyzeIOCommand]] → managed/commands/AnalyzeIOCommand.md:29
+- [[AnalyzeIOCommand]] → managed/commands/AnalyzeIOCommand.md:35
 - [[SymbolGraphFeatures]] → managed/features/symbol-graph.md:220
 - [[Analyzer Development Guide]] → managed/guides/analyzer-development-guide.md:28
 - [[Build Pipeline Guide]] → managed/guides/build-pipeline-guide.md:272

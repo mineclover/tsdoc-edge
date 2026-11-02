@@ -31,9 +31,9 @@ canonical graph 기반 metric으로 승격하려면 canonical node ID와 revisio
 - [[Commands Index]] → managed/COMMANDS.md:80
 - [[TSDoc Edge Documentation]] → managed/README.md:65
 - [[TestCoverageAnalyzer]] → managed/analyzers/TestCoverageAnalyzer.md:35
-- [[TestRelationshipAnalyzer]] → managed/analyzers/TestRelationshipAnalyzer.md:40
-- [[AnalyzerCommands]] → managed/commands/AnalyzerCommands.md:61
-- [[Phase Commands]] → managed/commands/PhaseCommands.md:48
+- [[TestRelationshipAnalyzer]] → managed/analyzers/TestRelationshipAnalyzer.md:38
+- [[AnalyzerCommands]] → managed/commands/AnalyzerCommands.md:63
+- [[Phase Commands]] → managed/commands/PhaseCommands.md:50
 - [[Coverage Metrics Contract]] → managed/features/coverage-metrics-contract.md:277
 - [[Guides & Tutorials]] → managed/guides/index.md:85
 - [[Relationship Analysis Guide]] → managed/guides/relationship-analysis-guide.md:486

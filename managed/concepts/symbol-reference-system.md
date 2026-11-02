@@ -297,6 +297,7 @@ tsdoc-edge validate docs managed 2>&1 | grep "missing_primary"
 
 - [[SymbolFixCommand]] → managed/commands/SymbolFixCommand.md:382
 - [[SymbolQueryCommand]] → managed/commands/SymbolQueryCommand.md:250
+- [[DocumentSymbolSystem]] → managed/concepts/document-symbol-system.md:275
 - [[Concepts Index]] → managed/concepts/index.md:248
 - [[SSOT]] → managed/concepts/ssot.md:69
 - [[DocumentSymbolParser]] → managed/features/DocumentSymbolParser.md:281
@@ -305,7 +306,6 @@ tsdoc-edge validate docs managed 2>&1 | grep "missing_primary"
 
 ### Implemented By
 
-- Symbol Reference System → src/commands/BuildCommand.ts:1
 - DocumentSymbol → src/utilities/DocumentSymbolLister.ts:27
 - DocumentSymbolLister → src/utilities/DocumentSymbolLister.ts:63
 - ReferenceType → src/utilities/FileReferenceUpdater.ts:24

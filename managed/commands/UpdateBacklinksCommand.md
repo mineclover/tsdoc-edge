@@ -35,6 +35,7 @@ canonical: true
 - [[CLI Commands]] → managed/CLI-COMMANDS.md:44
 - [[TSDoc Edge Documentation]] → managed/README.md:116
 - [[SyncCommand]] → managed/commands/SyncCommand.md:25
+- [[DocumentSymbolSystem]] → managed/concepts/document-symbol-system.md:174
 - [[DocumentSymbolRegistry]] → managed/features/DocumentSymbolRegistry.md:292
 - [[AutoIndexing]] → managed/features/auto-indexing.md:72
 - [[CLI Command Development Guide]] → managed/guides/command-development-guide.md:250

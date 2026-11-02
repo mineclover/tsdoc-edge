@@ -167,4 +167,34 @@ describe('Streamlined 20-Command CLI Surface', () => {
       fs.rmSync(emptyDir, { recursive: true, force: true });
     }
   });
+
+  it('never references retired flat top-level commands in src/commands help or runtime tips', () => {
+    const validFirstTokens = new Set<string>();
+    for (const cmd of registry.getAll()) {
+      validFirstTokens.add(cmd.getName());
+      for (const alias of cmd.getAlias()) {
+        validFirstTokens.add(alias);
+      }
+    }
+    validFirstTokens.add('version');
+
+    const commandsDir = path.resolve(__dirname, '../../commands');
+    const offenders: string[] = [];
+    for (const entry of fs.readdirSync(commandsDir)) {
+      if (!entry.endsWith('.ts')) continue;
+      const fullPath = path.join(commandsDir, entry);
+      const lines = fs.readFileSync(fullPath, 'utf8').split('\n');
+      lines.forEach((line, idx) => {
+        const re = /tsdoc-edge\s+([a-z][a-z0-9-]*)/g;
+        let match = re.exec(line);
+        while (match !== null) {
+          if (!validFirstTokens.has(match[1])) {
+            offenders.push(`${entry}:${idx + 1}: tsdoc-edge ${match[1]}`);
+          }
+          match = re.exec(line);
+        }
+      });
+    }
+    expect(offenders).toEqual([]);
+  });
 });

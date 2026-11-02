@@ -8,7 +8,7 @@ canonical: true
 
 # [[InitCommand]]
 
-**Source**: `src/commands/Phase4Commands.ts:153`
+**Source**: `src/commands/InitCommand.ts`
 
 ## Purpose
 
@@ -389,6 +389,5 @@ if (configManager.exists()) {
 
 ### Implemented By
 
-- InitCommand → src/commands/Phase4Commands.ts:153:1
 - InitCommand → src/commands/InitCommand.ts:27
 

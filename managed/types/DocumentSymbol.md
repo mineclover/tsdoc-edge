@@ -131,5 +131,5 @@ Special footnote references:
 - Backlink → src/types/feature/doc-symbol.ts:168
 - DocSymbolValidation → src/types/feature/doc-symbol.ts:190
 - DocSymbolError → src/types/feature/doc-symbol.ts:206
-- DocSymbolWarning → src/types/feature/doc-symbol.ts:234
+- DocSymbolWarning → src/types/feature/doc-symbol.ts:239
 

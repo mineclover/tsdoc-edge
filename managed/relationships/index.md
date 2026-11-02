@@ -249,8 +249,8 @@ sqlite3 .tsdoc/symbols.db "SELECT type, COUNT(*) FROM unified_relationships GROU
 - [[Commands Index]] → managed/COMMANDS.md:185
 - [[TSDoc Edge Documentation]] → managed/README.md:178
 - [[Analyzers & Extractors]] → managed/analyzers/index.md:398
-- [[AnalyzerCommands]] → managed/commands/AnalyzerCommands.md:254
-- [[RelationshipCommands]] → managed/commands/RelationshipCommands.md:167
+- [[AnalyzerCommands]] → managed/commands/AnalyzerCommands.md:256
+- [[RelationshipCommands]] → managed/commands/RelationshipCommands.md:169
 - [[Concepts Index]] → managed/concepts/index.md:283
 - [[Analyzer Status]] → managed/features/analyzer-status.md:305
 - [[Features Index]] → managed/features/index.md:350
@@ -259,7 +259,7 @@ sqlite3 .tsdoc/symbols.db "SELECT type, COUNT(*) FROM unified_relationships GROU
 - [[Usage Scenarios]] → managed/guides/usage-scenarios.md:250
 - [[Quick Start Guide]] → managed/quick-start.md:250
 - [[TSDoc Edge User Guide]] → managed/user-guide.md:27
-- [[Workflows Index]] → managed/workflows/index.md:287
+- [[Workflows Index]] → managed/workflows/index.md:285
 
 ### Implemented By
 

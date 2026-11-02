@@ -7,11 +7,12 @@ This file provides guidance to Codex (Codex.ai/code) when working with code in t
 | Metric | Value |
 |--------|-------|
 | CLI Commands | 20 top-level (10 Core + 7 Unified Groups + 3 Revision/Coverage) |
-| Test Cases | 3,247 (237 suites) |
-| Symbols | 10,409 (Enrichment DB) |
-| Canonical `@ttsc/graph` | 8,354 internal (8,606 total) nodes / 16,980 internal (21,133 total) edges |
+| Test Cases | 3,269 (237 suites) |
+| Symbols | 9,088 (Enrichment DB, local function-body variables excluded) |
+| Canonical `@ttsc/graph` | 8,381 internal (8,634 total) nodes / 17,118 internal (21,335 total) edges |
 | Normative `SpecGraph` | 8 `project-spec` docs · 62 nodes · 54 bindings (`54/54` satisfied) |
-| Code ↔ Doc `@doc` Coverage | 310/310 `src/` files + 6/6 `mcp-server/src/` files (`100%` file coverage · `0` unused docs) |
+| Managed Docs & Links | 308/308 `With [[Symbol]]` (`100%`) · 1,996 links (`0` broken) · `0` unused docs |
+| Code ↔ Doc `@doc` Coverage | 310/310 `src/` files + 6/6 `mcp-server/src/` files (`100%` file coverage · `78.7%` effective symbol coverage) |
 | Custom TSDoc Tags | 22 + Standard 29 + `@ttsc/graph` 6 |
 | `@ttsc/lint` | 25 error rules (0 findings) |
 | Health Score | 90/100 (A) system-status · 89/100 (A) spec metrics · 93/100 (A+) core modules |

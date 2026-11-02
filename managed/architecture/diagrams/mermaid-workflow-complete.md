@@ -1,12 +1,14 @@
 ---
-title: Complete Mermaid Entrypoint Workflow
+title: Complete Workflow Architecture
 type: architecture-diagram
 category: workflow
 status: active
+canonical: true
+codeImplementation: not-applicable
 created-at: 2025-11-08
 ---
 
-# Complete Mermaid Entrypoint Workflow
+# [[Complete Workflow Architecture]]
 
 > **Visual representation of the entire .mmd → explore → promote → validate cycle**
 
@@ -191,3 +193,12 @@ Promoted Symbols:
 **Created**: 2025-11-08
 **Purpose**: Visual representation of complete .mmd-based workflow
 **Improvement**: 14.3% → 95.1% symbol coverage (6.6x improvement)
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[Mermaid Entrypoint Workflow]] → managed/workflows/mermaid-entrypoint-workflow.md:613
+

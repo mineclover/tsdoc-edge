@@ -8,6 +8,8 @@ canonical: true
 
 # [[RelationshipCommands]]
 
+**Source**: `src/commands/RelationshipCommand.ts`
+
 > Commands for querying, analyzing, and visualizing symbol relationships
 
 ## Overview
@@ -41,15 +43,15 @@ tsdoc-edge relationship path <from> <to> [options]
 
 **Source**: `src/commands/RelationshipPathCommand.ts`
 
-### query-inferred
+### relationship analyze
 
-Query inferred relationships (computed, not stored).
+Runs unified relationship analyzers (`calls`, `types`, `chains`, `io`, `tests`, `all`, etc.) against the project graph.
 
 ```bash
-tsdoc-edge query-inferred <symbol-id> [options]
+tsdoc-edge relationship analyze --type=<type> [options]
 ```
 
-**Source**: `src/commands/QueryInferredCommand.ts`
+**Source**: `src/commands/AnalyzeRelationshipsCommand.ts`
 
 ## Analysis Commands
 
@@ -178,7 +180,7 @@ tsdoc-edge relationship help
 
 ### Implemented By
 
-- RelationshipCommands → src/commands/RelationshipQueryCommand.ts:1
+- RelationshipCommands → src/commands/RelationshipCommand.ts:1
 - AnalyzeRelationshipsCommand → src/commands/AnalyzeRelationshipsCommand.ts:42
 - RelationshipCommand → src/commands/RelationshipCommand.ts:60
 

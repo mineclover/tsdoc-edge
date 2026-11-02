@@ -8,11 +8,17 @@ canonical: true
 
 # [[AnalyzeCallsCommand]]
 
-**Source**: `src/commands/AnalyzeCallsCommand.ts`
+**Source**: `src/commands/AnalyzeRelationshipsCommand.ts`
 
 ## Purpose
 
-Analyze function call relationships.
+Analyze function call relationships via the unified relationship analyzer.
+
+## Usage
+
+```bash
+tsdoc-edge relationship analyze --type=calls [options]
+```
 
 ## Features
 
@@ -45,5 +51,5 @@ Analyze function call relationships.
 
 ### Implemented By
 
-- AnalyzeCallsCommand → src/commands/AnalyzeCallsCommand.ts:1
+- AnalyzeCallsCommand → src/commands/AnalyzeRelationshipsCommand.ts:1
 

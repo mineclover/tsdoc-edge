@@ -420,10 +420,12 @@ symbols.forEach(sym => {
 - [[UpdateBacklinksCommand]] → managed/commands/UpdateBacklinksCommand.md:26
 - [[UpdateSymbolRefsCommand]] → managed/commands/UpdateSymbolRefsCommand.md:29
 - [[ValidateSymbolRefsCommand]] → managed/commands/ValidateSymbolRefsCommand.md:30
+- [[DocumentSymbolSystem]] → managed/concepts/document-symbol-system.md:14
 - [[Concepts Index]] → managed/concepts/index.md:249
 - [[SSOT]] → managed/concepts/ssot.md:70
 - [[Spec Management System]] → managed/core/spec-management-system.md:60
 - [[Storage System]] → managed/core/storage-system.md:331
+- [[Features Index]] → managed/features/index.md:292
 - [[Guides & Tutorials]] → managed/guides/index.md:407
 - [[Usage Scenarios]] → managed/guides/usage-scenarios.md:163
 - [[Parser Components]] → managed/parser/index.md:119

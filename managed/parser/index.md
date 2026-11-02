@@ -125,6 +125,7 @@ const symbols = docParser.parse(markdownFile);
 ### Referenced By
 
 - [[TSDoc Edge Documentation]] → managed/README.md:195
+- [[DocumentSymbolSystem]] → managed/concepts/document-symbol-system.md:52
 - [[CoreWorkflow]] → managed/features/core-workflow.md:106
 - [[ValidationFeatures]] → managed/features/validation-features.md:250
 

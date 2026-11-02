@@ -52,13 +52,13 @@ interface RenameValidation {
  * @example
  * ```bash
  * # Rename symbol
- * tsdoc-edge symbol-rename "Old Symbol" "New Symbol"
+ * tsdoc-edge symbol rename "Old Symbol" "New Symbol"
  *
  * # Dry run (preview only)
- * tsdoc-edge symbol-rename "Old Symbol" "New Symbol" --dry-run
+ * tsdoc-edge symbol rename "Old Symbol" "New Symbol" --dry-run
  *
  * # Auto-confirm
- * tsdoc-edge symbol-rename "Old Symbol" "New Symbol" --yes
+ * tsdoc-edge symbol rename "Old Symbol" "New Symbol" --yes
  * ```
  */
 export class SymbolRenameCommand extends BaseCommand {
@@ -93,7 +93,7 @@ export class SymbolRenameCommand extends BaseCommand {
    * @public
    */
   protected getUsage(): string {
-    return `tsdoc-edge symbol-rename <old-symbol> <new-symbol> [options]
+    return `tsdoc-edge symbol rename <old-symbol> <new-symbol> [options]
 
   Arguments:
     old-symbol  Current symbol name (without [[ ]])
@@ -105,9 +105,9 @@ export class SymbolRenameCommand extends BaseCommand {
     --base-dir=DIR  Base directory (default: managed)
 
   Examples:
-    tsdoc-edge symbol-rename "Old Symbol" "New Symbol"
-    tsdoc-edge symbol-rename "Feature A" "Feature B" --dry-run
-    tsdoc-edge symbol-rename "OldName" "NewName" --yes`;
+    tsdoc-edge symbol rename "Old Symbol" "New Symbol"
+    tsdoc-edge symbol rename "Feature A" "Feature B" --dry-run
+    tsdoc-edge symbol rename "OldName" "NewName" --yes`;
   }
 
   /**
@@ -267,10 +267,10 @@ export class SymbolRenameCommand extends BaseCommand {
       console.log();
       console.log(`Next steps:`);
       console.log(
-        `  1. Run ${colors.cyan}tsdoc-edge update-backlinks ${baseDir}${colors.reset} to regenerate backlinks`
+        `  1. Run ${colors.cyan}tsdoc-edge docs backlinks ${baseDir}${colors.reset} to regenerate backlinks`
       );
       console.log(
-        `  2. Run ${colors.cyan}tsdoc-edge validate-symbol-refs ${baseDir}${colors.reset} to verify integrity`
+        `  2. Run ${colors.cyan}tsdoc-edge validate refs ${baseDir}${colors.reset} to verify integrity`
       );
 
       return this.success();

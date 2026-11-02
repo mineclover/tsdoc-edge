@@ -58,7 +58,7 @@ export class PromoteSymbolCommand extends BaseCommand {
    * @public
    */
   protected getUsage(): string {
-    return `tsdoc-edge promote-symbol <source-file> <symbol-name> [target-dir] [options]
+    return `tsdoc-edge symbol promote <source-file> <symbol-name> [target-dir] [options]
 
   Default target-dir: managed/relationships
   Options:
@@ -91,8 +91,8 @@ export class PromoteSymbolCommand extends BaseCommand {
         this.printError('Usage: promote-symbol <source-file> <symbol-name> [target-dir]');
         console.log();
         console.log('Examples:');
-        console.log('  tsdoc-edge promote-symbol docs/overview.md "Code Dependency"');
-        console.log('  tsdoc-edge promote-symbol diagram.md "IO Dependency" managed/relationships');
+        console.log('  tsdoc-edge symbol promote docs/overview.md "Code Dependency"');
+        console.log('  tsdoc-edge symbol promote diagram.md "IO Dependency" managed/relationships');
         console.log();
         return this.failure('Missing arguments');
       }
@@ -198,7 +198,7 @@ export class PromoteSymbolCommand extends BaseCommand {
       console.log('Next steps:');
       console.log(`  1. Review canonical file: ${targetPath}`);
       console.log('  2. Fill in TODO sections with implementation details');
-      console.log('  3. Validate: tsdoc-edge validate-symbol-refs managed');
+      console.log('  3. Validate: tsdoc-edge validate refs managed');
       console.log();
 
       return this.success(

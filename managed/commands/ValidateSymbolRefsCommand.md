@@ -39,6 +39,7 @@ Checks:
 - [[SymbolFixCommand]] → managed/commands/SymbolFixCommand.md:384
 - [[SymbolQueryCommand]] → managed/commands/SymbolQueryCommand.md:181
 - [[ValidateSpecCommand]] → managed/commands/ValidateSpecCommand.md:319
+- [[DocumentSymbolSystem]] → managed/concepts/document-symbol-system.md:175
 - [[CI/CD Integration]] → managed/features/CICDIntegration.md:248
 - [[AutoIndexing]] → managed/features/auto-indexing.md:77
 - [[ValidationFeatures]] → managed/features/validation-features.md:246
@@ -48,5 +49,5 @@ Checks:
 
 ### Implemented By
 
-- ValidateSymbolRefsCommand → src/commands/ValidateSymbolRefsCommand.ts:84
+- ValidateSymbolRefsCommand → src/commands/ValidateSymbolRefsCommand.ts:85
 

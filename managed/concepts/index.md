@@ -67,7 +67,7 @@ See [[BuildCommand]]...    ← Inline (simple link)
 ---
 
 ### [[Document Symbol System]]
-**Path**: `document-symbol-system.md`
+**Path**: `document-symbol-system.md` | **Link**: [[DocumentSymbolSystem]]
 **Priority**: ⭐⭐ High
 
 Wiki 스타일 `[[Symbol]]` 문법으로 문서와 코드를 양방향 연결.

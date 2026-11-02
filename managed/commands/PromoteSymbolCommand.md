@@ -36,6 +36,7 @@ Promote auxiliary symbols to primary definitions.
 ### Referenced By
 
 - [[TSDoc Edge Documentation]] → managed/README.md:114
+- [[DocumentSymbolSystem]] → managed/concepts/document-symbol-system.md:178
 - [[Guides & Tutorials]] → managed/guides/index.md:214
 
 ### Implemented By

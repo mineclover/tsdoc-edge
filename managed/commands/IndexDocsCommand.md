@@ -88,6 +88,7 @@ Related: [[Concept#Section]]
 - [[TSDoc Edge Documentation]] → managed/README.md:111
 - [[CoverageReportCommand]] → managed/commands/CoverageReportCommand.md:268
 - [[SyncCommand]] → managed/commands/SyncCommand.md:25
+- [[DocumentSymbolSystem]] → managed/concepts/document-symbol-system.md:173
 - [[Symbol Reference System]] → managed/concepts/symbol-reference-system.md:290
 - [[DocumentSymbolParser]] → managed/features/DocumentSymbolParser.md:183
 - [[DocumentSymbolRegistry]] → managed/features/DocumentSymbolRegistry.md:290

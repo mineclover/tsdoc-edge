@@ -417,5 +417,89 @@ export class FirstDeclaredClass {}
       expect(result.symbols).toHaveLength(1);
       expect(result.symbols[0]?.summary).toBe('Actual symbol summary');
     });
+
+    it('should not extract local variables inside function or arrow bodies and should mark unexported variables non-public', () => {
+      const testFile = path.join(tempDir, 'scoping-and-visibility.ts');
+      const sourceCode = `
+export const MAX_ITEMS = 10;
+const internalCache = new Map<string, number>();
+
+export function foo(input: string): number {
+  const startLine = 1;
+  let mutableCounter = input.length + startLine;
+  const nestedHelper = () => {
+    const innerArrowLocal = 42;
+    return innerArrowLocal;
+  };
+  return mutableCounter + nestedHelper();
+}
+
+export const arrowHandler = (value: number): number => {
+  const arrowLocal = value * 2;
+  return arrowLocal;
+};
+
+(() => {
+  const iifeLocal = 'ephemeral';
+  void iifeLocal;
+})();
+
+export class ScopedService {
+  constructor() {
+    const ctorLocal = 'init';
+    void ctorLocal;
+  }
+
+  get currentSize(): number {
+    const getterLocal = internalCache.size;
+    return getterLocal;
+  }
+
+  run(): void {
+    const methodLocal = true;
+    void methodLocal;
+  }
+}
+`;
+
+      const result = extractor.extract(testFile, sourceCode);
+      const names = result.symbols.map((s) => s.name);
+
+      expect(names).toEqual(
+        expect.arrayContaining([
+          'MAX_ITEMS',
+          'internalCache',
+          'foo',
+          'arrowHandler',
+          'ScopedService',
+          'ScopedService.run',
+        ])
+      );
+      expect(names).not.toContain('startLine');
+      expect(names).not.toContain('mutableCounter');
+      expect(names).not.toContain('nestedHelper');
+      expect(names).not.toContain('innerArrowLocal');
+      expect(names).not.toContain('arrowLocal');
+      expect(names).not.toContain('iifeLocal');
+      expect(names).not.toContain('ctorLocal');
+      expect(names).not.toContain('getterLocal');
+      expect(names).not.toContain('methodLocal');
+
+      const maxItems = result.symbols.find((s) => s.name === 'MAX_ITEMS');
+      expect(maxItems).toMatchObject({
+        name: 'MAX_ITEMS',
+        type: 'constant',
+        isExported: true,
+        isPublic: true,
+      });
+
+      const cache = result.symbols.find((s) => s.name === 'internalCache');
+      expect(cache).toMatchObject({
+        name: 'internalCache',
+        type: 'variable',
+        isExported: false,
+        isPublic: false,
+      });
+    });
   });
 });

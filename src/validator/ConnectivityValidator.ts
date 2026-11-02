@@ -8,7 +8,11 @@
  */
 
 import type { SymbolGraphBuilder } from '../graph/SymbolGraphBuilder';
-import { SymbolSearchEngine } from '../graph/SymbolSearchEngine';
+import {
+  isTestArtifactSymbol,
+  isUnexportedTopLevelSymbol,
+  SymbolSearchEngine,
+} from '../graph/SymbolSearchEngine';
 import type { ValidationResult } from '../types';
 import type {
   ConnectivityAnalysis,
@@ -146,7 +150,9 @@ export class ConnectivityValidator {
   private calculateConnectivityScore(
     analysis: Omit<ConnectivityAnalysis, 'connectivityScore'>
   ): number {
-    const totalSymbols = this.graphBuilder.getAllSymbols().length;
+    const totalSymbols = this.graphBuilder
+      .getAllSymbols()
+      .filter((s) => !isTestArtifactSymbol(s)).length;
     if (totalSymbols === 0) return 100;
 
     // Weight factors for different issues
@@ -179,7 +185,12 @@ export class ConnectivityValidator {
    * @returns Array of validation results
    */
   validateSymbol(symbol: Symbol): ValidationResult[] {
+    if (isTestArtifactSymbol(symbol)) {
+      return [];
+    }
+
     const results: ValidationResult[] = [];
+    const isPublicApi = symbol.isPublic && !isUnexportedTopLevelSymbol(symbol);
 
     // Check documentation
     if (!symbol.summary || symbol.summary.trim() === '') {
@@ -191,7 +202,7 @@ export class ConnectivityValidator {
     }
 
     // Check tests for public APIs
-    if (symbol.isPublic && symbol.tests.length === 0) {
+    if (isPublicApi && symbol.tests.length === 0) {
       results.push({
         ruleId: 'require-tests',
         severity: 'error',
@@ -200,7 +211,7 @@ export class ConnectivityValidator {
     }
 
     // Check responsibility definition
-    if (symbol.isPublic && !symbol.responsibility) {
+    if (isPublicApi && !symbol.responsibility) {
       results.push({
         ruleId: 'require-responsibility',
         severity: 'warning',
@@ -211,7 +222,7 @@ export class ConnectivityValidator {
     // Check contract for functions/methods
     if (
       (symbol.type === 'function' || symbol.type === 'method') &&
-      symbol.isPublic &&
+      isPublicApi &&
       !symbol.contract
     ) {
       results.push({
@@ -312,7 +323,7 @@ export class ConnectivityValidator {
    * @testScenario Provide fix suggestions
    */
   generateDetailedReport(): DetailedValidationReport {
-    const allSymbols = this.graphBuilder.getAllSymbols();
+    const allSymbols = this.graphBuilder.getAllSymbols().filter((s) => !isTestArtifactSymbol(s));
     const allIssues: DetailedValidationIssue[] = [];
 
     // Collect all issues from all symbols
@@ -403,7 +414,12 @@ export class ConnectivityValidator {
    * @returns Array of detailed issues
    */
   private extractDetailedIssues(symbol: Symbol): DetailedValidationIssue[] {
+    if (isTestArtifactSymbol(symbol)) {
+      return [];
+    }
+
     const issues: DetailedValidationIssue[] = [];
+    const isPublicApi = symbol.isPublic && !isUnexportedTopLevelSymbol(symbol);
 
     // Check documentation
     if (!symbol.summary || symbol.summary.trim() === '') {
@@ -421,7 +437,7 @@ export class ConnectivityValidator {
     }
 
     // Check tests for public APIs
-    if (symbol.isPublic && symbol.tests.length === 0) {
+    if (isPublicApi && symbol.tests.length === 0) {
       issues.push({
         symbolId: symbol.id,
         symbolName: symbol.name,
@@ -436,7 +452,7 @@ export class ConnectivityValidator {
     }
 
     // Check responsibility definition
-    if (symbol.isPublic && !symbol.responsibility) {
+    if (isPublicApi && !symbol.responsibility) {
       issues.push({
         symbolId: symbol.id,
         symbolName: symbol.name,
@@ -453,7 +469,7 @@ export class ConnectivityValidator {
     // Check contract for functions/methods
     if (
       (symbol.type === 'function' || symbol.type === 'method') &&
-      symbol.isPublic &&
+      isPublicApi &&
       !symbol.contract
     ) {
       issues.push({
@@ -547,10 +563,13 @@ export class ConnectivityValidator {
     output += `Total Issues: ${report.totalIssues}\n`;
     output += `Completion: ${report.completionPercentage.toFixed(2)}%\n\n`;
 
-    output += `Documentation: ${report.summary.documented}/${report.totalSymbols} (${((report.summary.documented / report.totalSymbols) * 100).toFixed(1)}%)\n`;
-    output += `Tests: ${report.summary.tested}/${report.totalSymbols} (${((report.summary.tested / report.totalSymbols) * 100).toFixed(1)}%)\n`;
-    output += `Responsibility: ${report.summary.withResponsibility}/${report.totalSymbols} (${((report.summary.withResponsibility / report.totalSymbols) * 100).toFixed(1)}%)\n`;
-    output += `Contract: ${report.summary.withContract}/${report.totalSymbols} (${((report.summary.withContract / report.totalSymbols) * 100).toFixed(1)}%)\n\n`;
+    const formatRatio = (count: number): string =>
+      report.totalSymbols > 0 ? ((count / report.totalSymbols) * 100).toFixed(1) : '0.0';
+
+    output += `Documentation: ${report.summary.documented}/${report.totalSymbols} (${formatRatio(report.summary.documented)}%)\n`;
+    output += `Tests: ${report.summary.tested}/${report.totalSymbols} (${formatRatio(report.summary.tested)}%)\n`;
+    output += `Responsibility: ${report.summary.withResponsibility}/${report.totalSymbols} (${formatRatio(report.summary.withResponsibility)}%)\n`;
+    output += `Contract: ${report.summary.withContract}/${report.totalSymbols} (${formatRatio(report.summary.withContract)}%)\n\n`;
 
     // Issues by severity
     output += `🚨 ISSUES BY SEVERITY\n`;

@@ -78,10 +78,5 @@ warning은 링크 허브의 `many_references` 33건이며, 새 warning 증가만
 
 ### Referenced By
 
-- [[Workflows Index]] → managed/workflows/index.md:147
-
-### Implemented By
-
-- Document Validation Warning Policy → 를 모두 code connection 입력으로 사용하고,
-단일 구현 owner가 없는 문서는 :1
+- [[Workflows Index]] → managed/workflows/index.md:145
 

@@ -381,5 +381,6 @@ File coverage: 92.3% ✓
 
 ### Referenced By
 
-- [[Workflows Index]] → managed/workflows/index.md:239
+- [[Complete Workflow Architecture]] → managed/architecture/diagrams/mermaid-workflow-complete.md:187
+- [[Workflows Index]] → managed/workflows/index.md:237
 

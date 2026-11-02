@@ -403,7 +403,7 @@ tsdoc-edge analyze --callback-depth
 
 - [[Commands Index]] → managed/COMMANDS.md:100
 - [[CallGraphAnalyzer]] → managed/analyzers/CallGraphAnalyzer.md:408
-- [[AnalyzerCommands]] → managed/commands/AnalyzerCommands.md:175
+- [[AnalyzerCommands]] → managed/commands/AnalyzerCommands.md:177
 - [[Unified Relationship Taxonomy]] → managed/concepts/unified-relationship-taxonomy.md:503
 - [[Event Flow]] → managed/relationships/event-flow.md:109
 

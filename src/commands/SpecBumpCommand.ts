@@ -73,10 +73,10 @@ export class SpecBumpCommand extends BaseCommand {
    * @public
    */
   protected getUsage(): string {
-    return `tsdoc-edge spec-bump <file> <bump-type>
+    return `tsdoc-edge spec bump <file> <bump-type>
 
   Bump types: major, minor, patch
-  Example: tsdoc-edge spec-bump managed/features/validation.md minor`;
+  Example: tsdoc-edge spec bump managed/features/validation.md minor`;
   }
 
   /**
@@ -96,9 +96,9 @@ export class SpecBumpCommand extends BaseCommand {
       const bumpType = args[1] as 'major' | 'minor' | 'patch' | undefined;
 
       if (!target) {
-        this.printError('Usage: tsdoc-edge spec-bump <file> <bump-type>');
+        this.printError('Usage: tsdoc-edge spec bump <file> <bump-type>');
         this.printInfo('Bump types: major, minor, patch');
-        this.printInfo('Example: tsdoc-edge spec-bump managed/features/validation.md minor');
+        this.printInfo('Example: tsdoc-edge spec bump managed/features/validation.md minor');
         console.log();
         return this.failure('File and bump type required');
       }

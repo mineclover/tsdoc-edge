@@ -64,15 +64,15 @@ for SpecGraph lifecycle operations, and `convention check --pack <file>` for rev
 
 ### Referenced By
 
-- [[Phase Commands]] → managed/commands/PhaseCommands.md:100
-- [[UtilityCommands]] → managed/commands/UtilityCommands.md:315
+- [[Phase Commands]] → managed/commands/PhaseCommands.md:102
+- [[UtilityCommands]] → managed/commands/UtilityCommands.md:295
 - [[CLI Command Development Guide]] → managed/guides/command-development-guide.md:791
 - [[CliCommandSurfaceSpecification]] → managed/specs/domains/cli-command-surface-spec.md:332
 
 ### Implemented By
 
 - CheckDuplicatesCommand → src/commands/CheckDuplicatesCommand.ts:73
-- CheckLinksCommand → src/commands/CheckLinksCommand.ts:45
+- CheckLinksCommand → src/commands/CheckLinksCommand.ts:55
 - CoreApiCommand → src/commands/CoreApiCommand.ts:43
 - FindMethodCommand → src/commands/FindMethodCommand.ts:47
 - FindUnusedDocsCommand → src/commands/FindUnusedDocsCommand.ts:44
@@ -93,7 +93,7 @@ for SpecGraph lifecycle operations, and `convention check --pack <file>` for rev
 - UndocumentedCommand → src/commands/UndocumentedCommand.ts:46
 - UpdateBacklinksCommand → src/commands/UpdateBacklinksCommand.ts:48
 - UpdateSymbolRefsCommand → src/commands/UpdateSymbolRefsCommand.ts:47
-- ValidateDocsCommand → src/commands/ValidateDocsCommand.ts:46
+- ValidateDocsCommand → src/commands/ValidateDocsCommand.ts:47
 - ValidateSpecCommand → src/commands/ValidateSpecCommand.ts:26
 - DEFAULT_SPEC_GRAPH_DATABASE → src/commands/canonicalReadHelper.ts:31
 - CanonicalGraphPlaneSnapshot → src/commands/canonicalReadHelper.ts:42

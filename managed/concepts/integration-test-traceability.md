@@ -555,7 +555,7 @@ Please add integration tests before committing.
 ### Referenced By
 
 - [[TSDoc Edge Documentation]] → managed/README.md:309
-- [[Phase Commands]] → managed/commands/PhaseCommands.md:48
+- [[Phase Commands]] → managed/commands/PhaseCommands.md:50
 - [[Concepts Index]] → managed/concepts/index.md:254
 - [[CLI Command Development Guide]] → managed/guides/command-development-guide.md:794
 - [[Guides & Tutorials]] → managed/guides/index.md:428
