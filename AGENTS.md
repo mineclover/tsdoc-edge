@@ -88,11 +88,13 @@ TSDoc Edge는 세 계층 SSOT를 함께 동기화합니다. `@microsoft/tsdoc`�
 
 | `tsdoc-edge` / `ttsc-graph-router` | `ttsc-doc` 통합 명령 |
 |---|---|
+| `tsdoc-edge init` / 규약·템플릿 부트스트랩 | `ttsc-doc init [--preset default\|clean-arch\|api-service\|jsdoc-library]` |
 | `tsdoc-edge sync [--check\|--dry-run\|--json]` | `ttsc-doc sync [--check\|--dry-run\|--json]` |
-| `tsdoc-edge wc <file>` / 심볼·체크포인트 조회 | `ttsc-doc wc <file\|symbol\|[[Checkpoint]]>` |
-| `tsdoc-edge dc <file>` / 심볼·체크포인트 설계 조회 | `ttsc-doc dc <file\|symbol\|[[Checkpoint]]>` |
-| `symbol trace` / `relationship trace <from> [to]` | `ttsc-doc trace <from> [to]` |
+| `tsdoc-edge wc <file>` / 심볼·체크포인트 조회 | `ttsc-doc wc <file\|symbol\|[[Checkpoint]]> [--repo <pkg>]` |
+| `tsdoc-edge dc <file>` / 심볼·체크포인트 설계 조회 | `ttsc-doc dc <file\|symbol\|[[Checkpoint]]> [--repo <pkg>]` |
+| `symbol trace` / `relationship trace <from> [to]` | `ttsc-doc trace <from> [to] [--repo <pkg>]` |
 | `relationship` 및 `ttsc-graph-router` graph routes | `ttsc-doc route repo-map\|related\|dependencies\|scope\|impact\|graph-lint` |
+| 실시간 아키텍처·TSDoc·SpecGraph 웹 뷰어 (SSE) | `ttsc-doc serve [--host 127.0.0.1] [--port 4310]` |
 | `mcp-server`의 tsdoc/graph 도구 | `ttsc-doc mcp` |
 
 `ttsc-doc mcp`는 다음 10개 통합 STDIO MCP 도구를 제공합니다.
